@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-// Auth
 export const AuthResponseSchema = z.object({
 	accessToken: z.string().min(1),
 	accessTokenExpiresAt: z.coerce.date().nullable().optional(),
@@ -16,13 +15,12 @@ export const TelegramAuthRequestSchema = z.object({
 	initData: z.string().min(1),
 })
 
-// Users
 export const WalletResponseSchema = z.object({
 	id: z.number().int(),
 	ownerId: z.number().int(),
 	name: z.string(),
 	currencyCode: z.string(),
-	balance: z.number(),
+	balance: z.coerce.number(),
 	createdAt: z.coerce.date().nullable().optional(),
 	updatedAt: z.coerce.date().nullable().optional(),
 })
@@ -46,7 +44,6 @@ export const UserUpdateRequestSchema = z.object({
 	subscriptionActive: z.boolean().optional(),
 })
 
-// Wallets
 export const WalletCreateRequestSchema = z.object({
 	name: z.string().min(1).max(50),
 	currencyCode: z.string().min(1).max(10),
@@ -59,7 +56,6 @@ export const WalletUpdateRequestSchema = z.object({
 	ownerId: z.number().int().positive().optional(),
 })
 
-// Transactions
 export const WalletTransactionRequestSchema = z.object({
 	fromWalletId: z.number().int(),
 	toWalletId: z.number().int(),
@@ -74,17 +70,16 @@ export const WalletTransactionResponseSchema = z.object({
 	fromWalletName: z.string(),
 	toWalletId: z.number().int(),
 	toWalletName: z.string(),
-	sourceAmount: z.number(),
+	sourceAmount: z.coerce.number(),
 	sourceCurrencyCode: z.string(),
-	targetAmount: z.number(),
+	targetAmount: z.coerce.number(),
 	targetCurrencyCode: z.string(),
-	exchangeRate: z.number(),
+	exchangeRate: z.coerce.number(),
 	description: z.string().nullable().optional(),
 	executedAt: z.coerce.date().nullable(),
 	createdAt: z.coerce.date().nullable(),
 })
 
-// Currencies & rates
 export const CurrencyResponseSchema = z.object({
 	id: z.number().int(),
 	code: z.string(),
@@ -96,13 +91,13 @@ export const CurrencyResponseSchema = z.object({
 export const ExchangeRateResponseSchema = z.object({
 	sourceCurrency: z.string(),
 	targetCurrency: z.string(),
-	rate: z.number(),
+	rate: z.coerce.number(),
 })
 
 export const CurrencyConversionResponseSchema = z.object({
-	amount: z.number(),
+	amount: z.coerce.number(),
 	sourceCurrency: z.string(),
 	targetCurrency: z.string(),
-	rate: z.number(),
-	convertedAmount: z.number(),
+	rate: z.coerce.number(),
+	convertedAmount: z.coerce.number(),
 })

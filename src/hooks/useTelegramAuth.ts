@@ -1,36 +1,45 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getInitData, isInTelegram, ready } from '@/lib/telegram'
+import { getInitData, isInTelegram, ready, extractUserFromInitData } from '@/lib/telegram'
 import { telegramLogin } from '@api/client'
 import { logDebug, logError, logInfo } from '@/lib/logger'
-
-type AuthStatus = 'idle' | 'authenticating' | 'authenticated' | 'error'
+import { useAuthStore, type AuthStatus } from '@/store/auth'
 
 export function useTelegramAuth(options?: { auto?: boolean }) {
 	const auto = options?.auto ?? true
 	const [status, setStatus] = useState<AuthStatus>('idle')
 	const [error, setError] = useState<string | null>(null)
+	const setStoreStatus = useAuthStore(s => s.setStatus)
+	const setStoreError = useAuthStore(s => s.setError)
+	const setStoreUser = useAuthStore(s => s.setUser)
 
 	const canAutoLogin = useMemo(() => auto && isInTelegram(), [auto])
-  const autoOnceRef = useRef(false)
+	const autoOnceRef = useRef(false)
 
 	const login = useCallback(async (initData?: string) => {
 		try {
 			setStatus('authenticating')
+			setStoreStatus('authenticating')
 			const data = initData ?? getInitData()
 			if (!data) throw new Error('Telegram initData is not available')
 			ready()
 			logInfo('Starting telegram login', { initDataLen: data.length })
 			await telegramLogin({ initData: data })
+			const parsedUser = extractUserFromInitData(data)
+			setStoreUser(parsedUser)
 			setStatus('authenticated')
+			setStoreStatus('authenticated')
 			setError(null)
+			setStoreError(null)
 			logInfo('Telegram login success')
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : 'Login failed'
 			setError(msg)
+			setStoreError(msg)
 			setStatus('error')
+			setStoreStatus('error')
 			logError('Telegram login failed', { message: msg })
 		}
-	}, [])
+	}, []) // eslint-disable-line
 
 	useEffect(() => {
 		if (status !== 'idle') return

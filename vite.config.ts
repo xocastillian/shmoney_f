@@ -24,9 +24,24 @@ export default defineConfig(({ mode }) => {
 			host: true,
 			allowedHosts: Array.from(allowed),
 			proxy: {
-				'/api': { target: devProxyTarget, changeOrigin: true, secure: true },
-				'/v3/api-docs': { target: devProxyTarget, changeOrigin: true, secure: true },
-				'/swagger-ui': { target: devProxyTarget, changeOrigin: true, secure: true },
+				'/api': {
+					target: devProxyTarget,
+					changeOrigin: true,
+					secure: true,
+					headers: { 'ngrok-skip-browser-warning': 'true' },
+				},
+				'/v3/api-docs': {
+					target: devProxyTarget,
+					changeOrigin: true,
+					secure: true,
+					headers: { 'ngrok-skip-browser-warning': 'true' },
+				},
+				'/swagger-ui': {
+					target: devProxyTarget,
+					changeOrigin: true,
+					secure: true,
+					headers: { 'ngrok-skip-browser-warning': 'true' },
+				},
 			},
 		},
 		resolve: {

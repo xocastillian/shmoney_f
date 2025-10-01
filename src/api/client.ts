@@ -24,7 +24,6 @@ import type {
 	WalletUpdateRequest,
 } from './types'
 
-// Auth via Telegram initData
 export async function telegramLogin(params: { initData: string }): Promise<AuthResponse> {
 	const body = TelegramAuthRequestSchema.parse(params)
 	const data = await post<AuthResponse>(endpoints.auth.telegram, body)
@@ -32,7 +31,6 @@ export async function telegramLogin(params: { initData: string }): Promise<AuthR
 	return parsed
 }
 
-// Wallets (current user sees own wallets)
 export async function listWallets(): Promise<WalletResponse[]> {
 	const data = await get<unknown>(endpoints.wallets.base)
 	return WalletResponseSchema.array().parse(data)
@@ -59,7 +57,6 @@ export async function deleteWallet(id: number): Promise<void> {
 	await del<void>(endpoints.wallets.byId(id))
 }
 
-// Transactions
 export async function createTransaction(payload: WalletTransactionRequest): Promise<WalletTransactionResponse> {
 	const body = WalletTransactionRequestSchema.parse(payload)
 	const data = await post<unknown>(endpoints.transactions.base, body)
@@ -71,7 +68,6 @@ export async function listTransactionsByWallet(walletId: number): Promise<Wallet
 	return WalletTransactionResponseSchema.array().parse(data)
 }
 
-// Currencies & rates
 export async function listCurrencies(): Promise<CurrencyResponse[]> {
 	const data = await get<unknown>(endpoints.currencies.base)
 	return CurrencyResponseSchema.array().parse(data)
