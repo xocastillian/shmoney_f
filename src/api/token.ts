@@ -2,10 +2,9 @@ import axios from 'axios'
 import { endpoints } from './endpoints'
 import { logDebug } from '@/lib/logger'
 
-const sameOrigin = Boolean(import.meta.env.VITE_DEV_API_TARGET)
-export const baseURL: string = sameOrigin
-  ? ''
-  : (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '')
+const isProd = import.meta.env.MODE === 'production'
+const sameOrigin = !isProd && Boolean(import.meta.env.VITE_DEV_API_TARGET)
+export const baseURL: string = sameOrigin ? '' : import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || ''
 const refreshClient = axios.create({ baseURL, withCredentials: true })
 
 let refreshingPromise: Promise<void> | null = null
@@ -17,9 +16,9 @@ async function doRefresh(): Promise<void> {
 		throw new Error('Max refresh attempts reached')
 	}
 
-    refreshAttempts += 1
-    logDebug('Refreshing tokens', { attempt: refreshAttempts, baseURL })
-    await refreshClient.post(endpoints.auth.refresh, {})
+	refreshAttempts += 1
+	logDebug('Refreshing tokens', { attempt: refreshAttempts, baseURL })
+	await refreshClient.post(endpoints.auth.refresh, {})
 	refreshAttempts = 0
 }
 

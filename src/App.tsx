@@ -12,7 +12,11 @@ function App() {
 		<div className='min-h-screen p-5 flex flex-col gap-4 max-w-md mx-auto'>
 			<Header />
 
-			{!authenticated && error && <AuthDiagnostics status={status} error={error ?? null} isInTelegram={isInTelegram} onLogin={data => login(data)} />}
+			{!authenticated && error ? (
+				<AuthDiagnostics status={status} error={error ?? null} isInTelegram={isInTelegram} onLogin={data => login(data)} />
+			) : (
+				<div>работает сучка вон твоя ава даже есть</div>
+			)}
 		</div>
 	)
 }

@@ -10,10 +10,9 @@ declare module 'axios' {
 	}
 }
 
-const sameOrigin = Boolean(import.meta.env.VITE_DEV_API_TARGET)
-export const baseURL: string = sameOrigin
-  ? ''
-  : (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '')
+const isProd = import.meta.env.MODE === 'production'
+const sameOrigin = !isProd && Boolean(import.meta.env.VITE_DEV_API_TARGET)
+export const baseURL: string = sameOrigin ? '' : import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || ''
 
 export const api: AxiosInstance = axios.create({
 	baseURL,
@@ -24,10 +23,10 @@ export const api: AxiosInstance = axios.create({
 	},
 })
 
-api.interceptors.request.use((cfg) => {
-  const payload = cfg.url?.includes('/api/auth/telegram') ? cfg.data : undefined
-  logDebug('Request', { url: cfg.url, baseURL: cfg.baseURL, data: payload })
-  return cfg
+api.interceptors.request.use(cfg => {
+	const payload = cfg.url?.includes('/api/auth/telegram') ? cfg.data : undefined
+	logDebug('Request', { url: cfg.url, baseURL: cfg.baseURL, data: payload })
+	return cfg
 })
 
 api.interceptors.response.use(
