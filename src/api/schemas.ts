@@ -20,6 +20,7 @@ export const WalletResponseSchema = z.object({
 	ownerId: z.number().int(),
 	name: z.string(),
 	currencyCode: z.string(),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	balance: z.coerce.number(),
 	createdAt: z.coerce.date().nullable().optional(),
 	updatedAt: z.coerce.date().nullable().optional(),
@@ -47,12 +48,15 @@ export const UserUpdateRequestSchema = z.object({
 export const WalletCreateRequestSchema = z.object({
 	name: z.string().min(1).max(50),
 	currencyCode: z.string().min(1).max(10),
+	balance: z.coerce.number().min(0),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	ownerId: z.number().int().positive().optional(),
 })
 
 export const WalletUpdateRequestSchema = z.object({
 	name: z.string().max(50).optional(),
 	currencyCode: z.string().max(10).optional(),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
 	ownerId: z.number().int().positive().optional(),
 })
 

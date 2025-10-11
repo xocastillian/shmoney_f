@@ -1,21 +1,33 @@
-import Header from '@/components/header'
+import { useEffect, useMemo } from 'react'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
-import { useMemo } from 'react'
 import AuthDiagnostics from '@/components/auth/auth-diagnostics'
+import Wallets from '@/widgets/Wallets/Wallets'
+import { useWallets } from '@/hooks/useWallets'
 
 function App() {
-	const { status, error, isInTelegram, login } = useTelegramAuth({ auto: true })
-
+	const { status, error: authError, isInTelegram, login } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
+	const { wallets, loading: walletsLoading, error: walletsError, fetchWallets, clearWallets } = useWallets()
+
+	useEffect(() => {
+		if (!authenticated) {
+			clearWallets()
+			return
+		}
+
+		void fetchWallets()
+	}, [authenticated, fetchWallets, clearWallets])
 
 	return (
-		<div className='min-h-screen p-5 flex flex-col gap-4 max-w-md mx-auto'>
-			<Header />
-
-			{!authenticated && error ? (
-				<AuthDiagnostics status={status} error={error ?? null} isInTelegram={isInTelegram} onLogin={data => login(data)} />
+		<div className='min-h-screen p-4'>
+			{!authenticated ? (
+				<AuthDiagnostics status={status} error={authError ?? null} isInTelegram={isInTelegram} onLogin={data => login(data)} />
 			) : (
-				<div>работает сучка вон твоя ава даже есть</div>
+				<>
+					{walletsError && <div className='text-sm text-red-400'>{walletsError}</div>}
+					<Wallets wallets={wallets} />
+					{walletsLoading && <div className='mt-2 text-sm text-muted-foreground'>Загрузка...</div>}
+				</>
 			)}
 		</div>
 	)
