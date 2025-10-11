@@ -1,0 +1,16 @@
+import { Plus } from 'lucide-react'
+
+export interface AddWalletCardProps {
+	onClick?: () => void
+}
+
+export const AddWalletCard = ({ onClick }: AddWalletCardProps) => {
+	return (
+		<div
+			className='flex min-h-[76px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-accent-orange bg-card p-3'
+			onClick={onClick}
+		>
+			<Plus className='text-accent-orange' />
+		</div>
+	)
+}

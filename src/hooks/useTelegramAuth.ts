@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getInitData, isInTelegram, ready, extractUserFromInitData } from '@/lib/telegram'
 import { telegramLogin } from '@api/client'
 import { logDebug, logError, logInfo } from '@/lib/logger'
-import { useAuthStore, type AuthStatus } from '@/store/auth'
+import { useAuthStore, type AuthStatus } from '@/store/authStore'
 
 export function useTelegramAuth(options?: { auto?: boolean }) {
 	const auto = options?.auto ?? true
@@ -11,7 +11,6 @@ export function useTelegramAuth(options?: { auto?: boolean }) {
 	const setStoreStatus = useAuthStore(s => s.setStatus)
 	const setStoreError = useAuthStore(s => s.setError)
 	const setStoreUser = useAuthStore(s => s.setUser)
-
 	const canAutoLogin = useMemo(() => auto && isInTelegram(), [auto])
 	const autoOnceRef = useRef(false)
 

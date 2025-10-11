@@ -3,7 +3,7 @@ import { subscribe, clearLogs } from '@/lib/logger'
 import type { LogEntry } from '@/lib/logger'
 import { baseURL as apiBase } from '@api/http'
 import { getInitData, isInTelegram as isInTg } from '@/lib/telegram'
-import type { AuthStatus } from '@/store/auth'
+import type { AuthStatus } from '@/store/authStore'
 
 interface Props {
 	status: AuthStatus
