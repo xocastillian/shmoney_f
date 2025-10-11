@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => {
 			console.log()
 		}
 	}
+	console.log('[vite] devProxyTarget =', devProxyTarget)
+
 	return {
 		plugins: [react()],
 		server: {
