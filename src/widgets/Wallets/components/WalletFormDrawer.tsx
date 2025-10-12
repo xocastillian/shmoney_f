@@ -3,7 +3,7 @@ import { useId } from 'react'
 import type { FormEvent } from 'react'
 import Drawer from '@/components/Drawer/Drawer'
 import { WalletForm } from './WalletForm'
-import type { CurrencyOption } from './types'
+import type { CurrencyOption } from '../types'
 import type { WalletType } from '@/types/entities/wallet'
 
 interface WalletFormDrawerProps {

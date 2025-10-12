@@ -2,7 +2,7 @@ import { Check, X } from 'lucide-react'
 
 import Drawer from '@/components/Drawer/Drawer'
 import { walletTypeLabels, walletTypeOrder, WalletType } from '@/types/entities/wallet'
-import { typeIcons } from './types'
+import { typeIcons } from '../types'
 
 interface TypePickerDrawerProps {
 	open: boolean

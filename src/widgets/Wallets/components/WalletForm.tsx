@@ -1,6 +1,6 @@
 import { Calculator, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
-import { currencyIconMap, typeIcons, type CurrencyOption } from './types'
+import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
 import { walletTypeLabels, WalletType } from '@/types/entities/wallet'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 
@@ -74,6 +74,8 @@ export function WalletForm({
 
 	const handleBalanceChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizeDecimalInput(event.target.value)
+		const digitCount = sanitized.replace(/\./g, '').length
+		if (digitCount > 9) return
 		onBalanceChange(sanitized)
 	}
 
@@ -90,6 +92,7 @@ export function WalletForm({
 								placeholder='Название'
 								value={name}
 								onChange={event => onNameChange(event.target.value)}
+								maxLength={15}
 							/>
 						</div>
 					</div>

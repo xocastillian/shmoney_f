@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
-import type { CurrencyOption } from './types'
-import { currencyIconMap } from './types'
+import type { CurrencyOption } from '../types'
+import { currencyIconMap } from '../types'
 
 interface CurrencyPickerDrawerProps {
 	open: boolean

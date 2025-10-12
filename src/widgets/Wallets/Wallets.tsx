@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { WheelEvent } from 'react'
 import type { FormEvent } from 'react'
 import { AddWalletCard } from '@/components/WalletCard/AddWalletCard'
 import WalletCard from '@/components/WalletCard/WalletCard'
@@ -8,50 +9,9 @@ import { WalletFormDrawer } from './components/WalletFormDrawer'
 import { ColorPickerDrawer } from './components/ColorPickerDrawer'
 import { TypePickerDrawer } from './components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
-import type { CurrencyOption } from './components/types'
 import { WalletType } from '@/types/entities/wallet'
 import { sanitizeDecimalInput } from '@/utils/number'
-
-const currencyOptions: CurrencyOption[] = [
-	{ value: 'USD', label: 'Доллар USD' },
-	{ value: 'KZT', label: 'Тенге KZT' },
-	{ value: 'EUR', label: 'Евро EUR' },
-	{ value: 'CNY', label: 'Юань CNY' },
-	{ value: 'AED', label: 'Дирхам AED' },
-]
-
-const colorOptions: readonly string[] = [
-	// oranges
-	'#FDBA74',
-	'#FB923C',
-	'#F97316',
-	'#EA580C',
-	// greens
-	'#BBF7D0',
-	'#86EFAC',
-	'#4ADE80',
-	'#22C55E',
-	// blues
-	'#BAE6FD',
-	'#7DD3FC',
-	'#38BDF8',
-	'#0EA5E9',
-	// reds
-	'#FCA5A5',
-	'#F87171',
-	'#EF4444',
-	'#DC2626',
-	// purples
-	'#E9D5FF',
-	'#D8B4FE',
-	'#C084FC',
-	'#A855F7',
-	// pinks
-	'#FBCFE8',
-	'#F9A8D4',
-	'#F472B6',
-	'#EC4899',
-]
+import { colorOptions, currencyOptions } from './constants'
 
 interface WalletsProps {
 	wallets: Wallet[]
@@ -191,22 +151,57 @@ const Wallets = ({ wallets }: WalletsProps) => {
 		setOpen(true)
 	}
 
+	const columns = []
+	const items = [...wallets, null]
+
+	for (let index = 0; index < items.length; index += 2) {
+		columns.push(items.slice(index, index + 2))
+	}
+
+	const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+	const handleHorizontalScroll = (event: WheelEvent<HTMLDivElement>) => {
+		const container = scrollContainerRef.current
+		if (!container) return
+		if (container.scrollWidth <= container.clientWidth) return
+
+		if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+			event.preventDefault()
+			container.scrollBy({
+				left: event.deltaY,
+				behavior: 'smooth',
+			})
+		}
+	}
+
 	return (
 		<>
-			<div className='grid grid-cols-2 gap-[10px]'>
-				{wallets.map(wallet => (
-					<WalletCard
-						key={wallet.id}
-						name={wallet.name}
-						balance={wallet.balance}
-						currencyCode={wallet.currencyCode}
-						color={wallet.color}
-						type={wallet.type}
-						onClick={() => handleWalletClick(wallet)}
-					/>
-				))}
-
-				<AddWalletCard onClick={handleAddWalletClick} />
+			<div
+				className='overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+				ref={scrollContainerRef}
+				onWheel={handleHorizontalScroll}
+			>
+				<div className='flex gap-[10px] pb-2'>
+					{columns.map((column, columnIndex) => (
+						<div key={`column-${columnIndex}`} className='flex-none basis-[calc(50%-5px)] grid items-start gap-[10px]'>
+							{column.map((item, rowIndex) =>
+								item ? (
+									<WalletCard
+										key={item.id}
+										name={item.name}
+										balance={item.balance}
+										currencyCode={item.currencyCode}
+										color={item.color}
+										type={item.type}
+										onClick={() => handleWalletClick(item)}
+									/>
+								) : (
+									<AddWalletCard key={`add-card-${columnIndex}-${rowIndex}`} onClick={handleAddWalletClick} />
+								)
+							)}
+						</div>
+					))}
+				</div>
 			</div>
 
 			<WalletFormDrawer
