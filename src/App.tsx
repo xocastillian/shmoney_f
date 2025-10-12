@@ -19,7 +19,7 @@ function App() {
 	}, [authenticated, fetchWallets, clearWallets])
 
 	return (
-		<div className='min-h-screen p-4'>
+		<div className='min-h-screen p-3'>
 			{!authenticated ? (
 				<AuthDiagnostics status={status} error={authError ?? null} isInTelegram={isInTelegram} onLogin={data => login(data)} />
 			) : (
