@@ -1,6 +1,6 @@
 import { WalletType } from '@/types/entities/wallet'
 import { Bitcoin, ChartLine, CreditCard, PiggyBank, Wallet as WalletIcon } from 'lucide-react'
-import type { ComponentType } from 'react'
+import type { ComponentType, CSSProperties } from 'react'
 import dirhamIcon from '@/assets/currencyIcons/currency-dirham.svg'
 import dollarIcon from '@/assets/currencyIcons/currency-dollar.svg'
 import euroIcon from '@/assets/currencyIcons/currency-euro.svg'
@@ -12,7 +12,7 @@ export interface CurrencyOption {
 	label: string
 }
 
-export const typeIcons: Record<WalletType, ComponentType<{ className?: string }>> = {
+export const typeIcons: Record<WalletType, ComponentType<{ className?: string; style?: CSSProperties }>> = {
 	[WalletType.CASH]: WalletIcon,
 	[WalletType.BANK_CARD]: CreditCard,
 	[WalletType.SAVINGS_ACCOUNT]: PiggyBank,

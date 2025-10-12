@@ -201,6 +201,7 @@ const Wallets = ({ wallets }: WalletsProps) => {
 						balance={wallet.balance}
 						currencyCode={wallet.currencyCode}
 						color={wallet.color}
+						type={wallet.type}
 						onClick={() => handleWalletClick(wallet)}
 					/>
 				))}
