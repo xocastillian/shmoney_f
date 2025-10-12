@@ -5,7 +5,9 @@
 @layer base {
 	:root {
 		--background: #000000;
+		--background-secondary: #0c0c0c;
 		--text: #fff;
+		--text-dark: #000;
 		--card: #171717;
 		--label: #818181;
 		--background-muted: #202020;

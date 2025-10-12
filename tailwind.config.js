@@ -12,6 +12,8 @@ module.exports = {
 				'accent-orange': 'var(--accent-orange)',
 				'background-muted': 'var(--background-muted)',
 				divider: 'var(--divider)',
+				'text-dark': 'var(--text-dark)',
+				'background-secondary': 'var(--background-secondary)',
 			},
 		},
 	},

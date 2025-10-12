@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { WalletType } from '@/types/entities/wallet'
+
+export const WalletTypeSchema = z.enum(WalletType)
 
 export const AuthResponseSchema = z.object({
 	accessToken: z.string().min(1),
@@ -21,6 +24,7 @@ export const WalletResponseSchema = z.object({
 	name: z.string(),
 	currencyCode: z.string(),
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+	type: WalletTypeSchema,
 	balance: z.coerce.number(),
 	createdAt: z.coerce.date().nullable().optional(),
 	updatedAt: z.coerce.date().nullable().optional(),
@@ -50,13 +54,18 @@ export const WalletCreateRequestSchema = z.object({
 	currencyCode: z.string().min(1).max(10),
 	balance: z.coerce.number().min(0),
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+	type: WalletTypeSchema,
 	ownerId: z.number().int().positive().optional(),
 })
 
 export const WalletUpdateRequestSchema = z.object({
 	name: z.string().max(50).optional(),
 	currencyCode: z.string().max(10).optional(),
-	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+	color: z
+		.string()
+		.regex(/^#[0-9A-Fa-f]{6}$/)
+		.optional(),
+	type: WalletTypeSchema.optional(),
 	ownerId: z.number().int().positive().optional(),
 })
 

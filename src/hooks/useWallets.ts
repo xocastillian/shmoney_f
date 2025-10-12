@@ -11,6 +11,7 @@ function mapWallet(response: WalletResponse): Wallet {
 		currencyCode: response.currencyCode,
 		balance: response.balance,
 		color: response.color,
+		type: response.type,
 	}
 }
 

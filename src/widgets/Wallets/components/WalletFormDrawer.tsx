@@ -4,6 +4,7 @@ import type { FormEvent } from 'react'
 import Drawer from '@/components/Drawer/Drawer'
 import { WalletForm } from './WalletForm'
 import type { CurrencyOption } from './types'
+import type { WalletType } from '@/types/entities/wallet'
 
 interface WalletFormDrawerProps {
 	open: boolean
@@ -12,8 +13,10 @@ interface WalletFormDrawerProps {
 	name: string
 	onNameChange: (value: string) => void
 	currencyCode: string
-	onCurrencyChange: (value: string) => void
 	currencyOptions: readonly CurrencyOption[]
+	onOpenCurrencyPicker: () => void
+	onOpenTypePicker: () => void
+	selectedType: WalletType
 	onOpenColorPicker: () => void
 	selectedColor: string
 	balance: string
@@ -29,8 +32,10 @@ export function WalletFormDrawer({
 	name,
 	onNameChange,
 	currencyCode,
-	onCurrencyChange,
 	currencyOptions,
+	onOpenCurrencyPicker,
+	onOpenTypePicker,
+	selectedType,
 	onOpenColorPicker,
 	selectedColor,
 	balance,
@@ -43,17 +48,22 @@ export function WalletFormDrawer({
 	return (
 		<Drawer open={open} onClose={onClose}>
 			<div className='flex h-full flex-col'>
-				<div className='mb-3 flex items-center justify-between gap-3 p-3'>
+				<div className='flex items-center justify-between gap-3 p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
 						<X />
 					</button>
 					<button
 						type='submit'
 						form={formId}
-						className='rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+						className='
+                        rounded-md px-4 py-2 text-sm font-medium 
+                        bg-accent-orange text-text-dark 
+                        disabled:bg-background-muted disabled:text-accent-orange disabled:opacity-50 
+                        transition-colors duration-300 ease-in-out
+                      '
 						disabled={submitDisabled}
 					>
-						Создать кошелёк
+						Готово
 					</button>
 				</div>
 
@@ -61,9 +71,11 @@ export function WalletFormDrawer({
 					name={name}
 					onNameChange={onNameChange}
 					currencyCode={currencyCode}
-					onCurrencyChange={onCurrencyChange}
 					currencyOptions={currencyOptions}
 					onSubmit={onSubmit}
+					onOpenCurrencyPicker={onOpenCurrencyPicker}
+					onOpenTypePicker={onOpenTypePicker}
+					selectedType={selectedType}
 					onOpenColorPicker={onOpenColorPicker}
 					selectedColor={selectedColor}
 					balance={balance}
