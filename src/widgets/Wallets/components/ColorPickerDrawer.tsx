@@ -12,7 +12,12 @@ interface ColorPickerDrawerProps {
 
 export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedColor }: ColorPickerDrawerProps) {
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-[70vh] rounded-t-lg' overlayClassName='bg-black/80 backdrop-blur-sm'>
+		<Drawer
+			open={open}
+			onClose={onClose}
+			className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
+			overlayClassName='bg-black/80 backdrop-blur-sm'
+		>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full'>
@@ -22,7 +27,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 
 				<div className='flex flex-1 flex-col px-4 pb-6'>
 					<h2 className='mb-4 text-sm font-medium text-label'>Выбор цвета</h2>
-					<div className='grid grid-cols-5 gap-3 gap-y-5 place-items-center'>
+					<div className='grid grid-cols-4 gap-3 gap-y-7 place-items-center'>
 						{colors.map(color => (
 							<button
 								key={color}

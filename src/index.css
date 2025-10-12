@@ -5,12 +5,15 @@
 @layer base {
 	:root {
 		--background: #000000;
+		--background-secondary: #0c0c0c;
 		--text: #fff;
+		--text-dark: #000;
 		--card: #171717;
 		--label: #818181;
 		--background-muted: #202020;
 		--accent-orange: #f89a04;
 		--divider: #303030;
+		--danger: #ff2f2f;
 	}
 
 	body {

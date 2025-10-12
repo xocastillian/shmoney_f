@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { createWallet as apiCreateWallet, deleteWallet as apiDeleteWallet, listWallets } from '@api/client'
-import type { WalletCreateRequest, WalletResponse } from '@api/types'
+import { createWallet as apiCreateWallet, deleteWallet as apiDeleteWallet, listWallets, updateWallet as apiUpdateWallet } from '@api/client'
+import type { WalletCreateRequest, WalletResponse, WalletUpdateRequest } from '@api/types'
 import { useWalletsStore } from '@/store/walletsStore'
 import type { Wallet } from '@/types/entities/wallet'
 
@@ -11,6 +11,7 @@ function mapWallet(response: WalletResponse): Wallet {
 		currencyCode: response.currencyCode,
 		balance: response.balance,
 		color: response.color,
+		type: response.type,
 	}
 }
 
@@ -88,6 +89,26 @@ export function useWallets() {
 
 	const isBusy = useMemo(() => loading || actionLoading, [loading, actionLoading])
 
+	const updateWallet = useCallback(
+		async (walletId: number, payload: WalletUpdateRequest) => {
+			setActionLoading(true)
+			try {
+				const updated = await apiUpdateWallet(walletId, payload)
+				const mapped = mapWallet(updated)
+				addWallet(mapped)
+				setError(null)
+				return mapped
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось обновить кошелёк'
+				setError(message)
+				throw err
+			} finally {
+				setActionLoading(false)
+			}
+		},
+		[addWallet]
+	)
+
 	return {
 		wallets,
 		loading,
@@ -97,6 +118,7 @@ export function useWallets() {
 		fetchWallets,
 		clearWallets,
 		createWallet,
+		updateWallet,
 		deleteWallet,
 	}
 }
