@@ -66,6 +66,7 @@ export const WalletUpdateRequestSchema = z.object({
 		.regex(/^#[0-9A-Fa-f]{6}$/)
 		.optional(),
 	type: WalletTypeSchema.optional(),
+	balance: z.coerce.number().min(0).optional(),
 	ownerId: z.number().int().positive().optional(),
 })
 

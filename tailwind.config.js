@@ -14,6 +14,7 @@ module.exports = {
 				divider: 'var(--divider)',
 				'text-dark': 'var(--text-dark)',
 				'background-secondary': 'var(--background-secondary)',
+				danger: 'var(--danger)',
 			},
 		},
 	},

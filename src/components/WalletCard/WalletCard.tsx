@@ -6,9 +6,10 @@ export interface WalletCardProps {
 	currencyCode: string
 	footer?: ReactNode
 	color: string
+	onClick?: () => void
 }
 
-const WalletCard = ({ name, balance, currencyCode, footer }: WalletCardProps) => {
+const WalletCard = ({ name, balance, currencyCode, footer, onClick }: WalletCardProps) => {
 	const formattedBalance = useMemo(() => {
 		try {
 			return new Intl.NumberFormat('ru-RU', {
@@ -26,7 +27,7 @@ const WalletCard = ({ name, balance, currencyCode, footer }: WalletCardProps) =>
 	}, [balance, currencyCode])
 
 	return (
-		<div className='flex flex-col p-3 rounded-xl gap-1 min-h-[76px] bg-background-muted'>
+		<div className='flex flex-col p-3 rounded-xl gap-1 min-h-[76px] bg-background-muted' onClick={onClick}>
 			<span className='text-sm uppercase'>{name}</span>
 			<span className='text-lg uppercase'>{formattedBalance}</span>
 			{footer}

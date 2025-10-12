@@ -10,6 +10,7 @@ import { TypePickerDrawer } from './components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
 import type { CurrencyOption } from './components/types'
 import { WalletType } from '@/types/entities/wallet'
+import { sanitizeDecimalInput } from '@/utils/number'
 
 const currencyOptions: CurrencyOption[] = [
 	{ value: 'USD', label: 'Доллар USD' },
@@ -59,7 +60,7 @@ interface WalletsProps {
 const defaultWalletType = WalletType.CASH
 
 const Wallets = ({ wallets }: WalletsProps) => {
-	const { createWallet, actionLoading } = useWallets()
+	const { createWallet, updateWallet, deleteWallet, actionLoading } = useWallets()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
 	const [currencyCode, setCurrencyCode] = useState(currencyOptions[0].value)
@@ -70,18 +71,26 @@ const Wallets = ({ wallets }: WalletsProps) => {
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [selectedType, setSelectedType] = useState<WalletType>(defaultWalletType)
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
+	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
+
+	const isEditing = editingWalletId !== null
+
+	const resetFormState = () => {
+		setName('')
+		setCurrencyCode(currencyOptions[0].value)
+		setBalance('')
+		setFormError(null)
+		setColorPickerOpen(false)
+		setSelectedColor(colorOptions[0])
+		setTypePickerOpen(false)
+		setSelectedType(defaultWalletType)
+		setCurrencyPickerOpen(false)
+		setEditingWalletId(null)
+	}
 
 	useEffect(() => {
 		if (!open) {
-			setName('')
-			setCurrencyCode(currencyOptions[0].value)
-			setBalance('')
-			setFormError(null)
-			setColorPickerOpen(false)
-			setSelectedColor(colorOptions[0])
-			setTypePickerOpen(false)
-			setSelectedType(defaultWalletType)
-			setCurrencyPickerOpen(false)
+			resetFormState()
 		}
 	}, [open])
 
@@ -89,8 +98,8 @@ const Wallets = ({ wallets }: WalletsProps) => {
 		event.preventDefault()
 		const trimmedName = name.trim()
 		const trimmedCurrency = currencyCode.trim().toUpperCase()
-		const trimmedBalance = balance.trim()
-		const parsedBalance = Number.parseFloat(trimmedBalance)
+		const sanitizedBalance = sanitizeDecimalInput(balance)
+		const parsedBalance = sanitizedBalance.length > 0 ? Number.parseFloat(sanitizedBalance) : NaN
 
 		if (trimmedName.length === 0) {
 			setFormError('Введите название кошелька')
@@ -113,17 +122,42 @@ const Wallets = ({ wallets }: WalletsProps) => {
 		}
 
 		try {
-			await createWallet({
-				name: trimmedName,
-				currencyCode: trimmedCurrency,
-				balance: parsedBalance,
-				color: selectedColor,
-				type: selectedType,
-			})
+			if (isEditing && editingWalletId !== null) {
+				await updateWallet(editingWalletId, {
+					name: trimmedName,
+					currencyCode: trimmedCurrency,
+					color: selectedColor,
+					type: selectedType,
+					balance: parsedBalance,
+				})
+			} else {
+				await createWallet({
+					name: trimmedName,
+					currencyCode: trimmedCurrency,
+					balance: parsedBalance,
+					color: selectedColor,
+					type: selectedType,
+				})
+			}
 			setFormError(null)
 			setOpen(false)
 		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Не удалось создать кошелёк'
+			const defaultMessage = isEditing ? 'Не удалось сохранить кошелёк' : 'Не удалось создать кошелёк'
+			const message = err instanceof Error ? err.message : defaultMessage
+			setFormError(message)
+		}
+	}
+
+	const handleDelete = async () => {
+		if (!isEditing || editingWalletId === null) return
+		const confirmed = window.confirm('Реально?')
+		if (!confirmed) return
+		try {
+			await deleteWallet(editingWalletId)
+			setFormError(null)
+			setOpen(false)
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Не удалось удалить кошелёк'
 			setFormError(message)
 		}
 	}
@@ -131,21 +165,47 @@ const Wallets = ({ wallets }: WalletsProps) => {
 	const submitDisabled = useMemo(() => {
 		const trimmedName = name.trim()
 		const trimmedCurrency = currencyCode.trim()
-		const trimmedBalance = balance.trim()
-		const parsedBalance = Number.parseFloat(trimmedBalance)
-		const balanceValid = trimmedBalance.length > 0 && !Number.isNaN(parsedBalance) && parsedBalance >= 0
+		const sanitizedBalance = sanitizeDecimalInput(balance)
+		const parsedBalance = sanitizedBalance.length > 0 ? Number.parseFloat(sanitizedBalance) : NaN
+		const balanceValid = sanitizedBalance.length > 0 && !Number.isNaN(parsedBalance) && parsedBalance >= 0
 
 		return actionLoading || trimmedName.length === 0 || trimmedCurrency.length === 0 || !balanceValid
 	}, [actionLoading, name, currencyCode, balance])
+
+	const handleAddWalletClick = () => {
+		resetFormState()
+		setOpen(true)
+	}
+
+	const handleWalletClick = (wallet: Wallet) => {
+		setEditingWalletId(wallet.id)
+		setName(wallet.name)
+		setCurrencyCode(wallet.currencyCode)
+		setBalance(sanitizeDecimalInput(String(wallet.balance)))
+		setSelectedColor(wallet.color || colorOptions[0])
+		setSelectedType(wallet.type || defaultWalletType)
+		setFormError(null)
+		setColorPickerOpen(false)
+		setCurrencyPickerOpen(false)
+		setTypePickerOpen(false)
+		setOpen(true)
+	}
 
 	return (
 		<>
 			<div className='grid grid-cols-2 gap-[10px]'>
 				{wallets.map(wallet => (
-					<WalletCard key={wallet.id} name={wallet.name} balance={wallet.balance} currencyCode={wallet.currencyCode} color={wallet.color} />
+					<WalletCard
+						key={wallet.id}
+						name={wallet.name}
+						balance={wallet.balance}
+						currencyCode={wallet.currencyCode}
+						color={wallet.color}
+						onClick={() => handleWalletClick(wallet)}
+					/>
 				))}
 
-				<AddWalletCard onClick={() => setOpen(true)} />
+				<AddWalletCard onClick={handleAddWalletClick} />
 			</div>
 
 			<WalletFormDrawer
@@ -171,6 +231,10 @@ const Wallets = ({ wallets }: WalletsProps) => {
 				}}
 				error={formError}
 				submitDisabled={submitDisabled}
+				title={isEditing ? 'Редактирование кошелька' : 'Создание кошелька'}
+				submitLabel={isEditing ? 'Сохранить' : 'Готово'}
+				onDelete={isEditing ? handleDelete : undefined}
+				disableDelete={actionLoading}
 			/>
 
 			<ColorPickerDrawer

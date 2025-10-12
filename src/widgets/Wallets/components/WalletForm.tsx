@@ -1,4 +1,4 @@
-import { Calculator, CircleDollarSign, Info, Palette } from 'lucide-react'
+import { Calculator, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from './types'
 import { walletTypeLabels, WalletType } from '@/types/entities/wallet'
@@ -19,6 +19,9 @@ interface WalletFormProps {
 	onBalanceChange: (value: string) => void
 	error: string | null
 	formId: string
+	title: string
+	onDelete?: () => void
+	disableDelete?: boolean
 }
 
 export function WalletForm({
@@ -36,6 +39,9 @@ export function WalletForm({
 	onBalanceChange,
 	error,
 	formId,
+	title,
+	onDelete,
+	disableDelete = false,
 }: WalletFormProps) {
 	const handleColorPickerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		if (event.key === 'Enter' || event.key === ' ') {
@@ -74,7 +80,7 @@ export function WalletForm({
 	return (
 		<form id={formId} className='flex flex-1 flex-col gap-4' onSubmit={onSubmit}>
 			<div>
-				<h1 className='text-sm px-3 mb-3'>Создание кошелька</h1>
+				<h1 className='text-sm px-3 mb-3'>{title}</h1>
 				<div className='bg-background-muted'>
 					<div className='border-b border-divider'>
 						<div className='flex items-center px-3 h-16'>
@@ -143,10 +149,19 @@ export function WalletForm({
 							</span>
 						</div>
 					</div>
+
+					{onDelete && (
+						<div className='border-b border-divider'>
+							<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onDelete} disabled={disableDelete}>
+								<Trash className='mr-3 text-danger' />
+								<span className='text-danger'>Удалить кошелёк</span>
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 
-			{error && <p className='px-3 text-xs text-red-500'>{error}</p>}
+			{error && <p className='px-3 text-xs text-danger'>{error}</p>}
 		</form>
 	)
 }

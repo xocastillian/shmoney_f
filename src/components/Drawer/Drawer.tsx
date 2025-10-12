@@ -33,7 +33,7 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 				role='dialog'
 				aria-modal='true'
 				className={cn(
-					'relative w-full h-full bg-background shadow-lg',
+					'relative w-full h-full overflow-y-auto overscroll-contain bg-background shadow-lg',
 					'transform transition-transform duration-300 ease-out will-change-transform',
 					open ? 'translate-y-0' : 'translate-y-full',
 					className
