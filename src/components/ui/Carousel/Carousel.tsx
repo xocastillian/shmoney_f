@@ -11,7 +11,7 @@ interface CarouselProps {
 	dots?: boolean
 }
 
-export const Carousel = ({ children, className, contentClassName, pageClassName, snapAlignment = 'start', dots }: CarouselProps) => {
+export const Carousel = ({ children, className, contentClassName, pageClassName, snapAlignment = 'start', dots = true }: CarouselProps) => {
 	const pages = useMemo(() => Children.toArray(children), [children])
 	const pageCount = pages.length
 	const [activeIndex, setActiveIndex] = useState(0)
