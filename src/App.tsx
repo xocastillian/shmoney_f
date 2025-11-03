@@ -6,11 +6,13 @@ import StatisticsScreen from '@/screens/Statistics/StatisticsScreen'
 import BudgetsScreen from '@/screens/Budgets/BudgetsScreen'
 import SettingsScreen from '@/screens/Settings/SettingsScreen'
 import { BottomNav, type BottomNavTab } from '@/components/ui/BottomNav'
+import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
 
 function App() {
 	const [activeTab, setActiveTab] = useState<TabKey>('home')
+	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const tabs = useMemo<BottomNavTab[]>(
 		() => [
 			{ key: 'home', label: 'Главная', icon: HomeIcon },
@@ -46,8 +48,14 @@ function App() {
 				tabs={tabs}
 				activeKey={activeTab}
 				onTabChange={value => setActiveTab(value as TabKey)}
-				onCreate={() => {
-					console.log('Открыть создание транзакции')
+				onCreate={() => setTransactionDrawerOpen(true)}
+			/>
+
+			<TransactionDrawer
+				open={transactionDrawerOpen}
+				onClose={() => setTransactionDrawerOpen(false)}
+				onSubmit={payload => {
+					console.log('Создать транзакцию', payload)
 				}}
 			/>
 		</div>
