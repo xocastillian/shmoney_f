@@ -1,6 +1,7 @@
 import { CalendarClock, CircleDollarSign, FileText, Wallet as WalletIcon } from 'lucide-react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
+import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 
 interface TransactionFormProps {
 	formId: string
@@ -113,7 +114,7 @@ export const TransactionForm = ({
 								value={description}
 								onChange={event => onDescriptionChange(event.target.value)}
 								maxLength={30}
-								className='flex-1 bg-transparent text-sm text-text placeholder:text-label outline-none'
+								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
 								placeholder='Описание (опционально)'
 								autoComplete='off'
 							/>
@@ -122,16 +123,12 @@ export const TransactionForm = ({
 					</div>
 
 					<div className='border-b border-divider'>
-						<div className='flex h-16 items-center gap-3 px-3'>
-							<CalendarClock className='text-label' />
-							<input
-								type='datetime-local'
-								value={dateTime}
-								onChange={event => onDateTimeChange(event.target.value)}
-								className='flex-1 bg-transparent text-text outline-none [appearance:none] [text-align:left!important]'
-								required
-							/>
-						</div>
+						<MobileDateTimePickerField
+							value={dateTime}
+							onChange={onDateTimeChange}
+							icon={<CalendarClock className={'text-label'} />}
+							placeholder='Дата и время'
+						/>
 					</div>
 				</div>
 			</div>
