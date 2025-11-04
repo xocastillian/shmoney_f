@@ -1,101 +1,71 @@
-import { useCallback, useEffect, useMemo, useState, useId, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
-import { useWallets } from '@/hooks/useWallets'
 import { TransactionForm } from './TransactionForm'
 import TransactionWalletPickerDrawer from './TransactionWalletPickerDrawer'
 import { currencyIconMap } from '@/widgets/Wallets/types'
-import { formatDateTimeLocal } from '@/utils/date'
-import { getWalletIcon, mapWalletsToPickerOptions, type WalletPickerOption } from '@/utils/wallet'
+import { getWalletIcon, type WalletPickerOption } from '@/utils/wallet'
+import type { Wallet } from '@/types/entities/wallet'
 
 interface TransactionDrawerProps {
 	open: boolean
 	onClose: () => void
-	onSubmit?: (payload: { amount: number; fromWalletId: number; toWalletId: number; description: string; date: string }) => void
+	formId: string
+	amount: string
+	onAmountChange: (value: string) => void
+	fromWallet: Wallet | null
+	toWallet: Wallet | null
+	availableFromWallets: WalletPickerOption[]
+	availableToWallets: WalletPickerOption[]
+	onSelectFromWallet: (walletId: number) => void
+	onSelectToWallet: (walletId: number) => void
+	description: string
+	onDescriptionChange: (value: string) => void
+	dateTime: string
+	onDateTimeChange: (value: string) => void
+	onSubmit: (event: FormEvent<HTMLFormElement>) => void
+	submitDisabled: boolean
+	submitting: boolean
+	error: string | null
 }
 
-const getCurrentDateTimeString = () => formatDateTimeLocal(new Date())
-
-export const TransactionDrawer = ({ open, onClose, onSubmit }: TransactionDrawerProps) => {
-	const formId = useId()
-	const { wallets, fetchWallets } = useWallets()
-	const [amount, setAmount] = useState('')
-	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
-	const [toWalletId, setToWalletId] = useState<number | null>(null)
-	const [description, setDescription] = useState('')
-	const [dateTime, setDateTime] = useState(getCurrentDateTimeString)
+export const TransactionDrawer = ({
+	open,
+	onClose,
+	formId,
+	amount,
+	onAmountChange,
+	fromWallet,
+	toWallet,
+	availableFromWallets,
+	availableToWallets,
+	onSelectFromWallet,
+	onSelectToWallet,
+	description,
+	onDescriptionChange,
+	dateTime,
+	onDateTimeChange,
+	onSubmit,
+	submitDisabled,
+	submitting,
+	error,
+}: TransactionDrawerProps) => {
 	const [fromPickerOpen, setFromPickerOpen] = useState(false)
 	const [toPickerOpen, setToPickerOpen] = useState(false)
 
-	const resetFormState = useCallback(() => {
-		setAmount('')
-		setDescription('')
-		setDateTime(getCurrentDateTimeString())
-		setFromWalletId(null)
-		setToWalletId(null)
-		setFromPickerOpen(false)
-		setToPickerOpen(false)
-	}, [])
-
-	useEffect(() => {
-		if (open && wallets.length === 0) {
-			void fetchWallets()
-		}
-	}, [open, wallets.length, fetchWallets])
-
 	useEffect(() => {
 		if (!open) {
-			resetFormState()
-			return
+			setFromPickerOpen(false)
+			setToPickerOpen(false)
 		}
+	}, [open])
 
-		setFromWalletId(prev => prev ?? wallets[0]?.id ?? null)
-	}, [open, wallets, resetFormState])
-
-	useEffect(() => {
-		if (fromWalletId !== null && toWalletId === fromWalletId) {
-			setToWalletId(null)
-		}
-	}, [fromWalletId, toWalletId])
-
-	const fromWallet = wallets.find(wallet => wallet.id === fromWalletId) ?? null
-	const toWallet = wallets.find(wallet => wallet.id === toWalletId) ?? null
-
-	const availableFromWallets: WalletPickerOption[] = useMemo(() => mapWalletsToPickerOptions(wallets), [wallets])
-
-	const availableToWallets = useMemo(() => {
-		return mapWalletsToPickerOptions(wallets.filter(wallet => wallet.id !== fromWalletId))
-	}, [wallets, fromWalletId])
-
-	const fromWalletPickerDisabled = availableFromWallets.length === 0
-	const toWalletPickerDisabled = availableToWallets.length === 0
-
-	const amountValid = useMemo(() => {
-		if (amount.trim().length === 0) return false
-		const parsed = Number(amount.replace(',', '.'))
-		return !Number.isNaN(parsed) && parsed > 0
-	}, [amount])
-
-	const dateValid = dateTime.trim().length > 0
-
-	const submitDisabled = fromWalletId === null || toWalletId === null || !amountValid || !dateValid
-
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		if (submitDisabled || fromWalletId === null || toWalletId === null) return
-
-		const parsedAmount = Number(amount.replace(',', '.'))
-		if (Number.isNaN(parsedAmount) || parsedAmount <= 0) return
-
-		onSubmit?.({
-			amount: parsedAmount,
-			fromWalletId: fromWalletId,
-			toWalletId: toWalletId,
-			description: description.trim(),
-			date: dateTime,
-		})
-		onClose()
-	}
+	const fromWalletCurrencyIcon = useMemo(() => (fromWallet?.currencyCode ? currencyIconMap[fromWallet.currencyCode] ?? null : null), [fromWallet])
+	const fromWalletIcon = useMemo(() => getWalletIcon(fromWallet), [fromWallet])
+	const toWalletIcon = useMemo(() => getWalletIcon(toWallet), [toWallet])
+	const fromWalletLabel = fromWallet?.name ?? (availableFromWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите кошелёк')
+	const toWalletLabel = toWallet?.name ?? (availableToWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите получателя')
+	const submitButtonLabel = submitting ? 'Создание...' : 'Создать'
 
 	return (
 		<>
@@ -110,32 +80,39 @@ export const TransactionDrawer = ({ open, onClose, onSubmit }: TransactionDrawer
 							form={formId}
 							className='rounded-md px-4 py-2 text-sm font-medium bg-accent-orange text-text-dark disabled:bg-background-muted disabled:text-accent-orange disabled:opacity-50 transition-colors duration-300 ease-in-out'
 							disabled={submitDisabled}
+							aria-busy={submitting}
 						>
-							Создать
+							{submitButtonLabel}
 						</button>
 					</div>
 
+					{error && (
+						<div className='px-3 pb-2 text-sm text-danger' role='alert'>
+							{error}
+						</div>
+					)}
+
 					<TransactionForm
 						formId={formId}
-						onSubmit={handleSubmit}
+						onSubmit={onSubmit}
 						title='Новая транзакция'
 						amount={amount}
-						onAmountChange={value => setAmount(value)}
-						fromWalletCurrencyIcon={fromWallet?.currencyCode ? currencyIconMap[fromWallet.currencyCode] ?? null : null}
-						fromWalletIcon={getWalletIcon(fromWallet)}
-						fromWalletLabel={fromWallet?.name ?? (fromWalletPickerDisabled ? 'Нет доступных кошельков' : 'Выберите кошелёк')}
-						fromWalletSelected={fromWalletId !== null}
+						onAmountChange={onAmountChange}
+						fromWalletCurrencyIcon={fromWalletCurrencyIcon}
+						fromWalletIcon={fromWalletIcon}
+						fromWalletLabel={fromWalletLabel}
+						fromWalletSelected={Boolean(fromWallet)}
 						onOpenFromWalletPicker={() => setFromPickerOpen(true)}
-						fromWalletPickerDisabled={fromWalletPickerDisabled}
-						toWalletIcon={getWalletIcon(toWallet)}
-						toWalletLabel={toWallet?.name ?? (toWalletPickerDisabled ? 'Нет доступных кошельков' : 'Выберите получателя')}
-						toWalletSelected={toWalletId !== null}
+						fromWalletPickerDisabled={availableFromWallets.length === 0}
+						toWalletIcon={toWalletIcon}
+						toWalletLabel={toWalletLabel}
+						toWalletSelected={Boolean(toWallet)}
 						onOpenToWalletPicker={() => setToPickerOpen(true)}
-						toWalletPickerDisabled={toWalletPickerDisabled}
+						toWalletPickerDisabled={availableToWallets.length === 0}
 						description={description}
-						onDescriptionChange={value => setDescription(value.slice(0, 30))}
+						onDescriptionChange={onDescriptionChange}
 						dateTime={dateTime}
-						onDateTimeChange={setDateTime}
+						onDateTimeChange={onDateTimeChange}
 					/>
 				</div>
 			</Drawer>
@@ -145,9 +122,9 @@ export const TransactionDrawer = ({ open, onClose, onSubmit }: TransactionDrawer
 				onClose={() => setFromPickerOpen(false)}
 				title='Выберите исходный кошелёк'
 				wallets={availableFromWallets}
-				selectedWalletId={fromWalletId}
+				selectedWalletId={fromWallet?.id ?? null}
 				onSelect={walletId => {
-					setFromWalletId(walletId)
+					onSelectFromWallet(walletId)
 					setFromPickerOpen(false)
 				}}
 			/>
@@ -157,9 +134,9 @@ export const TransactionDrawer = ({ open, onClose, onSubmit }: TransactionDrawer
 				onClose={() => setToPickerOpen(false)}
 				title='Выберите получателя'
 				wallets={availableToWallets}
-				selectedWalletId={toWalletId}
+				selectedWalletId={toWallet?.id ?? null}
 				onSelect={walletId => {
-					setToWalletId(walletId)
+					onSelectToWallet(walletId)
 					setToPickerOpen(false)
 				}}
 				emptyStateLabel='Нет доступных кошельков для перевода'
