@@ -9,6 +9,7 @@ import { BottomNav, type BottomNavTab } from '@/components/ui/BottomNav'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
 import { useCreateTransaction } from '@/hooks/useCreateTransaction'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
@@ -25,6 +26,7 @@ function App() {
 
 	const { wallets, fetchWallets } = useWallets()
 	const { createTransaction, loading: transactionLoading, error: transactionError, clearError } = useCreateTransaction()
+	const { fetchExchangeRates } = useExchangeRates()
 
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
@@ -53,6 +55,10 @@ function App() {
 		setFormError(null)
 		clearError()
 	}, [clearError])
+
+	useEffect(() => {
+		void fetchExchangeRates().catch(() => undefined)
+	}, [fetchExchangeRates])
 
 	useEffect(() => {
 		if (!transactionDrawerOpen) return
@@ -188,7 +194,7 @@ function App() {
 	)
 
 	return (
-		<div className='relative min-h-screen bg-background text-foreground'>
+		<div className='relative min-h-screen bg-background'>
 			<main>
 				<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
 					<HomeScreen />

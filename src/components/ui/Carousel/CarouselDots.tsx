@@ -12,7 +12,7 @@ export const CarouselDots = ({ count, activeIndex, onSelect }: CarouselDotsProps
 	}
 
 	return (
-		<div className='mt-2 flex items-center justify-center gap-2'>
+		<div className='flex items-center justify-center gap-2'>
 			{Array.from({ length: count }).map((_, index) => {
 				const isActive = index === activeIndex
 

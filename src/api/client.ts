@@ -4,6 +4,7 @@ import {
 	AuthResponseSchema,
 	CurrencyConversionResponseSchema,
 	CurrencyResponseSchema,
+	ExchangeRateListResponseSchema,
 	ExchangeRateResponseSchema,
 	TelegramAuthRequestSchema,
 	WalletCreateRequestSchema,
@@ -16,6 +17,7 @@ import type {
 	AuthResponse,
 	CurrencyConversionResponse,
 	CurrencyResponse,
+	ExchangeRateListResponse,
 	ExchangeRateResponse,
 	WalletCreateRequest,
 	WalletResponse,
@@ -77,6 +79,13 @@ export async function getRate(params: { from: string; to: string }): Promise<Exc
 	const url = `${endpoints.rates.base}?from=${encodeURIComponent(params.from)}&to=${encodeURIComponent(params.to)}`
 	const data = await get<unknown>(url)
 	return ExchangeRateResponseSchema.parse(data)
+}
+
+export async function listExchangeRates(params?: { to?: string }): Promise<ExchangeRateListResponse> {
+	const targetCurrency = params?.to ?? 'KZT'
+	const url = `${endpoints.rates.all}?to=${encodeURIComponent(targetCurrency)}`
+	const data = await get<unknown>(url)
+	return ExchangeRateListResponseSchema.parse(data)
 }
 
 export async function convertCurrency(params: { from: string; to: string; amount: number }): Promise<CurrencyConversionResponse> {

@@ -164,7 +164,7 @@ const Wallets = ({ wallets }: WalletsProps) => {
 
 	return (
 		<>
-			<Carousel contentClassName='gap-[10px] pb-2' pageClassName='grid grid-cols-2 gap-[10px]' dots>
+			<Carousel pageClassName='grid grid-cols-2 gap-[10px]' dots>
 				{pages.map((page, pageIndex) => (
 					<div key={`wallets-page-${pageIndex}`}>
 						{page.map((item, itemIndex) => {

@@ -11,6 +11,7 @@ import {
   WalletTransactionResponseSchema,
   CurrencyResponseSchema,
   ExchangeRateResponseSchema,
+  ExchangeRateListResponseSchema,
   CurrencyConversionResponseSchema,
 } from './schemas';
 
@@ -28,4 +29,5 @@ export type WalletTransactionResponse = z.infer<typeof WalletTransactionResponse
 
 export type CurrencyResponse = z.infer<typeof CurrencyResponseSchema>;
 export type ExchangeRateResponse = z.infer<typeof ExchangeRateResponseSchema>;
+export type ExchangeRateListResponse = z.infer<typeof ExchangeRateListResponseSchema>;
 export type CurrencyConversionResponse = z.infer<typeof CurrencyConversionResponseSchema>;
