@@ -45,7 +45,7 @@ jobs:
           push: true
           platforms: linux/amd64
           build-args: |
-            VITE_API_URL=https://api-shmoney.duckdns.org
+            VITE_API_URL=/api
           tags: |
             ${{ env.FRONT_IMAGE }}:${{ github.sha }}
             ${{ env.FRONT_IMAGE }}:latest
