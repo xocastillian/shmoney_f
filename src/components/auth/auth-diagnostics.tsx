@@ -42,7 +42,7 @@ export function AuthDiagnostics({ status, error, isInTelegram, onLogin }: Props)
 							placeholder='Paste Telegram WebApp initData here'
 						/>
 						<button
-							className='px-4 py-2 rounded bg-primary text-primary-foreground disabled:opacity-50'
+							className='px-4 py-2 rounded bg-primary disabled:opacity-50'
 							onClick={() => onLogin(manualInit)}
 							disabled={manualInit.trim().length === 0 || status === 'authenticating'}
 						>

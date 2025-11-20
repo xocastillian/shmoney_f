@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
 import AuthDiagnostics from '@/components/auth/auth-diagnostics'
 import Wallets from '@/widgets/Wallets/Wallets'
+import ExchangeRates from '@/widgets/ExchangeRates/ExchangeRates'
 import { useWallets } from '@/hooks/useWallets'
 
 const HomeScreen = () => {
@@ -27,6 +28,7 @@ const HomeScreen = () => {
 					{walletsError && <div className='text-sm text-red-400'>{walletsError}</div>}
 					<Wallets wallets={wallets} />
 					{walletsLoading && <div className='mt-2 text-sm text-muted-foreground'>Загрузка...</div>}
+					<ExchangeRates />
 				</>
 			)}
 		</div>

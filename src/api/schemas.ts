@@ -108,6 +108,8 @@ export const ExchangeRateResponseSchema = z.object({
 	rate: z.coerce.number(),
 })
 
+export const ExchangeRateListResponseSchema = z.array(ExchangeRateResponseSchema)
+
 export const CurrencyConversionResponseSchema = z.object({
 	amount: z.coerce.number(),
 	sourceCurrency: z.string(),
