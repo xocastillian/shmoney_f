@@ -52,5 +52,13 @@ export default defineConfig(({ mode }) => {
 				'@api': path.resolve(__dirname, 'src/api'),
 			},
 		},
+		optimizeDeps: {
+			include: ['tslib'],
+		},
+		build: {
+			commonjsOptions: {
+				include: [/node_modules/],
+			},
+		},
 	}
 })

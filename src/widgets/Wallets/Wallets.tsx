@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { WheelEvent } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { Carousel } from '@/components/ui/Carousel'
 import { AddWalletCard } from '@/components/WalletCard/AddWalletCard'
 import WalletCard from '@/components/WalletCard/WalletCard'
 import type { Wallet } from '@/types/entities/wallet'
@@ -151,58 +151,46 @@ const Wallets = ({ wallets }: WalletsProps) => {
 		setOpen(true)
 	}
 
-	const columns = []
-	const items = [...wallets, null]
+	const pages = useMemo(() => {
+		const items: Array<Wallet | null> = [...wallets, null]
+		const result: Array<Array<Wallet | null>> = []
 
-	for (let index = 0; index < items.length; index += 2) {
-		columns.push(items.slice(index, index + 2))
-	}
-
-	const scrollContainerRef = useRef<HTMLDivElement>(null)
-
-	const handleHorizontalScroll = (event: WheelEvent<HTMLDivElement>) => {
-		const container = scrollContainerRef.current
-		if (!container) return
-		if (container.scrollWidth <= container.clientWidth) return
-
-		if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-			event.preventDefault()
-			container.scrollBy({
-				left: event.deltaY,
-				behavior: 'smooth',
-			})
+		for (let index = 0; index < items.length; index += 2) {
+			result.push(items.slice(index, index + 2))
 		}
-	}
+
+		return result
+	}, [wallets])
 
 	return (
 		<>
-			<div
-				className='overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
-				ref={scrollContainerRef}
-				onWheel={handleHorizontalScroll}
-			>
-				<div className='flex gap-[10px] pb-2'>
-					{columns.map((column, columnIndex) => (
-						<div key={`column-${columnIndex}`} className='flex-none basis-[calc(50%-5px)] grid items-start gap-[10px]'>
-							{column.map((item, rowIndex) =>
-								item ? (
-									<WalletCard
-										key={item.id}
-										name={item.name}
-										balance={item.balance}
-										currencyCode={item.currencyCode}
-										color={item.color}
-										type={item.type}
-										onClick={() => handleWalletClick(item)}
-									/>
-								) : (
-									<AddWalletCard key={`add-card-${columnIndex}-${rowIndex}`} onClick={handleAddWalletClick} />
-								)
-							)}
-						</div>
-					))}
-				</div>
-			</div>
+			<Carousel contentClassName='gap-[10px] pb-2' pageClassName='grid grid-cols-2 gap-[10px]' dots>
+				{pages.map((page, pageIndex) => (
+					<div key={`wallets-page-${pageIndex}`}>
+						{page.map((item, itemIndex) => {
+							if (!item && item !== null) {
+								return null
+							}
+
+							if (item === null) {
+								return <AddWalletCard key={`add-card-${pageIndex}-${itemIndex}`} onClick={handleAddWalletClick} />
+							}
+
+							return (
+								<WalletCard
+									key={item.id}
+									name={item.name}
+									balance={item.balance}
+									currencyCode={item.currencyCode}
+									color={item.color}
+									type={item.type}
+									onClick={() => handleWalletClick(item)}
+								/>
+							)
+						})}
+					</div>
+				))}
+			</Carousel>
 
 			<WalletFormDrawer
 				open={open}
