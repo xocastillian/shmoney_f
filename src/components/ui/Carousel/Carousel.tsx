@@ -109,9 +109,11 @@ export const Carousel = ({ children, className, contentClassName, pageClassName,
 	}, [handleWheel])
 
 	const processedPages = useMemo(() => {
+		const snapAlignmentClass = snapAlignment === 'center' ? 'snap-center' : snapAlignment === 'end' ? 'snap-end' : 'snap-start'
+
 		return pages.map((page, index) => {
 			const key = (isValidElement(page) && page.key) || index
-			const combinedClassName = cn('flex-none w-full', `snap-${snapAlignment}`, pageClassName)
+			const combinedClassName = cn('flex-none w-full snap-always', snapAlignmentClass, pageClassName)
 
 			if (isValidElement(page)) {
 				const element = page as ReactElement<{ className?: string }>
