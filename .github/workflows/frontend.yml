@@ -59,6 +59,7 @@ jobs:
           script: |
             set -e
             cd /root/shmoney/shmoney
+            git pull
             docker login docker.io -u '${{ secrets.DOCKER_USERNAME }}' -p '${{ secrets.DOCKER_PASSWORD }}'
             FRONTEND_IMAGE=${{ env.FRONT_IMAGE }}:${{ github.sha }} docker compose --env-file .env pull frontend nginx
             FRONTEND_IMAGE=${{ env.FRONT_IMAGE }}:${{ github.sha }} docker compose --env-file .env up -d frontend nginx
