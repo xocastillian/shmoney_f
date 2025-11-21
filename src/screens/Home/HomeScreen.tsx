@@ -4,20 +4,24 @@ import AuthDiagnostics from '@/components/auth/auth-diagnostics'
 import Wallets from '@/widgets/Wallets/Wallets'
 import ExchangeRates from '@/widgets/ExchangeRates/ExchangeRates'
 import { useWallets } from '@/hooks/useWallets'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 
 const HomeScreen = () => {
 	const { status, error: authError, isInTelegram, login } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 	const { wallets, loading: walletsLoading, error: walletsError, fetchWallets, clearWallets } = useWallets()
+	const { fetchExchangeRates, clearRates } = useExchangeRates()
 
 	useEffect(() => {
 		if (!authenticated) {
 			clearWallets()
+			clearRates()
 			return
 		}
 
 		void fetchWallets()
-	}, [authenticated, fetchWallets, clearWallets])
+		void fetchExchangeRates().catch(() => undefined)
+	}, [authenticated, fetchWallets, fetchExchangeRates, clearWallets, clearRates])
 
 	return (
 		<div className='min-h-full p-3 pb-24'>
