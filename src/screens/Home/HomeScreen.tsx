@@ -5,23 +5,27 @@ import Wallets from '@/widgets/Wallets/Wallets'
 import ExchangeRates from '@/widgets/ExchangeRates/ExchangeRates'
 import { useWallets } from '@/hooks/useWallets'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { useCategories } from '@/hooks/useCategories'
 
 const HomeScreen = () => {
 	const { status, error: authError, isInTelegram, login } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 	const { wallets, loading: walletsLoading, error: walletsError, fetchWallets, clearWallets } = useWallets()
 	const { fetchExchangeRates, clearRates } = useExchangeRates()
+	const { fetchCategories, clearCategories: resetCategories } = useCategories()
 
 	useEffect(() => {
 		if (!authenticated) {
 			clearWallets()
 			clearRates()
+			resetCategories()
 			return
 		}
 
 		void fetchWallets()
 		void fetchExchangeRates().catch(() => undefined)
-	}, [authenticated, fetchWallets, fetchExchangeRates, clearWallets, clearRates])
+		void fetchCategories().catch(() => undefined)
+	}, [authenticated, fetchWallets, fetchExchangeRates, fetchCategories, clearWallets, clearRates, resetCategories])
 
 	return (
 		<div className='min-h-full p-3 pb-24'>
