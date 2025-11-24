@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { WalletType } from '@/types/entities/wallet'
 
 export const WalletTypeSchema = z.enum(WalletType)
+export const CategoryTransactionTypeSchema = z.enum(['EXPENSE', 'INCOME'])
 
 export const AuthResponseSchema = z.object({
 	accessToken: z.string().min(1),
@@ -116,4 +117,54 @@ export const CurrencyConversionResponseSchema = z.object({
 	targetCurrency: z.string(),
 	rate: z.coerce.number(),
 	convertedAmount: z.coerce.number(),
+})
+
+export const SubcategoryResponseSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+	icon: z.string(),
+	createdAt: z.coerce.date().nullable().optional(),
+	updatedAt: z.coerce.date().nullable().optional(),
+})
+
+export const CategoryResponseSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+	icon: z.string(),
+	createdAt: z.coerce.date().nullable().optional(),
+	updatedAt: z.coerce.date().nullable().optional(),
+	subcategories: z.array(SubcategoryResponseSchema),
+})
+
+export const SubcategoryCreateRequestSchema = z.object({
+	name: z.string().min(1).max(100),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+	icon: z.string().min(1).max(100),
+})
+
+export const SubcategoryUpdateRequestSchema = z.object({
+	name: z.string().max(100).optional(),
+	color: z
+		.string()
+		.regex(/^#[0-9A-Fa-f]{6}$/)
+		.optional(),
+	icon: z.string().max(100).optional(),
+})
+
+export const CategoryCreateRequestSchema = z.object({
+	name: z.string().min(1).max(100),
+	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+	icon: z.string().min(1).max(100),
+	subcategories: z.array(SubcategoryCreateRequestSchema).optional(),
+})
+
+export const CategoryUpdateRequestSchema = z.object({
+	name: z.string().max(100).optional(),
+	color: z
+		.string()
+		.regex(/^#[0-9A-Fa-f]{6}$/)
+		.optional(),
+	icon: z.string().max(100).optional(),
 })

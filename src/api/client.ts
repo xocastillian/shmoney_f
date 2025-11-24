@@ -12,6 +12,12 @@ import {
 	WalletTransactionRequestSchema,
 	WalletTransactionResponseSchema,
 	WalletUpdateRequestSchema,
+	CategoryResponseSchema,
+	CategoryCreateRequestSchema,
+	CategoryUpdateRequestSchema,
+	SubcategoryResponseSchema,
+	SubcategoryCreateRequestSchema,
+	SubcategoryUpdateRequestSchema,
 } from './schemas'
 import type {
 	AuthResponse,
@@ -24,6 +30,12 @@ import type {
 	WalletTransactionRequest,
 	WalletTransactionResponse,
 	WalletUpdateRequest,
+	CategoryResponse,
+	CategoryCreateRequest,
+	CategoryUpdateRequest,
+	SubcategoryResponse,
+	SubcategoryCreateRequest,
+	SubcategoryUpdateRequest,
 } from './types'
 
 export async function telegramLogin(params: { initData: string }): Promise<AuthResponse> {
@@ -92,4 +104,46 @@ export async function convertCurrency(params: { from: string; to: string; amount
 	const url = `${endpoints.rates.convert}?from=${encodeURIComponent(params.from)}&to=${encodeURIComponent(params.to)}&amount=${params.amount}`
 	const data = await get<unknown>(url)
 	return CurrencyConversionResponseSchema.parse(data)
+}
+
+export async function listCategories(): Promise<CategoryResponse[]> {
+	const data = await get<unknown>(endpoints.categories.base)
+	return CategoryResponseSchema.array().parse(data)
+}
+
+export async function createCategory(payload: CategoryCreateRequest): Promise<CategoryResponse> {
+	const body = CategoryCreateRequestSchema.parse(payload)
+	const data = await post<unknown>(endpoints.categories.base, body)
+	return CategoryResponseSchema.parse(data)
+}
+
+export async function updateCategory(id: number, payload: CategoryUpdateRequest): Promise<CategoryResponse> {
+	const body = CategoryUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.categories.byId(id), body)
+	return CategoryResponseSchema.parse(data)
+}
+
+export async function deleteCategory(id: number): Promise<void> {
+	await del<void>(endpoints.categories.byId(id))
+}
+
+export async function listSubcategories(categoryId: number): Promise<SubcategoryResponse[]> {
+	const data = await get<unknown>(endpoints.categories.subcategories(categoryId))
+	return SubcategoryResponseSchema.array().parse(data)
+}
+
+export async function createSubcategory(categoryId: number, payload: SubcategoryCreateRequest): Promise<SubcategoryResponse> {
+	const body = SubcategoryCreateRequestSchema.parse(payload)
+	const data = await post<unknown>(endpoints.categories.subcategories(categoryId), body)
+	return SubcategoryResponseSchema.parse(data)
+}
+
+export async function updateSubcategory(categoryId: number, subcategoryId: number, payload: SubcategoryUpdateRequest): Promise<SubcategoryResponse> {
+	const body = SubcategoryUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.categories.subcategoryById(categoryId, subcategoryId), body)
+	return SubcategoryResponseSchema.parse(data)
+}
+
+export async function deleteSubcategory(categoryId: number, subcategoryId: number): Promise<void> {
+	await del<void>(endpoints.categories.subcategoryById(categoryId, subcategoryId))
 }
