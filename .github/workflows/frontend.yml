@@ -57,9 +57,15 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            set -e
+            set -euo pipefail
             cd /root/shmoney/shmoney
             git pull
             docker login docker.io -u '${{ secrets.DOCKER_USERNAME }}' -p '${{ secrets.DOCKER_PASSWORD }}'
-            FRONTEND_IMAGE=${{ env.FRONT_IMAGE }}:${{ github.sha }} docker compose --env-file .env pull frontend nginx
-            FRONTEND_IMAGE=${{ env.FRONT_IMAGE }}:${{ github.sha }} docker compose --env-file .env up -d frontend nginx
+            NEW_IMAGE="${{ env.FRONT_IMAGE }}:${{ github.sha }}"
+            if grep -q '^FRONTEND_IMAGE=' .env; then
+              sed -i "s|^FRONTEND_IMAGE=.*|FRONTEND_IMAGE=${NEW_IMAGE}|" .env
+            else
+              echo "FRONTEND_IMAGE=${NEW_IMAGE}" >> .env
+            fi
+            docker compose --env-file .env pull frontend nginx
+            docker compose --env-file .env up -d frontend nginx
