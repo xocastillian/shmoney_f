@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -18,13 +18,15 @@ const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | unde
 
 const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
+	const [initialized, setInitialized] = useState(false)
 
 	useEffect(() => {
-		if (!open) return
-		if (categories.length === 0 && !loading) {
-			fetchCategories().catch(() => {})
-		}
-	}, [categories.length, fetchCategories, loading, open])
+		if (!open || initialized || loading) return
+
+		fetchCategories()
+			.then(() => setInitialized(true))
+			.catch(() => setInitialized(true))
+	}, [fetchCategories, initialized, loading, open])
 
 	const hasCategories = categories.length > 0
 

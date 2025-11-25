@@ -1,12 +1,14 @@
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
+
 import Drawer from '@/components/Drawer/Drawer'
 import type { Category } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
 import IconPickerDrawer from './IconPickerDrawer'
 import CategoryForm from './CategoryForm'
-import AddOrEditSubcategoryDrawer from './AddOrEditSubcategoryDrawer'
+import { categoryIconOptions } from '../icons'
+import useCategories from '@/hooks/useCategories'
 
 export type CategoryFormValues = Pick<Category, 'name' | 'color' | 'icon'>
 
@@ -18,7 +20,7 @@ interface AddOrEditCategoryDrawerProps {
 	title?: string
 }
 
-const DEFAULT_ICON = 'apple'
+const DEFAULT_ICON = categoryIconOptions[0]?.key ?? 'apple'
 const DEFAULT_COLOR = colorOptions[0] ?? '#F97316'
 
 const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, title = 'Новая категория' }: AddOrEditCategoryDrawerProps) => {
@@ -27,13 +29,16 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const [icon, setIcon] = useState(DEFAULT_ICON)
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
 	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
-	const [isSubcategoryDrawerOpen, setSubcategoryDrawerOpen] = useState(false)
+	const [isSubmitting, setSubmitting] = useState(false)
+	// const [isSubcategoryDrawerOpen, setSubcategoryDrawerOpen] = useState(false)
 	const formId = useId()
+	const { createCategory, updateCategory, deleteCategory } = useCategories()
+	const isEditMode = Boolean(initialCategory)
 
 	useEffect(() => {
 		if (!open) {
 			setColorPickerOpen(false)
-			setSubcategoryDrawerOpen(false)
+			// setSubcategoryDrawerOpen(false)
 			return
 		}
 
@@ -42,17 +47,34 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		setIcon(initialCategory?.icon ?? DEFAULT_ICON)
 	}, [initialCategory, open])
 
-	const isSubmitDisabled = !name.trim() || !color || !icon
+	const isSubmitDisabled = isSubmitting || !name.trim() || !color || !icon
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		if (isSubmitDisabled) return
 
-		onSubmit?.({
+		const payload = {
 			name: name.trim(),
 			color,
 			icon,
-		})
+		}
+
+		try {
+			setSubmitting(true)
+			const saved = isEditMode && initialCategory ? await updateCategory(initialCategory.id, payload) : await createCategory(payload)
+
+			onSubmit?.({
+				name: saved.name,
+				color: saved.color,
+				icon: saved.icon,
+			})
+
+			onClose()
+		} catch {
+			// ошибки обрабатываются внутри useCategories
+		} finally {
+			setSubmitting(false)
+		}
 	}
 
 	const handleSelectColor = (nextColor: string) => {
@@ -65,17 +87,41 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		setIconPickerOpen(false)
 	}
 
-	const handleOpenSubcategoryDrawer = () => {
-		setSubcategoryDrawerOpen(true)
-	}
+	// const handleOpenSubcategoryDrawer = () => {
+	// 	setSubcategoryDrawerOpen(true)
+	// }
 
-	const handleCloseSubcategoryDrawer = () => {
-		setSubcategoryDrawerOpen(false)
+	// const handleCloseSubcategoryDrawer = () => {
+	// 	setSubcategoryDrawerOpen(false)
+	// }
+
+	const handleDelete = async () => {
+		if (!initialCategory || isSubmitting) return
+
+		try {
+			setSubmitting(true)
+			await deleteCategory(initialCategory.id)
+			onSubmit?.({
+				name: initialCategory.name,
+				color: initialCategory.color,
+				icon: initialCategory.icon,
+			})
+			onClose()
+		} catch {
+			// ошибки уже обработаны в useCategories
+		} finally {
+			setSubmitting(false)
+		}
 	}
 
 	return (
 		<>
-			<Drawer open={open} onClose={onClose} className='!bg-background-secondary' overlayClassName='bg-black/80 backdrop-blur-sm'>
+			<Drawer
+				open={open}
+				onClose={onClose}
+				className='max-h-[80vh] rounded-t-lg !bg-background-secondary'
+				overlayClassName='bg-black/80 backdrop-blur-sm'
+			>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full' aria-label='Закрыть'>
@@ -101,7 +147,8 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 							onOpenColorPicker={() => setColorPickerOpen(true)}
 							icon={icon}
 							onOpenIconPicker={() => setIconPickerOpen(true)}
-							onAddSubcategory={handleOpenSubcategoryDrawer}
+							onDelete={isEditMode ? handleDelete : undefined}
+							disableDelete={isSubmitting}
 							onSubmit={handleSubmit}
 						/>
 					</div>
@@ -118,7 +165,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 
 			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
 
-			<AddOrEditSubcategoryDrawer open={isSubcategoryDrawerOpen} onClose={handleCloseSubcategoryDrawer} category={initialCategory ?? null} />
+			{/* <AddOrEditSubcategoryDrawer open={isSubcategoryDrawerOpen} onClose={handleCloseSubcategoryDrawer} category={initialCategory ?? null} /> */}
 		</>
 	)
 }

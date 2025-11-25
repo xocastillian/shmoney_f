@@ -1,4 +1,4 @@
-import { Info, Palette, Plus, Shapes } from 'lucide-react'
+import { Info, Palette, Shapes, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { categoryIconMap } from '../icons'
 
@@ -11,7 +11,8 @@ interface CategoryFormProps {
 	onOpenColorPicker: () => void
 	icon: string
 	onOpenIconPicker: () => void
-	onAddSubcategory?: () => void
+	onDelete?: () => void
+	disableDelete?: boolean
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 }
 
@@ -24,7 +25,8 @@ const CategoryForm = ({
 	onOpenColorPicker,
 	icon,
 	onOpenIconPicker,
-	onAddSubcategory,
+	onDelete,
+	disableDelete,
 	onSubmit,
 }: CategoryFormProps) => {
 	return (
@@ -64,11 +66,16 @@ const CategoryForm = ({
 						</button>
 					</div>
 
-					{onAddSubcategory && (
+					{onDelete && (
 						<div className='border-b border-divider'>
-							<button type='button' className='flex h-16 w-full items-center px-3 text-left text-access' onClick={onAddSubcategory}>
-								<Plus className='mr-3' />
-								<span>Добавить подкатегорию</span>
+							<button
+								type='button'
+								onClick={onDelete}
+								className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
+								disabled={disableDelete}
+							>
+								<Trash className='mr-3 text-danger' />
+								<span className='text-danger'>Удалить категорию</span>
 							</button>
 						</div>
 					)}
