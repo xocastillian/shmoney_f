@@ -1,5 +1,6 @@
-import { Info, Palette, Plus } from 'lucide-react'
+import { Info, Palette, Plus, Shapes } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
+import { categoryIconMap } from '../icons'
 
 interface CategoryFormProps {
 	formId: string
@@ -8,11 +9,24 @@ interface CategoryFormProps {
 	onNameChange: (value: string) => void
 	color: string
 	onOpenColorPicker: () => void
+	icon: string
+	onOpenIconPicker: () => void
 	onAddSubcategory?: () => void
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 }
 
-const CategoryForm = ({ formId, title, name, onNameChange, color, onOpenColorPicker, onAddSubcategory, onSubmit }: CategoryFormProps) => {
+const CategoryForm = ({
+	formId,
+	title,
+	name,
+	onNameChange,
+	color,
+	onOpenColorPicker,
+	icon,
+	onOpenIconPicker,
+	onAddSubcategory,
+	onSubmit,
+}: CategoryFormProps) => {
 	return (
 		<form id={formId} className='flex h-full flex-col gap-5' onSubmit={onSubmit}>
 			<div>
@@ -40,9 +54,19 @@ const CategoryForm = ({ formId, title, name, onNameChange, color, onOpenColorPic
 						</button>
 					</div>
 
+					<div className='border-b border-divider'>
+						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenIconPicker}>
+							{(() => {
+								const IconComponent = categoryIconMap[icon]
+								return IconComponent ? <IconComponent className='mr-3 h-6 w-6 text-label' /> : <Shapes className='mr-3 text-label' />
+							})()}
+							<span className='text-text'>Иконка</span>
+						</button>
+					</div>
+
 					{onAddSubcategory && (
 						<div className='border-b border-divider'>
-							<button type='button' className='flex h-16 w-full items-center px-3 text-left text-accent-orange' onClick={onAddSubcategory}>
+							<button type='button' className='flex h-16 w-full items-center px-3 text-left text-access' onClick={onAddSubcategory}>
 								<Plus className='mr-3' />
 								<span>Добавить подкатегорию</span>
 							</button>

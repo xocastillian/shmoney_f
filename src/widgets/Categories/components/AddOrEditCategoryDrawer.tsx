@@ -4,6 +4,7 @@ import Drawer from '@/components/Drawer/Drawer'
 import type { Category } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
+import IconPickerDrawer from './IconPickerDrawer'
 import CategoryForm from './CategoryForm'
 import AddOrEditSubcategoryDrawer from './AddOrEditSubcategoryDrawer'
 
@@ -17,7 +18,7 @@ interface AddOrEditCategoryDrawerProps {
 	title?: string
 }
 
-const DEFAULT_ICON = 'CircleDollarSign'
+const DEFAULT_ICON = 'apple'
 const DEFAULT_COLOR = colorOptions[0] ?? '#F97316'
 
 const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, title = 'Новая категория' }: AddOrEditCategoryDrawerProps) => {
@@ -25,6 +26,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [icon, setIcon] = useState(DEFAULT_ICON)
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
+	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
 	const [isSubcategoryDrawerOpen, setSubcategoryDrawerOpen] = useState(false)
 	const formId = useId()
 
@@ -56,6 +58,11 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const handleSelectColor = (nextColor: string) => {
 		setColor(nextColor)
 		setColorPickerOpen(false)
+	}
+
+	const handleSelectIcon = (nextIcon: string) => {
+		setIcon(nextIcon)
+		setIconPickerOpen(false)
 	}
 
 	const handleOpenSubcategoryDrawer = () => {
@@ -92,6 +99,8 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 							onNameChange={setName}
 							color={color}
 							onOpenColorPicker={() => setColorPickerOpen(true)}
+							icon={icon}
+							onOpenIconPicker={() => setIconPickerOpen(true)}
 							onAddSubcategory={handleOpenSubcategoryDrawer}
 							onSubmit={handleSubmit}
 						/>
@@ -106,6 +115,8 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 				onSelect={handleSelectColor}
 				selectedColor={color}
 			/>
+
+			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
 
 			<AddOrEditSubcategoryDrawer open={isSubcategoryDrawerOpen} onClose={handleCloseSubcategoryDrawer} category={initialCategory ?? null} />
 		</>

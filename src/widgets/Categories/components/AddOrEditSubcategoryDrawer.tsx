@@ -1,13 +1,16 @@
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
+
 import Drawer from '@/components/Drawer/Drawer'
 import type { Category, Subcategory } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
 import useCategories from '@/hooks/useCategories'
 import SubcategoryForm from './SubcategoryForm'
+import { categoryIconOptions } from '../icons'
+import IconPickerDrawer from './IconPickerDrawer'
 
-const DEFAULT_ICON = 'CircleDollarSign'
+const DEFAULT_ICON = categoryIconOptions[0]?.key ?? 'apple'
 const DEFAULT_COLOR = colorOptions[0] ?? '#F97316'
 
 interface AddOrEditSubcategoryDrawerProps {
@@ -24,6 +27,7 @@ const AddOrEditSubcategoryDrawer = ({ open, onClose, category, initialSubcategor
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [icon, setIcon] = useState(DEFAULT_ICON)
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
+	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
 	const [submitting, setSubmitting] = useState(false)
 	const formId = useId()
 
@@ -43,6 +47,11 @@ const AddOrEditSubcategoryDrawer = ({ open, onClose, category, initialSubcategor
 	const handleSelectColor = (nextColor: string) => {
 		setColor(nextColor)
 		setColorPickerOpen(false)
+	}
+
+	const handleSelectIcon = (nextIcon: string) => {
+		setIcon(nextIcon)
+		setIconPickerOpen(false)
 	}
 
 	const isSubmitDisabled = !name.trim() || !color || !icon || !category || submitting
@@ -104,6 +113,8 @@ const AddOrEditSubcategoryDrawer = ({ open, onClose, category, initialSubcategor
 							onNameChange={setName}
 							color={color}
 							onOpenColorPicker={() => setColorPickerOpen(true)}
+							icon={icon}
+							onOpenIconPicker={() => setIconPickerOpen(true)}
 							onSubmit={handleSubmit}
 						/>
 					</div>
@@ -117,6 +128,8 @@ const AddOrEditSubcategoryDrawer = ({ open, onClose, category, initialSubcategor
 				onSelect={handleSelectColor}
 				selectedColor={color}
 			/>
+
+			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
 		</>
 	)
 }

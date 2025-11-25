@@ -1,5 +1,6 @@
-import { Info, Palette } from 'lucide-react'
+import { Info, Palette, Shapes } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
+import { categoryIconMap } from '../icons'
 
 interface SubcategoryFormProps {
 	formId: string
@@ -9,10 +10,23 @@ interface SubcategoryFormProps {
 	onNameChange: (value: string) => void
 	color: string
 	onOpenColorPicker: () => void
+	onOpenIconPicker: () => void
+	icon: string
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 }
 
-const SubcategoryForm = ({ formId, title, categoryName, name, onNameChange, color, onOpenColorPicker, onSubmit }: SubcategoryFormProps) => {
+const SubcategoryForm = ({
+	formId,
+	title,
+	categoryName,
+	name,
+	onNameChange,
+	color,
+	onOpenColorPicker,
+	onOpenIconPicker,
+	icon,
+	onSubmit,
+}: SubcategoryFormProps) => {
 	return (
 		<form id={formId} className='flex h-full flex-col gap-5' onSubmit={onSubmit}>
 			<div>
@@ -38,6 +52,16 @@ const SubcategoryForm = ({ formId, title, categoryName, name, onNameChange, colo
 							<span className='text-text' style={{ color }}>
 								Цвет
 							</span>
+						</button>
+					</div>
+
+					<div className='border-b border-divider'>
+						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenIconPicker}>
+							{(() => {
+								const IconComponent = categoryIconMap[icon]
+								return IconComponent ? <IconComponent className='mr-3 h-6 w-6 text-label' /> : <Shapes className='mr-3 text-label' />
+							})()}
+							<span className='text-text'>Иконка</span>
 						</button>
 					</div>
 				</div>
