@@ -1,9 +1,38 @@
+import { useCallback, useMemo, useState } from 'react'
+import SettingsItem from '@/components/SettingsItem/SettingsItem'
+import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
+import { createSettings } from './settings'
+
 const SettingsScreen = () => {
+	const [isCategoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false)
+
+	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
+	const closeCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(false), [])
+
+	const settings = useMemo(
+		() =>
+			createSettings({
+				onCategoriesPress: openCategoriesDrawer,
+			}),
+		[openCategoriesDrawer]
+	)
+
+	const handleSelectCategory = useCallback(() => {
+		setCategoriesDrawerOpen(false)
+	}, [])
+
 	return (
-		<div className='flex min-h-full flex-col items-center justify-center gap-2 p-3 pb-24 text-center text-sm text-muted-foreground'>
-			<div className='text-lg font-medium text-foreground'>Настройки</div>
-			<p>Раздел настроек будет доступен позже.</p>
-		</div>
+		<>
+			<div className='p-3 text-lg font-medium'>Настройки</div>
+
+			<div>
+				{settings.map(setting => (
+					<SettingsItem key={setting.title} setting={setting} />
+				))}
+			</div>
+
+			<CategoriesDrawer open={isCategoriesDrawerOpen} onClose={closeCategoriesDrawer} onSelect={handleSelectCategory} />
+		</>
 	)
 }
 
