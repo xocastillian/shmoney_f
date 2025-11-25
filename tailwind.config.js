@@ -15,6 +15,7 @@ module.exports = {
 				'text-dark': 'var(--text-dark)',
 				'background-secondary': 'var(--background-secondary)',
 				danger: 'var(--danger)',
+				access: 'var(--access)',
 			},
 		},
 	},
