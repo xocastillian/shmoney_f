@@ -1,29 +1,30 @@
-import { Info, Palette, Plus } from 'lucide-react'
+import { Info, Palette } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
 
-interface CategoryFormProps {
+interface SubcategoryFormProps {
 	formId: string
 	title: string
+	categoryName?: string
 	name: string
 	onNameChange: (value: string) => void
 	color: string
 	onOpenColorPicker: () => void
-	onAddSubcategory?: () => void
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 }
 
-const CategoryForm = ({ formId, title, name, onNameChange, color, onOpenColorPicker, onAddSubcategory, onSubmit }: CategoryFormProps) => {
+const SubcategoryForm = ({ formId, title, categoryName, name, onNameChange, color, onOpenColorPicker, onSubmit }: SubcategoryFormProps) => {
 	return (
 		<form id={formId} className='flex h-full flex-col gap-5' onSubmit={onSubmit}>
 			<div>
-				<h2 className='mb-3 px-3 text-sm font-medium text-label'>{title}</h2>
-				<div className='overflow-hidden bg-background-muted'>
+				<h2 className='mb-1 px-3 text-xs font-medium uppercase tracking-wide text-label'>{title}</h2>
+				{categoryName && <p className='px-3 text-sm text-label'>Категория: {categoryName}</p>}
+				<div className='mt-3 overflow-hidden bg-background-muted'>
 					<div className='border-b border-divider'>
 						<div className='flex h-16 items-center px-3'>
 							<Info className='mr-3 text-label' />
 							<input
 								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
-								placeholder='Название категории'
+								placeholder='Название подкатегории'
 								value={name}
 								onChange={(event: ChangeEvent<HTMLInputElement>) => onNameChange(event.target.value)}
 								maxLength={100}
@@ -39,19 +40,10 @@ const CategoryForm = ({ formId, title, name, onNameChange, color, onOpenColorPic
 							</span>
 						</button>
 					</div>
-
-					{onAddSubcategory && (
-						<div className='border-b border-divider'>
-							<button type='button' className='flex h-16 w-full items-center px-3 text-left text-accent-orange' onClick={onAddSubcategory}>
-								<Plus className='mr-3' />
-								<span>Добавить подкатегорию</span>
-							</button>
-						</div>
-					)}
 				</div>
 			</div>
 		</form>
 	)
 }
 
-export default CategoryForm
+export default SubcategoryForm

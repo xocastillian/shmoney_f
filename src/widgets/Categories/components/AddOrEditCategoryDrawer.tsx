@@ -5,13 +5,14 @@ import type { Category } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
 import CategoryForm from './CategoryForm'
+import AddOrEditSubcategoryDrawer from './AddOrEditSubcategoryDrawer'
 
 export type CategoryFormValues = Pick<Category, 'name' | 'color' | 'icon'>
 
 interface AddOrEditCategoryDrawerProps {
 	open: boolean
 	onClose: () => void
-	initialCategory?: Partial<Category>
+	initialCategory?: Category
 	onSubmit?: (values: CategoryFormValues) => void
 	title?: string
 }
@@ -24,11 +25,13 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [icon, setIcon] = useState(DEFAULT_ICON)
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
+	const [isSubcategoryDrawerOpen, setSubcategoryDrawerOpen] = useState(false)
 	const formId = useId()
 
 	useEffect(() => {
 		if (!open) {
 			setColorPickerOpen(false)
+			setSubcategoryDrawerOpen(false)
 			return
 		}
 
@@ -55,14 +58,17 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		setColorPickerOpen(false)
 	}
 
+	const handleOpenSubcategoryDrawer = () => {
+		setSubcategoryDrawerOpen(true)
+	}
+
+	const handleCloseSubcategoryDrawer = () => {
+		setSubcategoryDrawerOpen(false)
+	}
+
 	return (
 		<>
-			<Drawer
-				open={open}
-				onClose={onClose}
-				className='max-h-[90vh] rounded-t-lg !bg-background-secondary'
-				overlayClassName='bg-black/80 backdrop-blur-sm'
-			>
+			<Drawer open={open} onClose={onClose} className='!bg-background-secondary' overlayClassName='bg-black/80 backdrop-blur-sm'>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full' aria-label='Закрыть'>
@@ -86,6 +92,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 							onNameChange={setName}
 							color={color}
 							onOpenColorPicker={() => setColorPickerOpen(true)}
+							onAddSubcategory={handleOpenSubcategoryDrawer}
 							onSubmit={handleSubmit}
 						/>
 					</div>
@@ -99,6 +106,8 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 				onSelect={handleSelectColor}
 				selectedColor={color}
 			/>
+
+			<AddOrEditSubcategoryDrawer open={isSubcategoryDrawerOpen} onClose={handleCloseSubcategoryDrawer} category={initialCategory ?? null} />
 		</>
 	)
 }

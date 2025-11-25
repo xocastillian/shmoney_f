@@ -1,9 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
-
 import SettingsItem from '@/components/SettingsItem/SettingsItem'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
-
 import { createSettings } from './settings'
 
 const SettingsScreen = () => {
