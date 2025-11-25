@@ -1,0 +1,47 @@
+import { Info, Palette } from 'lucide-react'
+import type { ChangeEvent, FormEvent } from 'react'
+
+interface CategoryFormProps {
+	formId: string
+	title: string
+	name: string
+	onNameChange: (value: string) => void
+	color: string
+	onOpenColorPicker: () => void
+	onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}
+
+const CategoryForm = ({ formId, title, name, onNameChange, color, onOpenColorPicker, onSubmit }: CategoryFormProps) => {
+	return (
+		<form id={formId} className='flex h-full flex-col gap-5' onSubmit={onSubmit}>
+			<div>
+				<h2 className='mb-3 px-3 text-sm font-medium text-label'>{title}</h2>
+				<div className='overflow-hidden bg-background-muted'>
+					<div className='border-b border-divider'>
+						<div className='flex h-16 items-center px-3'>
+							<Info className='mr-3 text-label' />
+							<input
+								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
+								placeholder='Название категории'
+								value={name}
+								onChange={(event: ChangeEvent<HTMLInputElement>) => onNameChange(event.target.value)}
+								maxLength={100}
+							/>
+						</div>
+					</div>
+
+					<div className='border-b border-divider'>
+						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenColorPicker}>
+							<Palette className='mr-3 text-label transition-colors' style={{ color }} />
+							<span className='text-text' style={{ color }}>
+								Цвет
+							</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	)
+}
+
+export default CategoryForm

@@ -40,7 +40,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerPr
 				<div className='flex-1 overflow-y-auto'>
 					{hasCategories && (
 						<>
-							<h2 className='mb-3 text-sm font-medium text-label px-3'>Категории</h2>
+							<h2 className='mb-3 px-3 text-sm font-medium text-label'>Категории</h2>
 							<div className='overflow-hidden bg-background-muted'>
 								{categories.map(category => {
 									const IconComponent = category.icon ? lucideIconMap[category.icon] : undefined
@@ -51,7 +51,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerPr
 											key={category.id}
 											type='button'
 											onClick={() => onSelect?.(category)}
-											className='w-full border-b border-divider text-left last:border-b-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
+											className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
 										>
 											<div className='flex h-16 items-center px-3'>
 												<div className='mr-3'>
@@ -71,16 +71,13 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerPr
 							</div>
 						</>
 					)}
-				</div>
 
-				<div className='border-t border-divider p-4'>
-					<button
-						type='button'
-						onClick={() => onAdd?.()}
-						className='w-full rounded-xl bg-accent-orange py-3 text-base font-medium text-text-dark transition-opacity duration-150 active:opacity-80'
-					>
-						Добавить категорию
-					</button>
+					<div className='border-b border-divider bg-background-muted'>
+						<button type='button' onClick={() => onAdd?.()} className='flex h-16 items-center px-3 w-full'>
+							<LucideIcons.Plus className='mr-3 text-access' />
+							<span className='text-access'>Добавить категорию</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</Drawer>

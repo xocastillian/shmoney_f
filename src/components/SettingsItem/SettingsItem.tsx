@@ -1,5 +1,4 @@
 import type { FC } from 'react'
-import { ChevronRight } from 'lucide-react'
 import type { Setting } from '@/types/entities/setting'
 
 interface Props {
@@ -21,10 +20,6 @@ const SettingsItem: FC<Props> = ({ setting }) => {
 				<div className='flex items-center'>
 					{Icon && <Icon className='mr-3 h-6 w-6 text-accent-orange' />}
 					<span className='text-text'>{setting?.title}</span>
-				</div>
-
-				<div className='ml-auto'>
-					<ChevronRight className='h-5 w-5 text-label' />
 				</div>
 			</div>
 		</div>
