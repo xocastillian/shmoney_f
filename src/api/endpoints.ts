@@ -1,34 +1,31 @@
 export const endpoints = {
 	auth: {
-		telegram: '/api/auth/telegram',
-		refresh: '/api/auth/refresh',
+		telegram: '/auth/telegram',
+		refresh: '/auth/refresh',
 	},
 	users: {
-		base: '/api/users',
-		byId: (id: number | string) => `/api/users/${id}`,
+		base: '/users',
+		byId: (id: number | string) => `/users/${id}`,
 	},
 	wallets: {
-		base: '/api/wallets',
-		byId: (id: number | string) => `/api/wallets/${id}`,
+		base: '/wallets',
+		byId: (id: number | string) => `/wallets/${id}`,
 	},
 	categories: {
-		base: '/api/categories',
-		byId: (id: number | string) => `/api/categories/${id}`,
-		subcategories: (categoryId: number | string) => `/api/categories/${categoryId}/subcategories`,
-		subcategoryById: (categoryId: number | string, subcategoryId: number | string) => `/api/categories/${categoryId}/subcategories/${subcategoryId}`,
+		base: '/categories',
+		byId: (id: number | string) => `/categories/${id}`,
+		subcategories: (categoryId: number | string) => `/categories/${categoryId}/subcategories`,
+		subcategoryById: (categoryId: number | string, subcategoryId: number | string) => `/categories/${categoryId}/subcategories/${subcategoryId}`,
 	},
 	transactions: {
-		base: '/api/wallet-transactions',
+		base: '/wallet-transactions',
 	},
 	currencies: {
-		base: '/api/currencies',
+		base: '/currencies',
 	},
 	rates: {
-		base: '/api/exchange-rates',
-		convert: '/api/exchange-rates/convert',
-		all: '/api/exchange-rates/all',
-	},
-	static: {
-		telegramHtml: '/telegram.html',
+		base: '/exchange-rates',
+		convert: '/exchange-rates/convert',
+		all: '/exchange-rates/all',
 	},
 } as const
