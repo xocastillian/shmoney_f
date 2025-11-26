@@ -41,6 +41,7 @@ export function useTransactions() {
 		upsertCategoryTransaction,
 		removeCategoryTransaction,
 		setFeed,
+		appendFeed,
 		setWalletLoading,
 		setCategoryLoading,
 		setFeedLoading,
@@ -89,15 +90,23 @@ export function useTransactions() {
 	)
 
 	const fetchTransactionFeed = useCallback(
-		async (params?: Parameters<typeof getTransactionFeed>[0]) => {
-			setFeedLoading(true)
+		async (params?: Parameters<typeof getTransactionFeed>[0], options?: { append?: boolean }) => {
+			const skipGlobalLoading = Boolean(options?.append)
+			if (!skipGlobalLoading) {
+				setFeedLoading(true)
+			}
 			try {
 				const response = await getTransactionFeed(params)
-				setFeed(response.results, {
+				const meta = {
 					count: response.count,
 					next: response.next ?? null,
 					previous: response.previous ?? null,
-				})
+				}
+				if (options?.append) {
+					appendFeed(response.results, meta)
+				} else {
+					setFeed(response.results, meta)
+				}
 				setFeedError(null)
 				return response
 			} catch (error) {
@@ -105,10 +114,12 @@ export function useTransactions() {
 				setFeedError(message)
 				throw error
 			} finally {
-				setFeedLoading(false)
+				if (!skipGlobalLoading) {
+					setFeedLoading(false)
+				}
 			}
 		},
-		[setFeedLoading, setFeed, setFeedError]
+		[setFeedLoading, setFeed, appendFeed, setFeedError]
 	)
 
 	const handleCreateWalletTransaction = useCallback(

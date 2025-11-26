@@ -34,7 +34,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerPr
 		<Drawer open={open} onClose={onClose} className='max-h-[100vh]' overlayClassName='bg-black/80 backdrop-blur-sm'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
 						<CloseIcon />
 					</button>
 				</div>

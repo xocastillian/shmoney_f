@@ -21,6 +21,7 @@ interface TransactionsState {
 	upsertCategoryTransaction: (transaction: CategoryTransactionResponse) => void
 	removeCategoryTransaction: (transactionId: number) => void
 	setFeed: (items: TransactionFeedItem[], meta?: Partial<typeof initialFeedMeta>) => void
+	appendFeed: (items: TransactionFeedItem[], meta?: Partial<typeof initialFeedMeta>) => void
 	setWalletLoading: (loading: boolean) => void
 	setCategoryLoading: (loading: boolean) => void
 	setFeedLoading: (loading: boolean) => void
@@ -71,6 +72,26 @@ export const useTransactionsStore = create<TransactionsState>(set => ({
 				next: meta?.next ?? initialFeedMeta.next,
 				previous: meta?.previous ?? initialFeedMeta.previous,
 			},
+		}),
+	appendFeed: (items, meta) =>
+		set(state => {
+			const merged = [...state.feed]
+			for (const item of items) {
+				const existingIndex = merged.findIndex(current => current.id === item.id)
+				if (existingIndex >= 0) {
+					merged[existingIndex] = item
+				} else {
+					merged.push(item)
+				}
+			}
+			return {
+				feed: merged,
+				feedMeta: {
+					count: meta?.count ?? state.feedMeta.count,
+					next: meta?.next ?? state.feedMeta.next,
+					previous: meta?.previous ?? state.feedMeta.previous,
+				},
+			}
 		}),
 	setWalletLoading: walletLoading => set({ walletLoading }),
 	setCategoryLoading: categoryLoading => set({ categoryLoading }),
