@@ -1,5 +1,5 @@
 import { useCallback, useRef, type UIEvent } from 'react'
-import { X } from 'lucide-react'
+import { Filter, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
 
@@ -10,6 +10,7 @@ export interface TransactionsDrawerProps extends TransactionsListProps {
 	hasMore?: boolean
 	loadingMore?: boolean
 	onLoadMore?: () => void
+	onOpenFilters?: () => void
 }
 
 const SCROLL_THRESHOLD_PX = 120
@@ -24,6 +25,7 @@ const TransactionsDrawer = ({
 	hasMore = false,
 	loadingMore = false,
 	onLoadMore,
+	onOpenFilters,
 }: TransactionsDrawerProps) => {
 	const scrollDebounceRef = useRef<number | null>(null)
 
@@ -51,9 +53,16 @@ const TransactionsDrawer = ({
 			<div className='flex h-full flex-col'>
 				<header className='flex items-center justify-between gap-3 p-3'>
 					<h2 className='text-lg font-semibold'>{title}</h2>
-					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
-						<X />
-					</button>
+					<div className='flex items-center gap-2'>
+						{onOpenFilters && (
+							<button type='button' onClick={onOpenFilters} className='rounded-full p-2' aria-label='Открыть фильтры'>
+								<Filter className='h-5 w-5' />
+							</button>
+						)}
+						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+							<X />
+						</button>
+					</div>
 				</header>
 
 				<div className='flex-1 overflow-y-auto px-3 pb-10' onScroll={handleScroll}>

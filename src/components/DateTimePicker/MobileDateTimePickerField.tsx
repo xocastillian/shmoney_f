@@ -40,7 +40,7 @@ export const MobileDateTimePickerField = ({
 		return formatDateTimeDisplay(dateValue, locale)
 	}, [dateValue, placeholder, locale])
 
-	const displayIcon = icon ?? <Calendar className={dateValue ? 'text-text' : 'text-label'} />
+	const displayIcon = icon ?? <Calendar className='text-label' />
 	const displayTextClass = dateValue ? 'text-text' : 'text-label'
 
 	const handleConfirm = (next: Date) => {
