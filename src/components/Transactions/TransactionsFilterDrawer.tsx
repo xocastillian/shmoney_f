@@ -18,10 +18,10 @@ const TransactionsFilterDrawer = ({ open, onClose, filters, onFiltersChange, onR
 	const [isTypePickerOpen, setTypePickerOpen] = useState(false)
 
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-[70vh] rounded-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='max-h-full rounded-lg bg-background'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
 						<X />
 					</button>
 				</div>
@@ -37,7 +37,7 @@ const TransactionsFilterDrawer = ({ open, onClose, filters, onFiltersChange, onR
 						>
 							<ListFilter className='mr-3 text-label' />
 
-							<span className='text-label'>
+							<span className='text-label' style={{ color: filters.type ? 'var(--text)' : '' }}>
 								{filters.type === 'EXPENSE' && 'Расходы'}
 								{filters.type === 'INCOME' && 'Доходы'}
 								{filters.type === 'TRANSFER' && 'Переводы'}
@@ -59,7 +59,10 @@ const TransactionsFilterDrawer = ({ open, onClose, filters, onFiltersChange, onR
 							<button
 								type='button'
 								className='flex h-16 w-full items-center px-3 text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60 text-danger'
-								onClick={onResetFilters}
+								onClick={() => {
+									onResetFilters()
+									onClose()
+								}}
 							>
 								<RotateCcw className='mr-3 text-danger' />
 								Сбросить

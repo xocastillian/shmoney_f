@@ -38,7 +38,7 @@ export const TransactionsList = ({ items, walletById = {}, categoryById = {}, li
 				const dateLabel = dateKey === 'unknown' ? 'Неизвестная дата' : format(new Date(dateKey), 'd MMMM', { locale: ru })
 
 				return (
-					<div key={dateKey} className='bg-background-muted-2 px-3 pb-3 rounded-xl p-3'>
+					<div key={dateKey} className='bg-background-muted-2 px-3 pb-3 p-3'>
 						<div className='text-xs font-bold uppercase text-label mb-4'>{dateLabel}</div>
 						<ul className='space-y-5'>
 							{itemsForDate.map(item => {
