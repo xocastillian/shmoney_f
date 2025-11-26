@@ -8,11 +8,12 @@ import SettingsScreen from '@/screens/Settings/SettingsScreen'
 import { BottomNav, type BottomNavTab } from '@/components/ui/BottomNav'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
-import { useCreateTransaction } from '@/hooks/useCreateTransaction'
+import useTransactions from '@/hooks/useTransactions'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
-import type { WalletTransactionResponse } from '@api/types'
+import type { Category } from '@/types/entities/category'
+import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
@@ -24,13 +25,17 @@ function App() {
 	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const formId = useId()
 	const { wallets, fetchWallets } = useWallets()
-	const { createTransaction, loading: transactionLoading, error: transactionError, clearError } = useCreateTransaction()
+	const { createWalletTransaction, createCategoryTransaction } = useTransactions()
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
 	const [toWalletId, setToWalletId] = useState<number | null>(null)
 	const [description, setDescription] = useState('')
 	const [dateTime, setDateTime] = useState(getCurrentDateTimeString)
 	const [formError, setFormError] = useState<string | null>(null)
+	const [transactionType, setTransactionType] = useState<TransactionTypeTabValue>('EXPENSE')
+	const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+	const [transactionSubmitting, setTransactionSubmitting] = useState(false)
+	const [transactionError, setTransactionError] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (!isInTelegram()) return
@@ -52,15 +57,20 @@ function App() {
 		[]
 	)
 
+	const clearTransactionError = useCallback(() => setTransactionError(null), [])
+
 	const resetForm = useCallback(() => {
 		setAmount('')
 		setDescription('')
 		setDateTime(getCurrentDateTimeString())
 		setFromWalletId(null)
 		setToWalletId(null)
+		setSelectedCategory(null)
+		setTransactionType('TRANSFER')
 		setFormError(null)
-		clearError()
-	}, [clearError])
+		setTransactionError(null)
+		setTransactionSubmitting(false)
+	}, [])
 
 	useEffect(() => {
 		if (!transactionDrawerOpen) return
@@ -101,7 +111,12 @@ function App() {
 		return !Number.isNaN(parsed.getTime())
 	}, [dateTime])
 
-	const submitDisabled = transactionLoading || !amountValid || !dateValid || fromWalletId === null || toWalletId === null
+	const submitDisabled =
+		transactionSubmitting ||
+		!amountValid ||
+		!dateValid ||
+		fromWalletId === null ||
+		(transactionType === 'TRANSFER' ? toWalletId === null : selectedCategory === null)
 	const combinedError = formError ?? transactionError
 
 	const handleDrawerClose = useCallback(() => {
@@ -113,45 +128,77 @@ function App() {
 		(value: string) => {
 			setAmount(value)
 			setFormError(null)
-			clearError()
+			clearTransactionError()
 		},
-		[clearError]
+		[clearTransactionError]
 	)
 
 	const handleDescriptionChange = useCallback(
 		(value: string) => {
 			setDescription(value.slice(0, 30))
 			setFormError(null)
-			clearError()
+			clearTransactionError()
 		},
-		[clearError]
+		[clearTransactionError]
 	)
 
 	const handleDateTimeChange = useCallback(
 		(value: string) => {
 			setDateTime(value)
 			setFormError(null)
-			clearError()
+			clearTransactionError()
 		},
-		[clearError]
+		[clearTransactionError]
 	)
 
-	const handleSelectFromWallet = useCallback((walletId: number) => {
-		setFromWalletId(walletId)
-	}, [])
+	const handleSelectFromWallet = useCallback(
+		(walletId: number) => {
+			setFromWalletId(walletId)
+			setFormError(null)
+			clearTransactionError()
+		},
+		[clearTransactionError]
+	)
 
-	const handleSelectToWallet = useCallback((walletId: number) => {
-		setToWalletId(walletId)
-	}, [])
+	const handleSelectToWallet = useCallback(
+		(walletId: number) => {
+			setToWalletId(walletId)
+			setFormError(null)
+			clearTransactionError()
+		},
+		[clearTransactionError]
+	)
 
-	const handleTransactionCreated = useCallback((transaction: WalletTransactionResponse) => {
-		console.log('Создана транзакция', transaction)
-	}, [])
+	const handleTransactionTypeChange = useCallback(
+		(type: TransactionTypeTabValue) => {
+			setTransactionType(type)
+			setFormError(null)
+			clearTransactionError()
+			if (type === 'TRANSFER') {
+				setSelectedCategory(null)
+			} else {
+				setToWalletId(null)
+			}
+		},
+		[clearTransactionError]
+	)
+
+	const handleSelectCategory = useCallback(
+		(category: Category | null) => {
+			setSelectedCategory(category)
+			setFormError(null)
+			clearTransactionError()
+		},
+		[clearTransactionError]
+	)
 
 	const handleSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
 			event.preventDefault()
-			if (submitDisabled || fromWalletId === null || toWalletId === null) return
+			const isTransfer = transactionType === 'TRANSFER'
+			if (submitDisabled || fromWalletId === null || (isTransfer ? toWalletId === null : selectedCategory === null)) {
+				return
+			}
 
 			const parsedAmount = Number(amount.replace(',', '.'))
 			if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
@@ -165,31 +212,49 @@ function App() {
 				return
 			}
 
-			try {
-				const transaction = await createTransaction({
-					fromWalletId,
-					toWalletId,
-					amount: parsedAmount,
-					description: description.trim() || undefined,
-					executedAt,
-				})
+			setTransactionSubmitting(true)
+			setTransactionError(null)
 
-				handleTransactionCreated(transaction)
+			try {
+				if (isTransfer) {
+					await createWalletTransaction({
+						fromWalletId,
+						toWalletId: toWalletId!,
+						amount: parsedAmount,
+						description: description.trim() || undefined,
+						executedAt,
+					})
+				} else {
+					await createCategoryTransaction({
+						walletId: fromWalletId,
+						categoryId: selectedCategory!.id,
+						type: transactionType,
+						amount: parsedAmount,
+						occurredAt: executedAt,
+						description: description.trim() || undefined,
+					})
+				}
+
 				void fetchWallets().catch(() => undefined)
 				handleDrawerClose()
-			} catch {
-				// Ошибка обработана в хукe useCreateTransaction
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось создать транзакцию'
+				setTransactionError(message)
+			} finally {
+				setTransactionSubmitting(false)
 			}
 		},
 		[
 			submitDisabled,
+			transactionType,
 			fromWalletId,
 			toWalletId,
+			selectedCategory,
 			amount,
 			dateTime,
 			description,
-			createTransaction,
-			handleTransactionCreated,
+			createWalletTransaction,
+			createCategoryTransaction,
 			fetchWallets,
 			handleDrawerClose,
 		]
@@ -220,7 +285,7 @@ function App() {
 				activeKey={activeTab}
 				onTabChange={value => setActiveTab(value as TabKey)}
 				onCreate={() => {
-					clearError()
+					clearTransactionError()
 					setFormError(null)
 					setTransactionDrawerOpen(true)
 				}}
@@ -238,13 +303,17 @@ function App() {
 				availableToWallets={availableToWallets}
 				onSelectFromWallet={handleSelectFromWallet}
 				onSelectToWallet={handleSelectToWallet}
+				transactionType={transactionType}
+				onTransactionTypeChange={handleTransactionTypeChange}
+				selectedCategory={selectedCategory}
+				onSelectCategory={handleSelectCategory}
 				description={description}
 				onDescriptionChange={handleDescriptionChange}
 				dateTime={dateTime}
 				onDateTimeChange={handleDateTimeChange}
 				onSubmit={handleSubmit}
 				submitDisabled={submitDisabled}
-				submitting={transactionLoading}
+				submitting={transactionSubmitting}
 				error={combinedError}
 			/>
 		</div>

@@ -17,12 +17,18 @@ interface TransactionTypePickerDrawerProps {
 	title?: string
 }
 
-export default function TransactionTypePickerDrawer({ open, onClose, selectedType, onSelect, title = 'Тип операции' }: TransactionTypePickerDrawerProps) {
+export default function TransactionTypePickerDrawer({
+	open,
+	onClose,
+	selectedType,
+	onSelect,
+	title = 'Тип операции',
+}: TransactionTypePickerDrawerProps) {
 	return (
 		<Drawer open={open} onClose={onClose} className='max-h-[70vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
 						<X />
 					</button>
 				</div>

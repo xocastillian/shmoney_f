@@ -31,7 +31,7 @@ export const TransactionWalletPickerDrawer = ({
 		>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
 						<X />
 					</button>
 				</div>
