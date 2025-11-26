@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import { TransactionForm } from './TransactionForm'
 import TransactionWalletPickerDrawer from './TransactionWalletPickerDrawer'
 import { currencyIconMap } from '@/widgets/Wallets/types'
 import { getWalletIcon, type WalletPickerOption } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
+import type { Category } from '@/types/entities/category'
+import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
+import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
+
+const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
 interface TransactionDrawerProps {
 	open: boolean
@@ -19,6 +26,10 @@ interface TransactionDrawerProps {
 	availableToWallets: WalletPickerOption[]
 	onSelectFromWallet: (walletId: number) => void
 	onSelectToWallet: (walletId: number) => void
+	transactionType: TransactionTypeTabValue
+	onTransactionTypeChange: (type: TransactionTypeTabValue) => void
+	selectedCategory: Category | null
+	onSelectCategory: (category: Category | null) => void
 	description: string
 	onDescriptionChange: (value: string) => void
 	dateTime: string
@@ -27,6 +38,8 @@ interface TransactionDrawerProps {
 	submitDisabled: boolean
 	submitting: boolean
 	error: string | null
+	mode?: 'create' | 'edit'
+	onDelete?: () => void
 }
 
 export const TransactionDrawer = ({
@@ -41,6 +54,10 @@ export const TransactionDrawer = ({
 	availableToWallets,
 	onSelectFromWallet,
 	onSelectToWallet,
+	transactionType,
+	onTransactionTypeChange,
+	selectedCategory,
+	onSelectCategory,
 	description,
 	onDescriptionChange,
 	dateTime,
@@ -49,14 +66,18 @@ export const TransactionDrawer = ({
 	submitDisabled,
 	submitting,
 	error,
+	mode = 'create',
+	onDelete,
 }: TransactionDrawerProps) => {
 	const [fromPickerOpen, setFromPickerOpen] = useState(false)
 	const [toPickerOpen, setToPickerOpen] = useState(false)
+	const [categoryPickerOpen, setCategoryPickerOpen] = useState(false)
 
 	useEffect(() => {
 		if (!open) {
 			setFromPickerOpen(false)
 			setToPickerOpen(false)
+			setCategoryPickerOpen(false)
 		}
 	}, [open])
 
@@ -65,7 +86,22 @@ export const TransactionDrawer = ({
 	const toWalletIcon = useMemo(() => getWalletIcon(toWallet), [toWallet])
 	const fromWalletLabel = fromWallet?.name ?? (availableFromWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите кошелёк')
 	const toWalletLabel = toWallet?.name ?? (availableToWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите получателя')
-	const submitButtonLabel = submitting ? 'Создание...' : 'Создать'
+	const submitButtonLabel = mode === 'edit' ? (submitting ? 'Сохранение...' : 'Сохранить') : submitting ? 'Создание...' : 'Создать'
+	const categoryIconNode = useMemo(() => {
+		if (!selectedCategory) return null
+		const IconComponent = selectedCategory.icon ? lucideIconMap[selectedCategory.icon] : undefined
+		const initials = selectedCategory.name.slice(0, 2).toUpperCase()
+		if (IconComponent) {
+			return <IconComponent className='mr-3 h-6 w-6' color={selectedCategory.color || '#f89a04'} />
+		}
+		return (
+			<span className='mr-3 text-lg font-semibold' style={{ color: selectedCategory.color || '#f89a04' }}>
+				{initials}
+			</span>
+		)
+	}, [selectedCategory])
+	const categoryLabel = selectedCategory?.name ?? 'Категория'
+	const formTitle = mode === 'edit' ? 'Редактирование транзакции' : 'Новая транзакция'
 
 	return (
 		<>
@@ -95,7 +131,12 @@ export const TransactionDrawer = ({
 					<TransactionForm
 						formId={formId}
 						onSubmit={onSubmit}
-						title='Новая транзакция'
+						title={formTitle}
+						mode={mode}
+						onDelete={onDelete}
+						deleteDisabled={submitting}
+						transactionType={transactionType}
+						onTransactionTypeChange={onTransactionTypeChange}
 						amount={amount}
 						onAmountChange={onAmountChange}
 						fromWalletCurrencyIcon={fromWalletCurrencyIcon}
@@ -109,6 +150,12 @@ export const TransactionDrawer = ({
 						toWalletSelected={Boolean(toWallet)}
 						onOpenToWalletPicker={() => setToPickerOpen(true)}
 						toWalletPickerDisabled={availableToWallets.length === 0}
+						categoryLabel={categoryLabel}
+						categorySelected={Boolean(selectedCategory)}
+						categoryIcon={categoryIconNode}
+						categoryColor={selectedCategory?.color ?? null}
+						onOpenCategoryPicker={() => setCategoryPickerOpen(true)}
+						categoryPickerDisabled={transactionType === 'TRANSFER'}
 						description={description}
 						onDescriptionChange={onDescriptionChange}
 						dateTime={dateTime}
@@ -140,6 +187,16 @@ export const TransactionDrawer = ({
 					setToPickerOpen(false)
 				}}
 				emptyStateLabel='Нет доступных кошельков для перевода'
+			/>
+
+			<CategoriesDrawer
+				open={categoryPickerOpen}
+				onClose={() => setCategoryPickerOpen(false)}
+				showAddButton={false}
+				onSelect={category => {
+					onSelectCategory(category)
+					setCategoryPickerOpen(false)
+				}}
 			/>
 		</>
 	)

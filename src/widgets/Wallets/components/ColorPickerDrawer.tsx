@@ -20,7 +20,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 		>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full'>
+					<button type='button' onClick={onClose} className='rounded-full p-2'>
 						<X />
 					</button>
 				</div>

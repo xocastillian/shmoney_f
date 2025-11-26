@@ -11,14 +11,22 @@ export const endpoints = {
 		base: '/api/wallets',
 		byId: (id: number | string) => `/api/wallets/${id}`,
 	},
+	walletTransactions: {
+		base: '/api/wallet-transactions',
+		byId: (id: number | string) => `/api/wallet-transactions/${id}`,
+	},
+	categoryTransactions: {
+		base: '/api/category-transactions',
+		byId: (id: number | string) => `/api/category-transactions/${id}`,
+	},
 	categories: {
 		base: '/api/categories',
 		byId: (id: number | string) => `/api/categories/${id}`,
 		subcategories: (categoryId: number | string) => `/api/categories/${categoryId}/subcategories`,
 		subcategoryById: (categoryId: number | string, subcategoryId: number | string) => `/api/categories/${categoryId}/subcategories/${subcategoryId}`,
 	},
-	transactions: {
-		base: '/api/wallet-transactions',
+	transactionsFeed: {
+		base: '/api/transactions',
 	},
 	currencies: {
 		base: '/api/currencies',

@@ -6,6 +6,8 @@ declare global {
 	interface TelegramWebApp {
 		initData: string
 		ready: () => void
+		disableVerticalSwipes?: () => void
+		enableVerticalSwipes?: () => void
 	}
 
 	interface TelegramNamespace {

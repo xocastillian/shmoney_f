@@ -11,12 +11,13 @@ interface CategoriesDrawerProps {
 	onClose: () => void
 	onSelect?: (category: Category) => void
 	onAdd?: () => void
+	showAddButton?: boolean
 }
 
 const CloseIcon = LucideIcons.X
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
-const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerProps) => {
+const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true }: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
 
@@ -34,7 +35,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerPr
 		<Drawer open={open} onClose={onClose} className='max-h-[100vh]' overlayClassName='bg-black/80 backdrop-blur-sm'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
 						<CloseIcon />
 					</button>
 				</div>
@@ -74,12 +75,14 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd }: CategoriesDrawerPr
 						</>
 					)}
 
-					<div className='border-b border-divider bg-background-muted'>
-						<button type='button' onClick={() => onAdd?.()} className='flex h-16 items-center px-3 w-full'>
-							<LucideIcons.Plus className='mr-3 text-access' />
-							<span className='text-access'>Добавить категорию</span>
-						</button>
-					</div>
+					{showAddButton && (
+						<div className='border-b border-divider bg-background-muted'>
+							<button type='button' onClick={() => onAdd?.()} className='flex h-16 items-center px-3 w-full'>
+								<LucideIcons.Plus className='mr-3 text-access' />
+								<span className='text-access'>Добавить категорию</span>
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</Drawer>

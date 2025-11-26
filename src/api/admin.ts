@@ -16,6 +16,6 @@ export async function listAllWallets(): Promise<WalletResponse[]> {
 }
 
 export async function listAllTransactions(): Promise<WalletTransactionResponse[]> {
-	const data = await get<unknown>(endpoints.transactions.base)
+	const data = await get<unknown>(endpoints.walletTransactions.base)
 	return WalletTransactionResponseSchema.array().parse(data)
 }

@@ -1,12 +1,18 @@
-import { CalendarClock, CircleDollarSign, FileText, Wallet as WalletIcon } from 'lucide-react'
+import { CalendarClock, CircleDollarSign, FileText, Wallet as WalletIcon, ListFilter, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
+import TransactionTypeTabs, { type TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 
 interface TransactionFormProps {
 	formId: string
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 	title: string
+	mode?: 'create' | 'edit'
+	onDelete?: () => void
+	deleteDisabled?: boolean
+	transactionType?: TransactionTypeTabValue
+	onTransactionTypeChange?: (type: TransactionTypeTabValue) => void
 	amount: string
 	onAmountChange: (value: string) => void
 	fromWalletCurrencyIcon?: string | null
@@ -20,6 +26,12 @@ interface TransactionFormProps {
 	onOpenToWalletPicker: () => void
 	toWalletIcon?: ReactNode
 	toWalletPickerDisabled?: boolean
+	categoryLabel?: string
+	categorySelected?: boolean
+	categoryIcon?: ReactNode
+	categoryColor?: string | null
+	onOpenCategoryPicker?: () => void
+	categoryPickerDisabled?: boolean
 	description: string
 	onDescriptionChange: (value: string) => void
 	dateTime: string
@@ -30,6 +42,11 @@ export const TransactionForm = ({
 	formId,
 	onSubmit,
 	title,
+	mode = 'create',
+	onDelete,
+	deleteDisabled = false,
+	transactionType = 'TRANSFER',
+	onTransactionTypeChange,
 	amount,
 	onAmountChange,
 	fromWalletCurrencyIcon,
@@ -43,12 +60,22 @@ export const TransactionForm = ({
 	onOpenToWalletPicker,
 	toWalletIcon,
 	toWalletPickerDisabled = false,
+	categoryLabel = 'Категория',
+	categorySelected = false,
+	categoryIcon,
+	categoryColor,
+	onOpenCategoryPicker,
+	categoryPickerDisabled = false,
 	description,
 	onDescriptionChange,
 	dateTime,
 	onDateTimeChange,
 }: TransactionFormProps) => {
 	const formattedAmount = formatDecimalForDisplay(amount)
+	const isEditMode = mode === 'edit'
+	const isEditingTransfer = isEditMode && transactionType === 'TRANSFER'
+	const shouldRenderTransactionTypeTabs = !isEditingTransfer
+	const transactionTypeOptions = isEditMode && !isEditingTransfer ? (['EXPENSE', 'INCOME'] as TransactionTypeTabValue[]) : undefined
 
 	const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizeDecimalInput(event.target.value)
@@ -61,6 +88,10 @@ export const TransactionForm = ({
 		<form id={formId} onSubmit={onSubmit} className='flex flex-1 flex-col gap-4'>
 			<div>
 				<h1 className='mb-3 px-3 text-sm'>{title}</h1>
+
+				{shouldRenderTransactionTypeTabs && (
+					<TransactionTypeTabs value={transactionType} onChange={onTransactionTypeChange} options={transactionTypeOptions} className='mb-3' />
+				)}
 
 				<div className='bg-background-muted'>
 					<div className='border-b border-divider'>
@@ -94,17 +125,36 @@ export const TransactionForm = ({
 						</div>
 					</button>
 
-					<button
-						type='button'
-						onClick={onOpenToWalletPicker}
-						className='w-full border-b border-divider text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60'
-						disabled={toWalletPickerDisabled}
-					>
-						<div className='flex h-16 items-center px-3'>
-							{toWalletIcon ?? <WalletIcon className='mr-3 text-label' />}
-							<span className={toWalletSelected ? 'text-text' : 'text-label'}>{toWalletSelected ? toWalletLabel : 'Куда'}</span>
-						</div>
-					</button>
+					{transactionType === 'TRANSFER' ? (
+						<button
+							type='button'
+							onClick={onOpenToWalletPicker}
+							className='w-full border-b border-divider text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60'
+							disabled={toWalletPickerDisabled}
+						>
+							<div className='flex h-16 items-center px-3'>
+								{toWalletIcon ?? <WalletIcon className='mr-3 text-label' />}
+								<span className={toWalletSelected ? 'text-text' : 'text-label'}>{toWalletSelected ? toWalletLabel : 'Куда'}</span>
+							</div>
+						</button>
+					) : (
+						<button
+							type='button'
+							onClick={onOpenCategoryPicker}
+							className='w-full border-b border-divider text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60'
+							disabled={categoryPickerDisabled}
+						>
+							<div className='flex h-16 items-center px-3'>
+								{categoryIcon ?? <ListFilter className='mr-3 text-label' />}
+								<span
+									className={categorySelected ? 'text-text' : 'text-label'}
+									style={categorySelected && categoryColor ? { color: categoryColor } : undefined}
+								>
+									{categorySelected ? categoryLabel : 'Категория'}
+								</span>
+							</div>
+						</button>
+					)}
 
 					<div className='border-b border-divider'>
 						<div className='flex h-16 items-center gap-3 px-3'>
@@ -131,6 +181,19 @@ export const TransactionForm = ({
 						/>
 					</div>
 				</div>
+				{mode === 'edit' && onDelete && (
+					<div className='border-b border-divider'>
+						<button
+							type='button'
+							onClick={onDelete}
+							className='flex h-16 items-center px-3 bg-background-muted w-full text-danger'
+							disabled={deleteDisabled}
+						>
+							<Trash className='mr-3 text-danger' />
+							Удалить
+						</button>
+					</div>
+				)}
 			</div>
 		</form>
 	)

@@ -79,6 +79,14 @@ export const WalletTransactionRequestSchema = z.object({
 	executedAt: z.coerce.date().nullable().optional(),
 })
 
+export const WalletTransactionUpdateRequestSchema = z.object({
+	fromWalletId: z.number().int().optional(),
+	toWalletId: z.number().int().optional(),
+	amount: z.number().positive().optional(),
+	description: z.string().max(255).optional(),
+	executedAt: z.coerce.date().nullable().optional(),
+})
+
 export const WalletTransactionResponseSchema = z.object({
 	id: z.number().int(),
 	fromWalletId: z.number().int(),
@@ -93,6 +101,74 @@ export const WalletTransactionResponseSchema = z.object({
 	description: z.string().nullable().optional(),
 	executedAt: z.coerce.date().nullable(),
 	createdAt: z.coerce.date().nullable(),
+})
+
+export const CategoryTransactionResponseSchema = z.object({
+	id: z.number().int(),
+	walletId: z.number().int(),
+	walletName: z.string(),
+	categoryId: z.number().int(),
+	categoryName: z.string(),
+	subcategoryId: z.number().int().nullable(),
+	subcategoryName: z.string().nullable(),
+	type: CategoryTransactionTypeSchema,
+	amount: z.coerce.number(),
+	currencyCode: z.string(),
+	description: z.string().nullable().optional(),
+	occurredAt: z.coerce.date(),
+	createdAt: z.coerce.date().nullable(),
+	updatedAt: z.coerce.date().nullable(),
+})
+
+export const CategoryTransactionCreateRequestSchema = z.object({
+	walletId: z.number().int().positive(),
+	categoryId: z.number().int().positive(),
+	subcategoryId: z.number().int().positive().optional(),
+	type: CategoryTransactionTypeSchema,
+	amount: z.number().positive(),
+	occurredAt: z.coerce.date(),
+	description: z.string().max(255).optional(),
+})
+
+export const CategoryTransactionUpdateRequestSchema = z.object({
+	walletId: z.number().int().positive().optional(),
+	categoryId: z.number().int().positive().optional(),
+	subcategoryId: z.number().int().positive().nullable().optional(),
+	type: CategoryTransactionTypeSchema.optional(),
+	amount: z.number().positive().optional(),
+	occurredAt: z.coerce.date().optional(),
+	description: z.string().max(255).optional(),
+})
+
+export const CategoryTransactionPageResponseSchema = z.object({
+	count: z.number().int(),
+	next: z.number().int().nullable().optional(),
+	previous: z.number().int().nullable().optional(),
+	results: CategoryTransactionResponseSchema.array(),
+})
+
+export const TransactionFeedTypeSchema = z.enum(['TRANSFER', 'EXPENSE', 'INCOME'])
+
+export const TransactionFeedItemSchema = z.object({
+	id: z.number().int(),
+	entryType: z.string(),
+	categoryType: CategoryTransactionTypeSchema.nullable(),
+	walletId: z.number().int().nullable(),
+	counterpartyWalletId: z.number().int().nullable(),
+	categoryId: z.number().int().nullable(),
+	subcategoryId: z.number().int().nullable(),
+	amount: z.coerce.number(),
+	currencyCode: z.string(),
+	description: z.string().nullable().optional(),
+	occurredAt: z.coerce.date(),
+	createdAt: z.coerce.date(),
+})
+
+export const TransactionFeedResponseSchema = z.object({
+	count: z.number().int(),
+	next: z.number().int().nullable().optional(),
+	previous: z.number().int().nullable().optional(),
+	results: TransactionFeedItemSchema.array(),
 })
 
 export const CurrencyResponseSchema = z.object({
