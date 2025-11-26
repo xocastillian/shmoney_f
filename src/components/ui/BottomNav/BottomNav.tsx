@@ -35,7 +35,7 @@ export const BottomNav = ({ tabs, activeKey, onTabChange, onCreate, createButton
 
 	return (
 		<nav className={cn('fixed inset-x-0 bottom-0', className)}>
-			<div className='relative mx-auto flex h-[90px] max-w-screen-sm items-start pt-3 justify-between '>
+			<div className='relative mx-auto flex h-[95px] max-w-screen-sm items-start pt-4 justify-between bg-black/80 backdrop-blur-sm'>
 				<div className='grid w-full items-center justify-items-center' style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
 					{tabs.map(tab => {
 						if (tab.variant === 'action') {

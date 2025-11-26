@@ -12,7 +12,7 @@ const ExchangeRates = () => {
 	const title = useMemo(() => 'Курсы валют', [])
 
 	return (
-		<section className='mt-4 rounded-xl bg-background-muted p-4 shadow-sm backdrop-blur'>
+		<section className='mt-4 rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur'>
 			<div className='mb-3 flex items-center justify-between gap-2 border-b pb-3 border-divider'>
 				<h2 className='text-base'>{title}</h2>
 				{loading && <span className='text-xs text-muted-foreground'>Обновление...</span>}

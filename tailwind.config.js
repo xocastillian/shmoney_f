@@ -11,6 +11,7 @@ module.exports = {
 				label: 'var(--label)',
 				'accent-orange': 'var(--accent-orange)',
 				'background-muted': 'var(--background-muted)',
+				'background-muted-2': 'var(--background-muted-2)',
 				divider: 'var(--divider)',
 				'text-dark': 'var(--text-dark)',
 				'background-secondary': 'var(--background-secondary)',

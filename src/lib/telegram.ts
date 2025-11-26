@@ -25,6 +25,20 @@ export function isInTelegram(): boolean {
 	return getTelegramWebApp() !== null
 }
 
+export function disableVerticalSwipes(): void {
+	const wa = getTelegramWebApp()
+	if (wa?.disableVerticalSwipes) {
+		wa.disableVerticalSwipes()
+	}
+}
+
+export function enableVerticalSwipes(): void {
+	const wa = getTelegramWebApp()
+	if (wa?.enableVerticalSwipes) {
+		wa.enableVerticalSwipes()
+	}
+}
+
 export function parseInitDataString(initData: string): Record<string, string> {
 	const map: Record<string, string> = {}
 	const pairs = initData.split('&')

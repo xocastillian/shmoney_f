@@ -13,6 +13,7 @@ import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
 import type { WalletTransactionResponse } from '@api/types'
+import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
 
@@ -30,6 +31,15 @@ function App() {
 	const [description, setDescription] = useState('')
 	const [dateTime, setDateTime] = useState(getCurrentDateTimeString)
 	const [formError, setFormError] = useState<string | null>(null)
+
+	useEffect(() => {
+		if (!isInTelegram()) return
+
+		disableVerticalSwipes()
+		return () => {
+			enableVerticalSwipes()
+		}
+	}, [])
 
 	const tabs = useMemo<BottomNavTab[]>(
 		() => [
