@@ -12,12 +12,22 @@ interface TransactionTypeTabsProps {
 	value: TransactionTypeTabValue
 	onChange?: (value: TransactionTypeTabValue) => void
 	className?: string
+	options?: TransactionTypeTabValue[]
 }
 
-export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className }: TransactionTypeTabsProps) => {
+export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className, options }: TransactionTypeTabsProps) => {
+	const resolvedOptions = options && options.length > 0 ? options : TRANSACTION_TABS.map(tab => tab.key)
+	const tabsToRender = resolvedOptions
+		.map(option => TRANSACTION_TABS.find(tab => tab.key === option) ?? null)
+		.filter((tab): tab is (typeof TRANSACTION_TABS)[number] => Boolean(tab))
+
+	if (tabsToRender.length === 0) {
+		return null
+	}
+
 	return (
 		<div className={cn('flex bg-background-muted p-[2px]', className)}>
-			{TRANSACTION_TABS.map(tab => {
+			{tabsToRender.map(tab => {
 				const isActive = tab.key === value
 				return (
 					<button

@@ -1,6 +1,7 @@
 import { useCallback, useRef, type UIEvent } from 'react'
 import { Filter, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
+import type { TransactionFeedItem } from '@api/types'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
 
 export interface TransactionsDrawerProps extends TransactionsListProps {
@@ -14,6 +15,7 @@ export interface TransactionsDrawerProps extends TransactionsListProps {
 	filtersActive?: boolean
 	initialLoading?: boolean
 	error?: string | null
+	onItemClick?: (item: TransactionFeedItem) => void
 }
 
 const SCROLL_THRESHOLD_PX = 120
@@ -32,6 +34,7 @@ const TransactionsDrawer = ({
 	filtersActive = false,
 	initialLoading = false,
 	error = null,
+	onItemClick,
 }: TransactionsDrawerProps) => {
 	const scrollDebounceRef = useRef<number | null>(null)
 
@@ -77,7 +80,7 @@ const TransactionsDrawer = ({
 					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg text-muted-foreground'>Нет данных</div>
 				) : (
 					<div className='flex-1 overflow-y-auto pb-10' onScroll={handleScroll}>
-						<TransactionsList items={items} walletById={walletById} categoryById={categoryById} />
+						<TransactionsList items={items} walletById={walletById} categoryById={categoryById} onItemClick={onItemClick} />
 						{loadingMore && <div className='py-3 text-center text-sm text-muted-foreground'>Загрузка...</div>}
 					</div>
 				)}

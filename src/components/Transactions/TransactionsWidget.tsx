@@ -1,7 +1,9 @@
+import type { TransactionFeedItem } from '@api/types'
 import Button from '../ui/Button/Button'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
 
-export interface TransactionsWidgetProps extends TransactionsListProps {
+export interface TransactionsWidgetProps extends Omit<TransactionsListProps, 'items'> {
+	items: TransactionFeedItem[]
 	loading?: boolean
 	error?: string | null
 	onOpenDrawer?: () => void
@@ -14,6 +16,7 @@ export const TransactionsWidget = ({
 	walletById = {},
 	categoryById = {},
 	onOpenDrawer,
+	onItemClick,
 	limit = 5,
 }: TransactionsWidgetProps) => {
 	if (loading) {
@@ -33,12 +36,12 @@ export const TransactionsWidget = ({
 	}
 
 	return (
-		<section className='mt-4 rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur'>
+		<section className='mt-4 rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur mb-3'>
 			<div className='mb-3 flex items-center justify-between gap-2 px-3'>
 				<h2 className='text-base border-b border-divider pb-3 w-full'>Последние транзакции</h2>
 			</div>
 
-			<TransactionsList items={items} walletById={walletById} categoryById={categoryById} limit={limit} />
+			<TransactionsList items={items} walletById={walletById} categoryById={categoryById} limit={limit} onItemClick={onItemClick} />
 
 			<div className='mt-3 px-3 ml-auto w-fit'>
 				<Button text='Показать все' onClick={onOpenDrawer} />

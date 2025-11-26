@@ -17,7 +17,11 @@ import useTransactions from '@/hooks/useTransactions'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 
-const HomeScreen = () => {
+interface HomeScreenProps {
+	onTransactionSelect?: (item: TransactionFeedItem) => void
+}
+
+const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	const { status, error: authError, isInTelegram, login } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 	const { wallets, loading: walletsLoading, error: walletsError, fetchWallets, clearWallets } = useWallets()
@@ -154,6 +158,7 @@ const HomeScreen = () => {
 						error={feedError}
 						walletById={walletById}
 						categoryById={categoryById}
+						onItemClick={onTransactionSelect}
 						onOpenDrawer={() => setTransactionsDrawerOpen(true)}
 					/>
 					<TransactionsDrawer
@@ -167,6 +172,7 @@ const HomeScreen = () => {
 						initialLoading={drawerLoading}
 						error={drawerError}
 						onLoadMore={handleLoadMoreFeed}
+						onItemClick={onTransactionSelect}
 						onOpenFilters={() => setFiltersDrawerOpen(true)}
 						filtersActive={hasActiveFeedFilters}
 					/>

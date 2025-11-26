@@ -14,9 +14,14 @@ import { mapWalletsToPickerOptions } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
+import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
+import { useCategories } from '@/hooks/useCategories'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
+type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
+
+const isCategoryTransactionType = (value: TransactionTypeTabValue): value is CategoryTransactionTypeValue => value === 'EXPENSE' || value === 'INCOME'
 
 const getCurrentDateTimeString = () => formatDateTimeLocal(new Date())
 
@@ -25,7 +30,18 @@ function App() {
 	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const formId = useId()
 	const { wallets, fetchWallets } = useWallets()
-	const { createWalletTransaction, createCategoryTransaction } = useTransactions()
+	const {
+		createWalletTransaction,
+		createCategoryTransaction,
+		updateWalletTransaction,
+		updateCategoryTransaction,
+		deleteWalletTransaction,
+		deleteCategoryTransaction,
+		getWalletTransaction,
+		getCategoryTransaction,
+		fetchTransactionFeed,
+	} = useTransactions()
+	const { categories, fetchCategories: fetchCategoriesData } = useCategories()
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
 	const [toWalletId, setToWalletId] = useState<number | null>(null)
@@ -36,6 +52,7 @@ function App() {
 	const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
 	const [transactionSubmitting, setTransactionSubmitting] = useState(false)
 	const [transactionError, setTransactionError] = useState<string | null>(null)
+	const [editingTransaction, setEditingTransaction] = useState<{ kind: 'TRANSFER' | 'CATEGORY'; id: number } | null>(null)
 
 	useEffect(() => {
 		if (!isInTelegram()) return
@@ -66,7 +83,7 @@ function App() {
 		setFromWalletId(null)
 		setToWalletId(null)
 		setSelectedCategory(null)
-		setTransactionType('TRANSFER')
+		setTransactionType('EXPENSE')
 		setFormError(null)
 		setTransactionError(null)
 		setTransactionSubmitting(false)
@@ -79,6 +96,12 @@ function App() {
 			void fetchWallets().catch(() => undefined)
 		}
 	}, [transactionDrawerOpen, wallets.length, fetchWallets])
+
+	useEffect(() => {
+		if (categories.length === 0) {
+			void fetchCategoriesData().catch(() => undefined)
+		}
+	}, [categories.length, fetchCategoriesData])
 
 	useEffect(() => {
 		if (!transactionDrawerOpen) return
@@ -98,6 +121,7 @@ function App() {
 
 	const availableFromWallets = useMemo(() => mapWalletsToPickerOptions(wallets), [wallets])
 	const availableToWallets = useMemo(() => mapWalletsToPickerOptions(wallets.filter(wallet => wallet.id !== fromWalletId)), [wallets, fromWalletId])
+	const isEditMode = Boolean(editingTransaction)
 
 	const amountValid = useMemo(() => {
 		if (amount.trim().length === 0) return false
@@ -121,6 +145,7 @@ function App() {
 
 	const handleDrawerClose = useCallback(() => {
 		setTransactionDrawerOpen(false)
+		setEditingTransaction(null)
 		resetForm()
 	}, [resetForm])
 
@@ -192,11 +217,76 @@ function App() {
 		[clearTransactionError]
 	)
 
+	const handleTransactionSelect = useCallback(
+		async (item: TransactionFeedItem) => {
+			setFormError(null)
+			clearTransactionError()
+			try {
+				if (item.entryType === 'TRANSFER') {
+					const detail = await getWalletTransaction(item.id)
+					setTransactionType('TRANSFER')
+					setFromWalletId(detail.fromWalletId)
+					setToWalletId(detail.toWalletId)
+					setAmount(detail.sourceAmount?.toString() ?? detail.targetAmount?.toString() ?? '0')
+					setDescription(detail.description ?? '')
+					setDateTime(formatDateTimeLocal(detail.executedAt ? new Date(detail.executedAt) : new Date()))
+					setSelectedCategory(null)
+					setEditingTransaction({ kind: 'TRANSFER', id: detail.id })
+				} else {
+					const detail = await getCategoryTransaction(item.id)
+					setTransactionType(detail.type)
+					setFromWalletId(detail.walletId)
+					setToWalletId(null)
+					const matchedCategory = categories.find(category => category.id === detail.categoryId)
+					const fallbackCategory: Category = matchedCategory ?? {
+						id: detail.categoryId,
+						name: detail.categoryName,
+						color: '#9CA3AF',
+						icon: '',
+						subcategories: [],
+						createdAt: null,
+						updatedAt: null,
+					}
+					setSelectedCategory(fallbackCategory)
+					setAmount(detail.amount.toString())
+					setDescription(detail.description ?? '')
+					setDateTime(formatDateTimeLocal(new Date(detail.occurredAt)))
+					setEditingTransaction({ kind: 'CATEGORY', id: detail.id })
+				}
+				setTransactionDrawerOpen(true)
+			} catch (error) {
+				const message = error instanceof Error ? error.message : 'Не удалось загрузить транзакцию'
+				setTransactionError(message)
+			}
+		},
+		[getWalletTransaction, getCategoryTransaction, categories, clearTransactionError]
+	)
+
+	const handleDeleteTransaction = useCallback(async () => {
+		if (!editingTransaction) return
+		setTransactionSubmitting(true)
+		setTransactionError(null)
+		try {
+			if (editingTransaction.kind === 'TRANSFER') {
+				await deleteWalletTransaction(editingTransaction.id)
+			} else {
+				await deleteCategoryTransaction(editingTransaction.id)
+			}
+			void fetchWallets().catch(() => undefined)
+			void fetchTransactionFeed().catch(() => undefined)
+			handleDrawerClose()
+		} catch (error) {
+			const message = error instanceof Error ? error.message : 'Не удалось удалить транзакцию'
+			setTransactionError(message)
+		} finally {
+			setTransactionSubmitting(false)
+		}
+	}, [editingTransaction, deleteWalletTransaction, deleteCategoryTransaction, fetchWallets, fetchTransactionFeed, handleDrawerClose])
+
 	const handleSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
 			event.preventDefault()
-			const isTransfer = transactionType === 'TRANSFER'
-			if (submitDisabled || fromWalletId === null || (isTransfer ? toWalletId === null : selectedCategory === null)) {
+			if (submitDisabled || fromWalletId === null || (transactionType === 'TRANSFER' ? toWalletId === null : selectedCategory === null)) {
 				return
 			}
 
@@ -216,7 +306,30 @@ function App() {
 			setTransactionError(null)
 
 			try {
-				if (isTransfer) {
+				if (editingTransaction) {
+					if (editingTransaction.kind === 'TRANSFER') {
+						await updateWalletTransaction(editingTransaction.id, {
+							fromWalletId,
+							toWalletId: toWalletId!,
+							amount: parsedAmount,
+							description: description.trim() || undefined,
+							executedAt,
+						})
+					} else {
+						if (!isCategoryTransactionType(transactionType)) {
+							setFormError('Некорректный тип транзакции')
+							return
+						}
+						await updateCategoryTransaction(editingTransaction.id, {
+							walletId: fromWalletId,
+							categoryId: selectedCategory!.id,
+							type: transactionType,
+							amount: parsedAmount,
+							occurredAt: executedAt,
+							description: description.trim() || undefined,
+						})
+					}
+				} else if (transactionType === 'TRANSFER') {
 					await createWalletTransaction({
 						fromWalletId,
 						toWalletId: toWalletId!,
@@ -225,6 +338,10 @@ function App() {
 						executedAt,
 					})
 				} else {
+					if (!isCategoryTransactionType(transactionType)) {
+						setFormError('Некорректный тип транзакции')
+						return
+					}
 					await createCategoryTransaction({
 						walletId: fromWalletId,
 						categoryId: selectedCategory!.id,
@@ -236,9 +353,10 @@ function App() {
 				}
 
 				void fetchWallets().catch(() => undefined)
+				void fetchTransactionFeed().catch(() => undefined)
 				handleDrawerClose()
 			} catch (err) {
-				const message = err instanceof Error ? err.message : 'Не удалось создать транзакцию'
+				const message = err instanceof Error ? err.message : 'Не удалось сохранить транзакцию'
 				setTransactionError(message)
 			} finally {
 				setTransactionSubmitting(false)
@@ -253,8 +371,12 @@ function App() {
 			amount,
 			dateTime,
 			description,
+			editingTransaction,
 			createWalletTransaction,
 			createCategoryTransaction,
+			updateWalletTransaction,
+			updateCategoryTransaction,
+			fetchTransactionFeed,
 			fetchWallets,
 			handleDrawerClose,
 		]
@@ -264,7 +386,7 @@ function App() {
 		<div className='relative min-h-screen bg-background'>
 			<main>
 				<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
-					<HomeScreen />
+					<HomeScreen onTransactionSelect={handleTransactionSelect} />
 				</section>
 
 				<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
@@ -285,8 +407,8 @@ function App() {
 				activeKey={activeTab}
 				onTabChange={value => setActiveTab(value as TabKey)}
 				onCreate={() => {
-					clearTransactionError()
-					setFormError(null)
+					resetForm()
+					setEditingTransaction(null)
 					setTransactionDrawerOpen(true)
 				}}
 			/>
@@ -315,6 +437,8 @@ function App() {
 				submitDisabled={submitDisabled}
 				submitting={transactionSubmitting}
 				error={combinedError}
+				mode={isEditMode ? 'edit' : 'create'}
+				onDelete={isEditMode ? handleDeleteTransaction : undefined}
 			/>
 		</div>
 	)

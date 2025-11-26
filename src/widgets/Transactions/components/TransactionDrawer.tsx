@@ -38,6 +38,8 @@ interface TransactionDrawerProps {
 	submitDisabled: boolean
 	submitting: boolean
 	error: string | null
+	mode?: 'create' | 'edit'
+	onDelete?: () => void
 }
 
 export const TransactionDrawer = ({
@@ -64,6 +66,8 @@ export const TransactionDrawer = ({
 	submitDisabled,
 	submitting,
 	error,
+	mode = 'create',
+	onDelete,
 }: TransactionDrawerProps) => {
 	const [fromPickerOpen, setFromPickerOpen] = useState(false)
 	const [toPickerOpen, setToPickerOpen] = useState(false)
@@ -82,7 +86,7 @@ export const TransactionDrawer = ({
 	const toWalletIcon = useMemo(() => getWalletIcon(toWallet), [toWallet])
 	const fromWalletLabel = fromWallet?.name ?? (availableFromWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите кошелёк')
 	const toWalletLabel = toWallet?.name ?? (availableToWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите получателя')
-	const submitButtonLabel = submitting ? 'Создание...' : 'Создать'
+	const submitButtonLabel = mode === 'edit' ? (submitting ? 'Сохранение...' : 'Сохранить') : submitting ? 'Создание...' : 'Создать'
 	const categoryIconNode = useMemo(() => {
 		if (!selectedCategory) return null
 		const IconComponent = selectedCategory.icon ? lucideIconMap[selectedCategory.icon] : undefined
@@ -97,6 +101,7 @@ export const TransactionDrawer = ({
 		)
 	}, [selectedCategory])
 	const categoryLabel = selectedCategory?.name ?? 'Категория'
+	const formTitle = mode === 'edit' ? 'Редактирование транзакции' : 'Новая транзакция'
 
 	return (
 		<>
@@ -126,7 +131,10 @@ export const TransactionDrawer = ({
 					<TransactionForm
 						formId={formId}
 						onSubmit={onSubmit}
-						title='Новая транзакция'
+						title={formTitle}
+						mode={mode}
+						onDelete={onDelete}
+						deleteDisabled={submitting}
 						transactionType={transactionType}
 						onTransactionTypeChange={onTransactionTypeChange}
 						amount={amount}
