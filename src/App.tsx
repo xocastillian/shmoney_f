@@ -18,7 +18,6 @@ import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 import { useCategories } from '@/hooks/useCategories'
 import { useAuthStore } from '@/store/authStore'
-import Aurora from './components/ui/Aurora/Aurora'
 import Loader from './components/ui/Loader/Loader'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
@@ -399,14 +398,6 @@ function App() {
 
 	return (
 		<div className='relative min-h-screen bg-background overflow-hidden'>
-			<Aurora
-				colorStops={['var(--accent)', 'var(--accent-1)', 'var(--accent-2)']}
-				blend={1000}
-				amplitude={1}
-				speed={1}
-				className='pointer-events-none fixed inset-0 z-0 opacity-20'
-			/>
-
 			<div className='relative z-10'>
 				<main>
 					<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
