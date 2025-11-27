@@ -80,7 +80,7 @@ export function WalletForm({
 	}
 
 	return (
-		<form id={formId} className='flex flex-1 flex-col gap-4' onSubmit={onSubmit}>
+		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
 				<h1 className='text-sm px-3 mb-3'>{title}</h1>
 				<div className='bg-background-muted'>

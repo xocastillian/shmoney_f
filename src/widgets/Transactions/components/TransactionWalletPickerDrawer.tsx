@@ -42,7 +42,7 @@ export const TransactionWalletPickerDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col'>
+				<div className='flex flex-1 flex-col pb-10 overflow-y-auto'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title}</h2>
 
 					{wallets.length === 0 ? (

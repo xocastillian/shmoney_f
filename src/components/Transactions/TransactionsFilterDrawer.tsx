@@ -270,7 +270,8 @@ const TransactionsFilterDrawer = ({
 			<CategoriesDrawer
 				open={isCategoryPickerOpen}
 				onClose={() => setCategoryPickerOpen(false)}
-				showAllOption
+				selectable
+				selectedCategoryId={filters.categoryId ?? null}
 				showAddButton={false}
 				onSelect={category => {
 					onFiltersChange({ categoryId: category.id === filters.categoryId ? null : category.id })

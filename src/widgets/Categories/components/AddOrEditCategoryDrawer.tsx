@@ -30,7 +30,6 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
 	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
 	const [isSubmitting, setSubmitting] = useState(false)
-	// const [isSubcategoryDrawerOpen, setSubcategoryDrawerOpen] = useState(false)
 	const formId = useId()
 	const { createCategory, updateCategory, deleteCategory } = useCategories()
 	const isEditMode = Boolean(initialCategory)
@@ -38,7 +37,6 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	useEffect(() => {
 		if (!open) {
 			setColorPickerOpen(false)
-			// setSubcategoryDrawerOpen(false)
 			return
 		}
 
@@ -87,14 +85,6 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		setIconPickerOpen(false)
 	}
 
-	// const handleOpenSubcategoryDrawer = () => {
-	// 	setSubcategoryDrawerOpen(true)
-	// }
-
-	// const handleCloseSubcategoryDrawer = () => {
-	// 	setSubcategoryDrawerOpen(false)
-	// }
-
 	const handleDelete = async () => {
 		if (!initialCategory || isSubmitting) return
 
@@ -119,7 +109,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 			<Drawer
 				open={open}
 				onClose={onClose}
-				className='max-h-[80vh] rounded-t-lg !bg-background-secondary'
+				className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
 				overlayClassName='bg-black/80 backdrop-blur-sm'
 			>
 				<div className='flex h-full flex-col'>
@@ -164,8 +154,6 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 			/>
 
 			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
-
-			{/* <AddOrEditSubcategoryDrawer open={isSubcategoryDrawerOpen} onClose={handleCloseSubcategoryDrawer} category={initialCategory ?? null} /> */}
 		</>
 	)
 }

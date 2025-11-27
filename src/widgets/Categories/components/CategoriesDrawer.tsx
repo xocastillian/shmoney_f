@@ -12,9 +12,10 @@ interface CategoriesDrawerProps {
 	onAdd?: () => void
 	showAddButton?: boolean
 	className?: string
-	showAllOption?: boolean
+	selectable?: boolean
 	allOptionLabel?: string
 	onSelectAll?: () => void
+	selectedCategoryId?: number | null
 }
 
 const CloseIcon = LucideIcons.X
@@ -27,9 +28,10 @@ const CategoriesDrawer = ({
 	onAdd,
 	showAddButton = true,
 	className,
-	showAllOption = false,
+	selectable = false,
 	allOptionLabel = 'Все категории',
 	onSelectAll,
+	selectedCategoryId = null,
 }: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
@@ -53,12 +55,12 @@ const CategoriesDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto'>
+				<div className='flex-1 overflow-y-auto pb-10'>
 					{hasCategories && (
 						<>
 							<h2 className='mb-3 px-3 text-sm font-medium text-label'>Категории</h2>
 							<div className='overflow-hidden bg-background-muted'>
-								{showAllOption && (
+								{selectable && (
 									<button
 										type='button'
 										onClick={() => onSelectAll?.()}
@@ -67,12 +69,14 @@ const CategoriesDrawer = ({
 										<div className='flex h-16 items-center px-3'>
 											<LucideIcons.FolderHeart className='mr-3 text-label' />
 											<span className='text-text'>{allOptionLabel}</span>
+											{selectable && selectedCategoryId == null && <LucideIcons.Check className='ml-auto text-primary' size={16} />}
 										</div>
 									</button>
 								)}
 								{categories.map(category => {
 									const IconComponent = category.icon ? lucideIconMap[category.icon] : undefined
 									const initials = category.name.slice(0, 2).toUpperCase()
+									const isSelected = selectable && selectedCategoryId === category.id
 
 									return (
 										<button
@@ -92,6 +96,7 @@ const CategoriesDrawer = ({
 													)}
 												</div>
 												<span className='text-text'>{category.name}</span>
+												{isSelected && <LucideIcons.Check className='ml-auto text-primary' size={16} />}
 											</div>
 										</button>
 									)
