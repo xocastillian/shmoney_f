@@ -401,7 +401,7 @@ function App() {
 				blend={1000}
 				amplitude={1}
 				speed={1}
-				className='pointer-events-none fixed inset-0 z-0 opacity-30'
+				className='pointer-events-none fixed inset-0 z-0 opacity-20'
 			/>
 
 			<div className='relative z-10'>
