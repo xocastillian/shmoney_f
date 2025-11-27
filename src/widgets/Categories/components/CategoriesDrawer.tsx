@@ -29,7 +29,7 @@ const CategoriesDrawer = ({
 	showAddButton = true,
 	className,
 	selectable = false,
-	allOptionLabel = 'Все категории',
+	allOptionLabel,
 	onSelectAll,
 	selectedCategoryId = null,
 }: CategoriesDrawerProps) => {
@@ -60,7 +60,7 @@ const CategoriesDrawer = ({
 						<>
 							<h2 className='mb-3 px-3 text-sm font-medium text-label'>Категории</h2>
 							<div className='overflow-hidden bg-background-muted'>
-								{selectable && (
+								{selectable && allOptionLabel && (
 									<button
 										type='button'
 										onClick={() => onSelectAll?.()}

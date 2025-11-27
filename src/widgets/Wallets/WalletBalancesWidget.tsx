@@ -8,7 +8,7 @@ interface WalletBalancesWidgetProps {
 
 const WalletBalancesWidget = ({ balances, loading = false, error = null }: WalletBalancesWidgetProps) => {
 	if (loading) {
-		return <div className='mt-3 text-sm text-muted-foreground'>Загрузка сводных балансов...</div>
+		return <div className='mt-3 text-sm'>Загрузка сводных балансов...</div>
 	}
 
 	if (error) {
@@ -20,7 +20,11 @@ const WalletBalancesWidget = ({ balances, loading = false, error = null }: Walle
 	}
 
 	if (!balances.length) {
-		return <div className='mt-3 text-sm text-muted-foreground'>Нет данных по балансу</div>
+		return (
+			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>
+				Здесь будет общий баланс
+			</section>
+		)
 	}
 
 	return (

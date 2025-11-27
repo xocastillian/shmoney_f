@@ -15,7 +15,7 @@ const ExchangeRates = () => {
 		<section className='mt-4 rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur'>
 			<div className='mb-3 flex items-center justify-between gap-2 border-b pb-3 border-divider'>
 				<h2 className='text-base'>{title}</h2>
-				{loading && <span className='text-xs text-muted-foreground'>Обновление...</span>}
+				{loading && <span className='text-xs '>Обновление...</span>}
 			</div>
 
 			{error && <div className='mb-2 text-sm text-red-400'>{error}</div>}
@@ -24,7 +24,7 @@ const ExchangeRates = () => {
 				<ul className='flex items-center justify-between'>
 					{rates.map(rate => (
 						<li key={`${rate.sourceCurrency}-${rate.targetCurrency}`} className='flex flex-col items-center'>
-							<span className='text-muted-foreground text-xs'>
+							<span className=' text-xs'>
 								{rate.sourceCurrency}/{rate.targetCurrency}
 							</span>
 
@@ -33,7 +33,7 @@ const ExchangeRates = () => {
 					))}
 				</ul>
 			) : (
-				<div className='text-sm text-muted-foreground'>{loading ? 'Загрузка курсов…' : 'Курсы пока недоступны'}</div>
+				<div className='text-sm '>{loading ? 'Загрузка курсов…' : 'Курсы пока недоступны'}</div>
 			)}
 		</section>
 	)
