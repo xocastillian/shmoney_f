@@ -17,7 +17,9 @@ import type { TransactionTypeTabValue } from '@/components/Transactions/Transact
 import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 import { useCategories } from '@/hooks/useCategories'
+import { useAuthStore } from '@/store/authStore'
 import Aurora from './components/ui/Aurora/Aurora'
+import Loader from './components/ui/Loader/Loader'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
 type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
@@ -43,6 +45,7 @@ function App() {
 		fetchTransactionFeed,
 	} = useTransactions()
 	const { categories, fetchCategories: fetchCategoriesData } = useCategories()
+	const authLoading = useAuthStore(state => state.loading)
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
 	const [toWalletId, setToWalletId] = useState<number | null>(null)
@@ -462,6 +465,14 @@ function App() {
 					onDelete={isEditMode ? handleDeleteTransaction : undefined}
 				/>
 			</div>
+
+			{authLoading && (
+				<div className='fixed inset-0 z-30 bg-black/80 backdrop-blur-sm'>
+					<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+						<Loader />
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }
