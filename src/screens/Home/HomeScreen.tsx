@@ -14,6 +14,7 @@ import { useWallets } from '@/hooks/useWallets'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useCategories } from '@/hooks/useCategories'
 import useTransactions from '@/hooks/useTransactions'
+import { useTranslation } from '@/i18n'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 
@@ -37,6 +38,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	const { rates, loading: ratesLoading, error: ratesError, fetchExchangeRates, clearRates } = useExchangeRates()
 	const { categories, fetchCategories, clearCategories: resetCategories } = useCategories()
 	const { feed, feedLoading, feedError, fetchTransactionFeed, clearTransactions } = useTransactions()
+	const { t } = useTranslation()
 	const [isTransactionsDrawerOpen, setTransactionsDrawerOpen] = useState(false)
 	const [isFiltersDrawerOpen, setFiltersDrawerOpen] = useState(false)
 	const [isLoadingMoreFeed, setIsLoadingMoreFeed] = useState(false)
@@ -216,6 +218,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				onItemClick={onTransactionSelect}
 				onOpenFilters={() => setFiltersDrawerOpen(true)}
 				filtersActive={hasActiveFeedFilters}
+				title={t('transactions.drawer.all')}
 			/>
 			<TransactionsFilterDrawer
 				open={isFiltersDrawerOpen}
@@ -225,6 +228,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				onResetFilters={handleResetFeedFilters}
 				wallets={wallets}
 				categories={categories}
+				title={t('transactions.drawer.filters')}
 			/>
 		</div>
 	)

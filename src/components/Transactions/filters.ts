@@ -2,13 +2,13 @@ export type TransactionFilterType = '' | 'EXPENSE' | 'INCOME' | 'TRANSFER'
 
 export type TransactionPeriodFilter = '' | 'TODAY' | 'LAST_7_DAYS' | 'LAST_MONTH' | 'LAST_6_MONTHS' | 'LAST_YEAR'
 
-export const periodOptions: Array<{ value: TransactionPeriodFilter; label: string }> = [
-	{ value: '', label: 'Выбрать период' },
-	{ value: 'TODAY', label: 'Сегодня' },
-	{ value: 'LAST_7_DAYS', label: 'Последние 7 дней' },
-	{ value: 'LAST_MONTH', label: 'Последний месяц' },
-	{ value: 'LAST_6_MONTHS', label: 'Последние 6 месяцев' },
-	{ value: 'LAST_YEAR', label: 'Последний год' },
+export const periodOptions: Array<{ value: TransactionPeriodFilter; labelKey: string }> = [
+	{ value: '', labelKey: 'transactions.filters.period.pick' },
+	{ value: 'TODAY', labelKey: 'transactions.filters.period.today' },
+	{ value: 'LAST_7_DAYS', labelKey: 'transactions.filters.period.last7Days' },
+	{ value: 'LAST_MONTH', labelKey: 'transactions.filters.period.lastMonth' },
+	{ value: 'LAST_6_MONTHS', labelKey: 'transactions.filters.period.last6Months' },
+	{ value: 'LAST_YEAR', labelKey: 'transactions.filters.period.lastYear' },
 ]
 
 export interface TransactionsFilterState {

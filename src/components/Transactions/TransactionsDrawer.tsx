@@ -24,7 +24,7 @@ const SCROLL_THRESHOLD_PX = 120
 const TransactionsDrawer = ({
 	open,
 	onClose,
-	title = 'Все транзакции',
+	title,
 	items,
 	walletById,
 	categoryById,

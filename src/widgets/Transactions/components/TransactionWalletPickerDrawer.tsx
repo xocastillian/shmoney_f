@@ -2,6 +2,7 @@ import { Check, Wallet as WalletIcon, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import { typeIcons } from '@/widgets/Wallets/types'
 import type { WalletType } from '@/types/entities/wallet'
+import { useTranslation } from '@/i18n'
 
 interface TransactionWalletPickerDrawerProps {
 	open: boolean
@@ -25,9 +26,10 @@ export const TransactionWalletPickerDrawer = ({
 	onSelect,
 	emptyStateLabel,
 	showAllOption = false,
-	allOptionLabel = 'Все кошельки',
+	allOptionLabel,
 	onSelectAll,
 }: TransactionWalletPickerDrawerProps) => {
+	const { t } = useTranslation()
 	return (
 		<Drawer
 			open={open}
@@ -37,7 +39,7 @@ export const TransactionWalletPickerDrawer = ({
 		>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
 						<X />
 					</button>
 				</div>
@@ -46,7 +48,9 @@ export const TransactionWalletPickerDrawer = ({
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title}</h2>
 
 					{wallets.length === 0 ? (
-						<div className='flex flex-1 items-center justify-center px-3 text-sm text-label'>{emptyStateLabel ?? 'Нет доступных кошельков'}</div>
+						<div className='flex flex-1 items-center justify-center px-3 text-sm text-label'>
+							{emptyStateLabel ?? t('transactions.filters.walletPicker.empty')}
+						</div>
 					) : (
 						<div className='bg-background-muted'>
 							{showAllOption && (
@@ -59,7 +63,7 @@ export const TransactionWalletPickerDrawer = ({
 								>
 									<div className='flex h-16 items-center px-3'>
 										<WalletIcon className='mr-3 h-6 w-6 text-label' />
-										<span className='text-text'>{allOptionLabel}</span>
+										<span className='text-text'>{allOptionLabel ?? t('transactions.filters.wallet.all')}</span>
 										{selectedWalletId == null && <Check className='ml-auto text-primary' size={16} />}
 									</div>
 								</button>

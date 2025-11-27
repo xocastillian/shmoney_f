@@ -13,6 +13,7 @@ import { typeIcons } from '@/widgets/Wallets/types'
 import { formatDateDisplay } from '@/utils/date'
 import PeriodFilterDrawer from './PeriodFilterDrawer'
 import { periodOptions } from './filters'
+import { useTranslation } from '@/i18n'
 
 interface TransactionsFilterDrawerProps {
 	open: boolean
@@ -31,10 +32,11 @@ const TransactionsFilterDrawer = ({
 	filters,
 	onFiltersChange,
 	onResetFilters,
-	title = 'Фильтры',
+	title,
 	wallets = [],
 	categories = [],
 }: TransactionsFilterDrawerProps) => {
+	const { t, locale } = useTranslation()
 	const [isTypePickerOpen, setTypePickerOpen] = useState(false)
 	const [isWalletPickerOpen, setWalletPickerOpen] = useState(false)
 	const [isCategoryPickerOpen, setCategoryPickerOpen] = useState(false)
@@ -54,13 +56,13 @@ const TransactionsFilterDrawer = ({
 		[wallets]
 	)
 	const selectedWallet = filters.walletId ? walletPickerOptions.find(wallet => wallet.id === filters.walletId) ?? null : null
-	const walletLabel = selectedWallet?.name ?? 'Все кошельки'
+	const walletLabel = selectedWallet?.name ?? t('transactions.filters.wallet.all')
 	const walletTextClass = selectedWallet ? 'text-text' : 'text-label'
 	const WalletIconComponent = selectedWallet?.type ? typeIcons[selectedWallet.type] ?? WalletIcon : WalletIcon
 	const walletIconClassName = selectedWallet ? 'mr-3 h-6 w-6' : 'mr-3 text-label'
 	const walletIconStyle = selectedWallet?.color ? { color: selectedWallet.color } : undefined
 	const selectedCategory = filters.categoryId ? categories.find(category => category.id === filters.categoryId) ?? null : null
-	const categoryLabel = selectedCategory?.name ?? 'Все категории'
+	const categoryLabel = selectedCategory?.name ?? t('transactions.filters.category.all')
 	const categoryTextClass = selectedCategory ? 'text-text' : 'text-label'
 	const categoryTextStyle = selectedCategory?.color ? { color: selectedCategory.color } : undefined
 	const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
@@ -68,22 +70,25 @@ const TransactionsFilterDrawer = ({
 
 	const selectedPeriodOption = periodOptions.find(option => option.value === filters.period && option.value !== '')
 
-	const formatDateValue = useCallback((value: string) => {
-		if (!value) return null
-		const parsed = new Date(value)
-		if (Number.isNaN(parsed.getTime())) return null
-		return formatDateDisplay(parsed)
-	}, [])
+	const formatDateValue = useCallback(
+		(value: string) => {
+			if (!value) return null
+			const parsed = new Date(value)
+			if (Number.isNaN(parsed.getTime())) return null
+			return formatDateDisplay(parsed, locale)
+		},
+		[locale]
+	)
 
 	const periodLabel = useMemo(() => {
-		if (selectedPeriodOption) return selectedPeriodOption.label
+		if (selectedPeriodOption) return t(selectedPeriodOption.labelKey)
 		const fromLabel = formatDateValue(filters.from)
 		const toLabel = formatDateValue(filters.to)
 		if (fromLabel || toLabel) {
 			return [fromLabel ?? '—', toLabel ?? '—'].join(' — ')
 		}
-		return 'Период'
-	}, [filters.from, filters.to, selectedPeriodOption, formatDateValue])
+		return t('transactions.filters.period.placeholder')
+	}, [filters.from, filters.to, selectedPeriodOption, formatDateValue, t])
 
 	const hasPeriodFilters = Boolean(filters.period || filters.from || filters.to)
 
@@ -106,13 +111,13 @@ const TransactionsFilterDrawer = ({
 			<Drawer open={open} onClose={onClose} className='max-h-full rounded-lg bg-background'>
 				<div className='flex h-full flex-col'>
 					<div className='flex justify-end p-3'>
-						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
 							<X />
 						</button>
 					</div>
 
 					<div className='flex flex-1 flex-col'>
-						<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title}</h2>
+						<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title ?? t('transactions.filters.title')}</h2>
 
 						<div className='relative border-b border-divider bg-background-muted'>
 							<button
@@ -123,10 +128,10 @@ const TransactionsFilterDrawer = ({
 								<ListFilter className='mr-3 text-label' />
 
 								<span className='text-label' style={{ color: filters.type ? 'var(--text)' : '' }}>
-									{filters.type === 'EXPENSE' && 'Расходы'}
-									{filters.type === 'INCOME' && 'Доходы'}
-									{filters.type === 'TRANSFER' && 'Переводы'}
-									{!filters.type && 'Все операции'}
+									{filters.type === 'EXPENSE' && t('transactions.filters.type.expense')}
+									{filters.type === 'INCOME' && t('transactions.filters.type.income')}
+									{filters.type === 'TRANSFER' && t('transactions.filters.type.transfer')}
+									{!filters.type && t('transactions.filters.type.all')}
 								</span>
 							</button>
 							{filters.type && (
@@ -138,7 +143,7 @@ const TransactionsFilterDrawer = ({
 										event.preventDefault()
 										onFiltersChange({ type: '' })
 									}}
-									aria-label='Сбросить тип'
+									aria-label={t('transactions.filters.type.reset')}
 								>
 									<X className='h-4 w-4' />
 								</button>
@@ -163,7 +168,7 @@ const TransactionsFilterDrawer = ({
 										event.preventDefault()
 										onFiltersChange({ walletId: null })
 									}}
-									aria-label='Сбросить кошелёк'
+									aria-label={t('transactions.filters.wallet.reset')}
 								>
 									<X className='h-4 w-4' />
 								</button>
@@ -194,7 +199,7 @@ const TransactionsFilterDrawer = ({
 										event.preventDefault()
 										onFiltersChange({ categoryId: null })
 									}}
-									aria-label='Сбросить категорию'
+									aria-label={t('transactions.filters.category.reset')}
 								>
 									<X className='h-4 w-4' />
 								</button>
@@ -219,7 +224,7 @@ const TransactionsFilterDrawer = ({
 										event.preventDefault()
 										onFiltersChange({ period: '', from: '', to: '' })
 									}}
-									aria-label='Сбросить период'
+									aria-label={t('transactions.filters.period.reset')}
 								>
 									<X className='h-4 w-4' />
 								</button>
@@ -236,7 +241,7 @@ const TransactionsFilterDrawer = ({
 									}}
 								>
 									<RotateCcw className='mr-3 text-danger' />
-									Сбросить
+									{t('transactions.filters.resetButton')}
 								</button>
 							</div>
 						)}
@@ -250,23 +255,26 @@ const TransactionsFilterDrawer = ({
 				selectedType={filters.type as TransactionFilterType}
 				onSelect={type => onFiltersChange({ type })}
 			/>
+
 			<TransactionWalletPickerDrawer
 				open={isWalletPickerOpen}
 				onClose={() => setWalletPickerOpen(false)}
-				title='Выберите кошелёк'
+				title={t('transactions.filters.walletPicker.title')}
 				wallets={walletPickerOptions}
 				selectedWalletId={filters.walletId ?? null}
 				onSelect={walletId => {
 					onFiltersChange({ walletId: walletId === filters.walletId ? null : walletId })
 					setWalletPickerOpen(false)
 				}}
-				emptyStateLabel='Нет доступных кошельков'
+				emptyStateLabel={t('transactions.filters.walletPicker.empty')}
 				showAllOption
+				allOptionLabel={t('transactions.filters.wallet.all')}
 				onSelectAll={() => {
 					onFiltersChange({ walletId: null })
 					setWalletPickerOpen(false)
 				}}
 			/>
+
 			<CategoriesDrawer
 				open={isCategoryPickerOpen}
 				onClose={() => setCategoryPickerOpen(false)}
@@ -282,8 +290,9 @@ const TransactionsFilterDrawer = ({
 					setCategoryPickerOpen(false)
 				}}
 				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
-				allOptionLabel='Все категории'
+				allOptionLabel={t('transactions.filters.category.all')}
 			/>
+
 			<PeriodFilterDrawer
 				open={isPeriodPickerOpen}
 				onClose={() => setPeriodPickerOpen(false)}

@@ -16,7 +16,7 @@ export const walletTypeOrder: WalletType[] = [
 	WalletType.INVESTMENT_ACCOUNT,
 ]
 
-export const walletTypeLabels: Record<WalletType, keyof TranslationDictionary> = {
+export const walletTypeLabels: Record<WalletType, string> = {
 	[WalletType.CASH]: 'wallets.form.type.cash',
 	[WalletType.BANK_CARD]: 'wallets.form.type.bankCard',
 	[WalletType.SAVINGS_ACCOUNT]: 'wallets.form.type.savingsAccount',
