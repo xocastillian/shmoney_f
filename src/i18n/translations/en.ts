@@ -1,11 +1,22 @@
 export const en = {
+	'bottomNav.home': 'Home',
+	'bottomNav.statistics': 'Stats',
+	'bottomNav.budgets': 'Budgets',
+	'bottomNav.settings': 'Settings',
 	'settings.title': 'Settings',
-	'wallets.balancePlaceholder': 'Total balance will appear here',
-	'transactions.placeholder': 'Transactions will appear here',
-	'exchangeRates.unavailable': 'Exchange rates are not available yet',
-	'wallets.loading': 'Loading wallets...',
-	'transactions.loading': 'Loading transactions...',
-	'balance.loading': 'Loading balances...',
+	'settings.categories': 'Categories',
+	'settings.language': 'Language',
+	'settings.theme': 'Theme',
+	'categories.drawer.title': 'Categories',
+	'categories.drawer.newTitle': 'New category',
+	'categories.drawer.editTitle': 'Edit category',
+	'categories.drawer.close': 'Close',
+	'categories.drawer.add': 'Add category',
+	'categories.form.namePlaceholder': 'Category name',
+	'categories.form.color': 'Color',
+	'categories.form.icon': 'Icon',
+	'categories.form.delete': 'Delete category',
+	'common.save': 'Save',
 } as const
 
-export type TranslationDictionary = typeof en
+export type TranslationDictionary = Record<keyof typeof en, string>

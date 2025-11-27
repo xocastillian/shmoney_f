@@ -1,5 +1,7 @@
 import { Check, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
+import Loader from '@/components/ui/Loader/Loader'
+import { useTranslation } from '@/i18n'
 
 interface LanguageSettingsDrawerProps {
 	open: boolean
@@ -12,6 +14,7 @@ interface LanguageSettingsDrawerProps {
 }
 
 export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLanguage, loading = false, onSelect }: LanguageSettingsDrawerProps) => {
+	const { t } = useTranslation()
 	const handleClose = () => {
 		if (loading) return
 		onClose()
@@ -32,7 +35,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 				</div>
 
 				<div className='flex flex-1 flex-col'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>Язык</h2>
+					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('settings.language')}</h2>
 					<div className='bg-background-muted'>
 						{languages.map(language => {
 							const isSelected = language === selectedLanguage
@@ -54,6 +57,14 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 						})}
 					</div>
 				</div>
+
+				{loading && (
+					<div className='fixed inset-0 z-30 bg-black/80 backdrop-blur-sm'>
+						<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+							<Loader />
+						</div>
+					</div>
+				)}
 			</div>
 		</Drawer>
 	)

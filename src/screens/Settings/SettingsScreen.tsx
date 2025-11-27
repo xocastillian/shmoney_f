@@ -1,12 +1,13 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { Category } from '@/types/entities/category'
 import SettingsItem from '@/components/SettingsItem/SettingsItem'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
-import { createSettings } from './settings'
+import { useSettingsList } from './settings'
 import { useCategories } from '@/hooks/useCategories'
 import LanguageSettingsDrawer from './components/LanguageSettingsDrawer'
 import { useSettings } from '@/hooks/useSettings'
+import { useTranslation } from '@/i18n'
 
 const SettingsScreen = () => {
 	const [isCategoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false)
@@ -15,20 +16,17 @@ const SettingsScreen = () => {
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 	const { actionLoading: categoriesSubmitting } = useCategories()
 	const { supportedLanguages, language, loading: settingsLoading, error: settingsError, changeLanguage } = useSettings()
+	const { t } = useTranslation()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
 	const closeCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(false), [])
 	const openLanguageDrawer = useCallback(() => setLanguageDrawerOpen(true), [])
 	const closeLanguageDrawer = useCallback(() => setLanguageDrawerOpen(false), [])
 
-	const settings = useMemo(
-		() =>
-			createSettings({
-				onCategoriesPress: openCategoriesDrawer,
-				onLanguagePress: openLanguageDrawer,
-			}),
-		[openCategoriesDrawer, openLanguageDrawer]
-	)
+	const settings = useSettingsList({
+		onCategoriesPress: openCategoriesDrawer,
+		onLanguagePress: openLanguageDrawer,
+	})
 
 	const handleSelectCategory = useCallback((category: Category) => {
 		setEditingCategory(category)
@@ -64,7 +62,7 @@ const SettingsScreen = () => {
 
 	return (
 		<>
-			<div className='p-3 text-lg font-medium'>Настройки</div>
+			<div className='p-3 text-lg font-medium'>{t('settings.title')}</div>
 
 			<div>
 				{settings.map(setting => (
@@ -80,7 +78,7 @@ const SettingsScreen = () => {
 				initialCategory={editingCategory ?? undefined}
 				onSubmit={handleSubmitCategory}
 				submitting={categoriesSubmitting}
-				title={editingCategory ? 'Редактирование категории' : 'Новая категория'}
+				title={editingCategory ? t('categories.drawer.editTitle') : t('categories.drawer.newTitle')}
 			/>
 
 			<LanguageSettingsDrawer

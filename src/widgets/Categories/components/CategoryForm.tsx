@@ -1,6 +1,7 @@
 import { Info, Palette, Shapes, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { categoryIconMap } from '../icons'
+import { useTranslation } from '@/i18n'
 
 interface CategoryFormProps {
 	formId: string
@@ -29,6 +30,8 @@ const CategoryForm = ({
 	disableDelete,
 	onSubmit,
 }: CategoryFormProps) => {
+	const { t } = useTranslation()
+
 	return (
 		<form id={formId} className='flex h-full flex-col gap-5' onSubmit={onSubmit}>
 			<div>
@@ -39,7 +42,7 @@ const CategoryForm = ({
 							<Info className='mr-3 text-label' />
 							<input
 								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
-								placeholder='Название категории'
+								placeholder={t('categories.form.namePlaceholder')}
 								value={name}
 								onChange={(event: ChangeEvent<HTMLInputElement>) => onNameChange(event.target.value)}
 								maxLength={100}
@@ -51,7 +54,7 @@ const CategoryForm = ({
 						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenColorPicker}>
 							<Palette className='mr-3 text-label transition-colors' style={{ color }} />
 							<span className='text-text' style={{ color }}>
-								Цвет
+								{t('categories.form.color')}
 							</span>
 						</button>
 					</div>
@@ -62,7 +65,7 @@ const CategoryForm = ({
 								const IconComponent = categoryIconMap[icon]
 								return IconComponent ? <IconComponent className='mr-3 h-6 w-6 text-label' /> : <Shapes className='mr-3 text-label' />
 							})()}
-							<span className='text-text'>Иконка</span>
+							<span className='text-text'>{t('categories.form.icon')}</span>
 						</button>
 					</div>
 
@@ -75,7 +78,7 @@ const CategoryForm = ({
 								disabled={disableDelete}
 							>
 								<Trash className='mr-3 text-danger' />
-								<span className='text-danger'>Удалить категорию</span>
+								<span className='text-danger'>{t('categories.form.delete')}</span>
 							</button>
 						</div>
 					)}

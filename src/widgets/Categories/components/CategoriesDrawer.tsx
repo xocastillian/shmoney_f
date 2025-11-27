@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import { useCategories } from '@/hooks/useCategories'
 import type { Category } from '@/types/entities/category'
+import { useTranslation } from '@/i18n'
 
 interface CategoriesDrawerProps {
 	open: boolean
@@ -35,6 +36,7 @@ const CategoriesDrawer = ({
 }: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		if (!open || initialized || loading) return
@@ -58,7 +60,7 @@ const CategoriesDrawer = ({
 				<div className='flex-1 overflow-y-auto pb-10'>
 					{hasCategories && (
 						<>
-							<h2 className='mb-3 px-3 text-sm font-medium text-label'>Категории</h2>
+							<h2 className='mb-3 px-3 text-sm font-medium text-label'>{t('categories.drawer.title')}</h2>
 							<div className='overflow-hidden bg-background-muted'>
 								{selectable && allOptionLabel && (
 									<button
@@ -109,7 +111,7 @@ const CategoriesDrawer = ({
 						<div className='border-b border-divider bg-background-muted'>
 							<button type='button' onClick={() => onAdd?.()} className='flex h-16 items-center px-3 w-full'>
 								<LucideIcons.Plus className='mr-3 text-access' />
-								<span className='text-access'>Добавить категорию</span>
+								<span className='text-access'>{t('categories.drawer.add')}</span>
 							</button>
 						</div>
 					)}

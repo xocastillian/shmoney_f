@@ -9,6 +9,7 @@ import IconPickerDrawer from './IconPickerDrawer'
 import CategoryForm from './CategoryForm'
 import { categoryIconOptions } from '../icons'
 import useCategories from '@/hooks/useCategories'
+import { useTranslation } from '@/i18n'
 
 export type CategoryFormValues = Pick<Category, 'name' | 'color' | 'icon'>
 
@@ -24,14 +25,7 @@ interface AddOrEditCategoryDrawerProps {
 const DEFAULT_ICON = categoryIconOptions[0]?.key ?? 'apple'
 const DEFAULT_COLOR = colorOptions[0] ?? '#F97316'
 
-const AddOrEditCategoryDrawer = ({
-	open,
-	onClose,
-	initialCategory,
-	onSubmit,
-	title = 'Новая категория',
-	submitting = false,
-}: AddOrEditCategoryDrawerProps) => {
+const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, title, submitting = false }: AddOrEditCategoryDrawerProps) => {
 	const [name, setName] = useState('')
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [icon, setIcon] = useState(DEFAULT_ICON)
@@ -40,6 +34,8 @@ const AddOrEditCategoryDrawer = ({
 	const [internalSubmitting, setSubmitting] = useState(false)
 	const formId = useId()
 	const { createCategory, updateCategory, deleteCategory } = useCategories()
+	const { t } = useTranslation()
+	const computedTitle = title ?? (initialCategory ? t('categories.drawer.editTitle') : t('categories.drawer.newTitle'))
 	const isEditMode = Boolean(initialCategory)
 	const isBusy = internalSubmitting || submitting
 
@@ -123,7 +119,7 @@ const AddOrEditCategoryDrawer = ({
 			>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
-						<button type='button' onClick={onClose} className='rounded-full' aria-label='Закрыть'>
+						<button type='button' onClick={onClose} className='rounded-full' aria-label={t('categories.drawer.close')}>
 							<X />
 						</button>
 						<button
@@ -132,14 +128,14 @@ const AddOrEditCategoryDrawer = ({
 							className='rounded-md px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
 							disabled={isSubmitDisabled}
 						>
-							Сохранить
+							{t('common.save')}
 						</button>
 					</div>
 
 					<div className='flex-1 overflow-y-auto'>
 						<CategoryForm
 							formId={formId}
-							title={title}
+							title={computedTitle}
 							name={name}
 							onNameChange={setName}
 							color={color}
