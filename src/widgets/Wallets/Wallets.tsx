@@ -15,11 +15,12 @@ import { colorOptions, currencyOptions } from './constants'
 
 interface WalletsProps {
 	wallets: Wallet[]
+	loading?: boolean
 }
 
 const defaultWalletType = WalletType.CASH
 
-const Wallets = ({ wallets }: WalletsProps) => {
+const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const { createWallet, updateWallet, deleteWallet, actionLoading, fetchWalletBalances } = useWallets()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
@@ -164,35 +165,41 @@ const Wallets = ({ wallets }: WalletsProps) => {
 		return result
 	}, [wallets])
 
+	const shouldRenderSkeleton = loading
+
 	return (
 		<>
-			<Carousel pageClassName='grid grid-cols-2 gap-[10px]' dots>
-				{pages.map((page, pageIndex) => (
-					<div key={`wallets-page-${pageIndex}`}>
-						{page.map((item, itemIndex) => {
-							if (!item && item !== null) {
-								return null
-							}
+			{shouldRenderSkeleton ? (
+				<WalletsSkeleton />
+			) : (
+				<Carousel pageClassName='grid grid-cols-2 gap-[10px]' dots>
+					{pages.map((page, pageIndex) => (
+						<div key={`wallets-page-${pageIndex}`}>
+							{page.map((item, itemIndex) => {
+								if (!item && item !== null) {
+									return null
+								}
 
-							if (item === null) {
-								return <AddWalletCard key={`add-card-${pageIndex}-${itemIndex}`} onClick={handleAddWalletClick} />
-							}
+								if (item === null) {
+									return <AddWalletCard key={`add-card-${pageIndex}-${itemIndex}`} onClick={handleAddWalletClick} />
+								}
 
-							return (
-								<WalletCard
-									key={item.id}
-									name={item.name}
-									balance={item.balance}
-									currencyCode={item.currencyCode}
-									color={item.color}
-									type={item.type}
-									onClick={() => handleWalletClick(item)}
-								/>
-							)
-						})}
-					</div>
-				))}
-			</Carousel>
+								return (
+									<WalletCard
+										key={item.id}
+										name={item.name}
+										balance={item.balance}
+										currencyCode={item.currencyCode}
+										color={item.color}
+										type={item.type}
+										onClick={() => handleWalletClick(item)}
+									/>
+								)
+							})}
+						</div>
+					))}
+				</Carousel>
+			)}
 
 			<WalletFormDrawer
 				open={open}
@@ -258,6 +265,25 @@ const Wallets = ({ wallets }: WalletsProps) => {
 				}}
 			/>
 		</>
+	)
+}
+
+function WalletsSkeleton() {
+	return (
+		<div className='grid grid-cols-2 gap-[10px]'>
+			{Array.from({ length: 2 }).map((_, index) => (
+				<div
+					key={`wallet-skeleton-${index}`}
+					className='min-h-[110px] h-[110px] rounded-xl bg-background-muted p-3 animate-pulse flex flex-col gap-3'
+				>
+					<div className='h-7 w-7 rounded-full bg-background-muted-2/60' />
+					<div className='mt-auto flex flex-col gap-2'>
+						<div className='h-3 w-3/4 rounded bg-background-muted-2/60' />
+						<div className='h-5 w-full rounded bg-background-muted-2/60' />
+					</div>
+				</div>
+			))}
+		</div>
 	)
 }
 

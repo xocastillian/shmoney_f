@@ -3,6 +3,7 @@ import { Filter, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import type { TransactionFeedItem } from '@api/types'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
+import Loader from '../ui/Loader/Loader'
 
 export interface TransactionsDrawerProps extends TransactionsListProps {
 	open: boolean
@@ -75,13 +76,16 @@ const TransactionsDrawer = ({
 				</header>
 
 				{initialLoading ? (
-					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>Загрузка...</div>
+					<div className='fixed inset-0 z-30 bg-black/80 backdrop-blur-sm'>
+						<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+							<Loader />
+						</div>
+					</div>
 				) : items.length === 0 ? (
 					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>Нет данных</div>
 				) : (
 					<div className='flex-1 overflow-y-auto pb-10' onScroll={handleScroll}>
 						<TransactionsList items={items} walletById={walletById} categoryById={categoryById} onItemClick={onItemClick} />
-						{loadingMore && <div className='py-3 text-center text-sm '>Загрузка...</div>}
 					</div>
 				)}
 				{error && <div className='px-3 pb-4 text-sm text-danger'>{error}</div>}

@@ -7,8 +7,10 @@ interface WalletBalancesWidgetProps {
 }
 
 const WalletBalancesWidget = ({ balances, loading = false, error = null }: WalletBalancesWidgetProps) => {
-	if (loading) {
-		return <div className='mt-3 text-sm'>Загрузка сводных балансов...</div>
+	const shouldRenderSkeleton = loading
+
+	if (shouldRenderSkeleton) {
+		return <WalletBalancesSkeleton />
 	}
 
 	if (error) {
@@ -38,6 +40,21 @@ const WalletBalancesWidget = ({ balances, loading = false, error = null }: Walle
 					<li key={balance.currencyCode} className='text-2xl'>
 						<span className='font-medium mr-2'>{balance.totalBalance.toLocaleString()}</span>
 						<span className='text-label'>{balance.currencyCode}</span>
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}
+
+const WalletBalancesSkeleton = () => {
+	return (
+		<section className='rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur animate-pulse'>
+			<ul className='space-y-2'>
+				{Array.from({ length: 1 }).map((_, index) => (
+					<li key={`wallet-balance-skeleton-${index}`} className='flex items-center gap-3'>
+						<div className='h-28 w-28 rounded bg-background-muted-2/60' />
+						<div className='h-4 w-12 rounded bg-background-muted-2/60' />
 					</li>
 				))}
 			</ul>

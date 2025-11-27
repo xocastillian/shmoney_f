@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
-import AuthDiagnostics from '@/components/auth/auth-diagnostics'
 import Wallets from '@/widgets/Wallets/Wallets'
 import WalletBalancesWidget from '@/widgets/Wallets/WalletBalancesWidget'
 import ExchangeRates from '@/widgets/ExchangeRates/ExchangeRates'
@@ -23,7 +22,7 @@ interface HomeScreenProps {
 }
 
 const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
-	const { status, error: authError, isInTelegram, login } = useTelegramAuth({ auto: true })
+	const { status } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 	const {
 		wallets,
@@ -35,7 +34,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		fetchWalletBalances,
 		clearWallets,
 	} = useWallets()
-	const { fetchExchangeRates, clearRates } = useExchangeRates()
+	const { rates, loading: ratesLoading, error: ratesError, fetchExchangeRates, clearRates } = useExchangeRates()
 	const { categories, fetchCategories, clearCategories: resetCategories } = useCategories()
 	const { feed, feedLoading, feedError, fetchTransactionFeed, clearTransactions } = useTransactions()
 	const [isTransactionsDrawerOpen, setTransactionsDrawerOpen] = useState(false)
@@ -180,60 +179,53 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 
 	return (
 		<div className='min-h-full p-3 pb-24'>
-			{!authenticated ? (
-				<AuthDiagnostics status={status} error={authError ?? null} isInTelegram={isInTelegram} onLogin={data => login(data)} />
-			) : (
-				<>
-					{walletsError && <div className='text-sm text-red-400'>{walletsError}</div>}
-					<Wallets wallets={wallets} />
-					{walletsLoading && <div className='mt-2 text-sm '>Загрузка...</div>}
+			{walletsError && <div className='text-sm text-danger'>{walletsError}</div>}
+			<Wallets wallets={wallets} loading={walletsLoading} />
 
-					<div className='mt-4'>
-						<WalletBalancesWidget balances={balances} loading={balancesLoading} error={walletsError} />
-					</div>
+			<div className='mt-4'>
+				<WalletBalancesWidget balances={balances} loading={balancesLoading} error={walletsError} />
+			</div>
 
-					<div className='mt-4'>
-						<TransactionsWidget
-							items={feed}
-							loading={feedLoading}
-							error={feedError}
-							walletById={walletById}
-							categoryById={categoryById}
-							onItemClick={onTransactionSelect}
-							onOpenDrawer={() => setTransactionsDrawerOpen(true)}
-						/>
-					</div>
+			<div className='mt-4'>
+				<TransactionsWidget
+					items={feed}
+					loading={feedLoading}
+					error={feedError}
+					walletById={walletById}
+					categoryById={categoryById}
+					onItemClick={onTransactionSelect}
+					onOpenDrawer={() => setTransactionsDrawerOpen(true)}
+				/>
+			</div>
 
-					<div className='mb-3'>
-						<ExchangeRates />
-					</div>
+			<div className='mb-3 mt-4'>
+				<ExchangeRates rates={rates} loading={ratesLoading} error={ratesError} />
+			</div>
 
-					<TransactionsDrawer
-						open={isTransactionsDrawerOpen}
-						onClose={() => setTransactionsDrawerOpen(false)}
-						items={drawerFeed}
-						walletById={walletById}
-						categoryById={categoryById}
-						hasMore={drawerNextPage != null}
-						loadingMore={isLoadingMoreFeed}
-						initialLoading={drawerLoading}
-						error={drawerError}
-						onLoadMore={handleLoadMoreFeed}
-						onItemClick={onTransactionSelect}
-						onOpenFilters={() => setFiltersDrawerOpen(true)}
-						filtersActive={hasActiveFeedFilters}
-					/>
-					<TransactionsFilterDrawer
-						open={isFiltersDrawerOpen}
-						onClose={() => setFiltersDrawerOpen(false)}
-						filters={feedFilters}
-						onFiltersChange={handleFeedFiltersChange}
-						onResetFilters={handleResetFeedFilters}
-						wallets={wallets}
-						categories={categories}
-					/>
-				</>
-			)}
+			<TransactionsDrawer
+				open={isTransactionsDrawerOpen}
+				onClose={() => setTransactionsDrawerOpen(false)}
+				items={drawerFeed}
+				walletById={walletById}
+				categoryById={categoryById}
+				hasMore={drawerNextPage != null}
+				loadingMore={isLoadingMoreFeed}
+				initialLoading={drawerLoading}
+				error={drawerError}
+				onLoadMore={handleLoadMoreFeed}
+				onItemClick={onTransactionSelect}
+				onOpenFilters={() => setFiltersDrawerOpen(true)}
+				filtersActive={hasActiveFeedFilters}
+			/>
+			<TransactionsFilterDrawer
+				open={isFiltersDrawerOpen}
+				onClose={() => setFiltersDrawerOpen(false)}
+				filters={feedFilters}
+				onFiltersChange={handleFeedFiltersChange}
+				onResetFilters={handleResetFeedFilters}
+				wallets={wallets}
+				categories={categories}
+			/>
 		</div>
 	)
 }

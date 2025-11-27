@@ -11,6 +11,7 @@ export function useTelegramAuth(options?: { auto?: boolean }) {
 	const setStoreStatus = useAuthStore(s => s.setStatus)
 	const setStoreError = useAuthStore(s => s.setError)
 	const setStoreUser = useAuthStore(s => s.setUser)
+	const setStoreLoading = useAuthStore(s => s.setLoading)
 	const canAutoLogin = useMemo(() => auto && isInTelegram(), [auto])
 	const autoOnceRef = useRef(false)
 
@@ -18,6 +19,7 @@ export function useTelegramAuth(options?: { auto?: boolean }) {
 		try {
 			setStatus('authenticating')
 			setStoreStatus('authenticating')
+			setStoreLoading(true)
 			const data = initData ?? getInitData()
 			if (!data) throw new Error('Telegram initData is not available')
 			ready()
@@ -29,6 +31,7 @@ export function useTelegramAuth(options?: { auto?: boolean }) {
 			setStoreStatus('authenticated')
 			setError(null)
 			setStoreError(null)
+			setStoreLoading(false)
 			logInfo('Telegram login success')
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : 'Login failed'
@@ -36,6 +39,7 @@ export function useTelegramAuth(options?: { auto?: boolean }) {
 			setStoreError(msg)
 			setStatus('error')
 			setStoreStatus('error')
+			setStoreLoading(false)
 			logError('Telegram login failed', { message: msg })
 		}
 	}, []) // eslint-disable-line
