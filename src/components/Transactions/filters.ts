@@ -4,4 +4,6 @@ export interface TransactionsFilterState {
 	type: TransactionFilterType
 	from: string
 	to: string
+	walletId: number | null
+	categoryId: number | null
 }

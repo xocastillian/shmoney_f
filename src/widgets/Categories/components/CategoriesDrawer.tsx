@@ -12,12 +12,26 @@ interface CategoriesDrawerProps {
 	onSelect?: (category: Category) => void
 	onAdd?: () => void
 	showAddButton?: boolean
+	className?: string
+	showAllOption?: boolean
+	allOptionLabel?: string
+	onSelectAll?: () => void
 }
 
 const CloseIcon = LucideIcons.X
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
-const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true }: CategoriesDrawerProps) => {
+const CategoriesDrawer = ({
+	open,
+	onClose,
+	onSelect,
+	onAdd,
+	showAddButton = true,
+	className,
+	showAllOption = false,
+	allOptionLabel = 'Все категории',
+	onSelectAll,
+}: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
 
@@ -32,7 +46,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true
 	const hasCategories = categories.length > 0
 
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-[100vh]' overlayClassName='bg-black/80 backdrop-blur-sm'>
+		<Drawer open={open} onClose={onClose} className={`max-h-[100vh] ${className}`} overlayClassName='bg-black/80 backdrop-blur-sm'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
@@ -45,6 +59,18 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true
 						<>
 							<h2 className='mb-3 px-3 text-sm font-medium text-label'>Категории</h2>
 							<div className='overflow-hidden bg-background-muted'>
+								{showAllOption && (
+									<button
+										type='button'
+										onClick={() => onSelectAll?.()}
+										className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
+									>
+										<div className='flex h-16 items-center px-3'>
+											<LucideIcons.FolderHeart className='mr-3 text-label' />
+											<span className='text-text'>{allOptionLabel}</span>
+										</div>
+									</button>
+								)}
 								{categories.map(category => {
 									const IconComponent = category.icon ? lucideIconMap[category.icon] : undefined
 									const initials = category.name.slice(0, 2).toUpperCase()

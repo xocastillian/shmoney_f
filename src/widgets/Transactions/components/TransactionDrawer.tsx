@@ -102,6 +102,7 @@ export const TransactionDrawer = ({
 	}, [selectedCategory])
 	const categoryLabel = selectedCategory?.name ?? 'Категория'
 	const formTitle = mode === 'edit' ? 'Редактирование транзакции' : 'Новая транзакция'
+	const maxTransactionDate = new Date()
 
 	return (
 		<>
@@ -153,13 +154,13 @@ export const TransactionDrawer = ({
 						categoryLabel={categoryLabel}
 						categorySelected={Boolean(selectedCategory)}
 						categoryIcon={categoryIconNode}
-						categoryColor={selectedCategory?.color ?? null}
 						onOpenCategoryPicker={() => setCategoryPickerOpen(true)}
 						categoryPickerDisabled={transactionType === 'TRANSFER'}
 						description={description}
 						onDescriptionChange={onDescriptionChange}
 						dateTime={dateTime}
 						onDateTimeChange={onDateTimeChange}
+						maxDate={maxTransactionDate}
 					/>
 				</div>
 			</Drawer>
@@ -197,6 +198,7 @@ export const TransactionDrawer = ({
 					onSelectCategory(category)
 					setCategoryPickerOpen(false)
 				}}
+				className='max-h-[70vh] bg-background-secondary'
 			/>
 		</>
 	)

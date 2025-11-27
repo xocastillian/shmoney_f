@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import DatePicker from 'antd-mobile/es/components/date-picker'
 import { Calendar, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { formatDateTimeDisplay, formatDateTimeLocal } from '@/utils/date'
+import { formatDateDisplay, formatDateTimeDisplay, formatDateTimeLocal } from '@/utils/date'
 
 export interface MobileDateTimePickerFieldProps {
 	value: string
@@ -14,6 +14,7 @@ export interface MobileDateTimePickerFieldProps {
 	locale?: string
 	minDate?: Date
 	maxDate?: Date
+	precision?: 'minute' | 'day'
 }
 
 export const MobileDateTimePickerField = ({
@@ -26,6 +27,7 @@ export const MobileDateTimePickerField = ({
 	locale = 'ru-RU',
 	minDate,
 	maxDate,
+	precision = 'minute',
 }: MobileDateTimePickerFieldProps) => {
 	const [visible, setVisible] = useState(false)
 
@@ -37,14 +39,15 @@ export const MobileDateTimePickerField = ({
 
 	const displayText = useMemo(() => {
 		if (!dateValue) return placeholder
-		return formatDateTimeDisplay(dateValue, locale)
-	}, [dateValue, placeholder, locale])
+		return precision === 'day' ? formatDateDisplay(dateValue, locale) : formatDateTimeDisplay(dateValue, locale)
+	}, [dateValue, placeholder, locale, precision])
 
 	const displayIcon = icon ?? <Calendar className='text-label' />
 	const displayTextClass = dateValue ? 'text-text' : 'text-label'
 
 	const handleConfirm = (next: Date) => {
-		onChange(formatDateTimeLocal(next))
+		const normalized = precision === 'day' ? new Date(next.getFullYear(), next.getMonth(), next.getDate()) : next
+		onChange(formatDateTimeLocal(normalized))
 	}
 
 	return (
@@ -74,7 +77,7 @@ export const MobileDateTimePickerField = ({
 				onSelect={handleConfirm}
 				min={minDate}
 				max={maxDate}
-				precision='minute'
+				precision={precision}
 				cancelText={null}
 				confirmText={<X className='h-6 w-6 text-text' />}
 				style={{ height: '70vh', backgroundColor: 'var(--background-secondary)' }}

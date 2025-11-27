@@ -1,4 +1,4 @@
-import { CalendarClock, CircleDollarSign, FileText, Wallet as WalletIcon, ListFilter, Trash } from 'lucide-react'
+import { CalendarClock, CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart } from 'lucide-react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
@@ -29,13 +29,13 @@ interface TransactionFormProps {
 	categoryLabel?: string
 	categorySelected?: boolean
 	categoryIcon?: ReactNode
-	categoryColor?: string | null
 	onOpenCategoryPicker?: () => void
 	categoryPickerDisabled?: boolean
 	description: string
 	onDescriptionChange: (value: string) => void
 	dateTime: string
 	onDateTimeChange: (value: string) => void
+	maxDate?: Date
 }
 
 export const TransactionForm = ({
@@ -63,13 +63,13 @@ export const TransactionForm = ({
 	categoryLabel = 'Категория',
 	categorySelected = false,
 	categoryIcon,
-	categoryColor,
 	onOpenCategoryPicker,
 	categoryPickerDisabled = false,
 	description,
 	onDescriptionChange,
 	dateTime,
 	onDateTimeChange,
+	maxDate,
 }: TransactionFormProps) => {
 	const formattedAmount = formatDecimalForDisplay(amount)
 	const isEditMode = mode === 'edit'
@@ -145,13 +145,8 @@ export const TransactionForm = ({
 							disabled={categoryPickerDisabled}
 						>
 							<div className='flex h-16 items-center px-3'>
-								{categoryIcon ?? <ListFilter className='mr-3 text-label' />}
-								<span
-									className={categorySelected ? 'text-text' : 'text-label'}
-									style={categorySelected && categoryColor ? { color: categoryColor } : undefined}
-								>
-									{categorySelected ? categoryLabel : 'Категория'}
-								</span>
+								{categoryIcon ?? <FolderHeart className='mr-3 text-label' />}
+								<span className={categorySelected ? 'text-text' : 'text-label'}>{categorySelected ? categoryLabel : 'Категория'}</span>
 							</div>
 						</button>
 					)}
@@ -178,6 +173,7 @@ export const TransactionForm = ({
 							onChange={onDateTimeChange}
 							icon={<CalendarClock className={'text-label'} />}
 							placeholder='Дата и время'
+							maxDate={maxDate}
 						/>
 					</div>
 				</div>

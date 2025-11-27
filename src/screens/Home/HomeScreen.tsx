@@ -36,12 +36,17 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		type: '',
 		from: '',
 		to: '',
+		walletId: null,
+		categoryId: null,
 	})
 	const [drawerFeed, setDrawerFeed] = useState<TransactionFeedItem[]>([])
 	const [drawerNextPage, setDrawerNextPage] = useState<number | null>(null)
 	const [drawerLoading, setDrawerLoading] = useState(false)
 	const [drawerError, setDrawerError] = useState<string | null>(null)
-	const hasActiveFeedFilters = useMemo(() => Boolean(feedFilters.type || feedFilters.from || feedFilters.to), [feedFilters])
+	const hasActiveFeedFilters = useMemo(
+		() => Boolean(feedFilters.type || feedFilters.from || feedFilters.to || feedFilters.walletId || feedFilters.categoryId),
+		[feedFilters]
+	)
 
 	const feedQueryParams = useMemo(() => {
 		const params: Parameters<typeof fetchTransactionFeed>[0] = {}
@@ -54,6 +59,12 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		if (feedFilters.to) {
 			params.to = serializeUtcDate(feedFilters.to)
 		}
+		if (typeof feedFilters.walletId === 'number') {
+			params.walletId = feedFilters.walletId
+		}
+		if (typeof feedFilters.categoryId === 'number') {
+			params.categoryId = feedFilters.categoryId
+		}
 		return params
 	}, [feedFilters])
 
@@ -62,7 +73,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	}, [])
 
 	const handleResetFeedFilters = useCallback(() => {
-		setFeedFilters({ type: '', from: '', to: '' })
+		setFeedFilters({ type: '', from: '', to: '', walletId: null, categoryId: null })
 	}, [])
 
 	const walletById = useMemo(() => {
@@ -182,6 +193,8 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 						filters={feedFilters}
 						onFiltersChange={handleFeedFiltersChange}
 						onResetFilters={handleResetFeedFilters}
+						wallets={wallets}
+						categories={categories}
 					/>
 				</>
 			)}
