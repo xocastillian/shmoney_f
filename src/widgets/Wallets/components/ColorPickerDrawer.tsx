@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 
 interface ColorPickerDrawerProps {
 	open: boolean
@@ -11,6 +12,7 @@ interface ColorPickerDrawerProps {
 }
 
 export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedColor }: ColorPickerDrawerProps) {
+	const { t } = useTranslation()
 	return (
 		<Drawer
 			open={open}
@@ -26,7 +28,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 				</div>
 
 				<div className='flex flex-1 flex-col px-4 pb-6'>
-					<h2 className='mb-4 text-sm font-medium text-label'>Выбор цвета</h2>
+					<h2 className='mb-4 text-sm font-medium text-label'>{t('wallets.form.colorPickerTitle')}</h2>
 					<div className='grid grid-cols-4 gap-3 gap-y-7 place-items-center'>
 						{colors.map(color => (
 							<button

@@ -1,11 +1,11 @@
 import type { CurrencyOption } from './types'
 
 export const currencyOptions: CurrencyOption[] = [
-	{ value: 'USD', label: 'Доллар USD' },
-	{ value: 'KZT', label: 'Тенге KZT' },
-	{ value: 'EUR', label: 'Евро EUR' },
-	{ value: 'CNY', label: 'Юань CNY' },
-	{ value: 'AED', label: 'Дирхам AED' },
+	{ value: 'USD', label: 'wallets.currency.usd' },
+	{ value: 'KZT', label: 'wallets.currency.kzt' },
+	{ value: 'EUR', label: 'wallets.currency.eur' },
+	{ value: 'CNY', label: 'wallets.currency.cny' },
+	{ value: 'AED', label: 'wallets.currency.aed' },
 ]
 
 export const colorOptions: readonly string[] = [

@@ -5,7 +5,6 @@ import HomeScreen from '@/screens/Home/HomeScreen'
 import StatisticsScreen from '@/screens/Statistics/StatisticsScreen'
 import BudgetsScreen from '@/screens/Budgets/BudgetsScreen'
 import SettingsScreen from '@/screens/Settings/SettingsScreen'
-import { BottomNav, type BottomNavTab } from '@/components/ui/BottomNav'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
 import useTransactions from '@/hooks/useTransactions'
@@ -18,7 +17,10 @@ import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 import { useCategories } from '@/hooks/useCategories'
 import { useAuthStore } from '@/store/authStore'
+import { useSettings } from '@/hooks/useSettings'
 import Loader from './components/ui/Loader/Loader'
+import { useTranslation, type Locale } from './i18n'
+import { BottomNav, type BottomNavTab } from './components/ui/BottomNav/BottomNav'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
 type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
@@ -45,6 +47,8 @@ function App() {
 	} = useTransactions()
 	const { categories, fetchCategories: fetchCategoriesData } = useCategories()
 	const authLoading = useAuthStore(state => state.loading)
+	const { fetchSettings, language } = useSettings()
+	const { t, setLocale } = useTranslation()
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
 	const [toWalletId, setToWalletId] = useState<number | null>(null)
@@ -66,15 +70,25 @@ function App() {
 		}
 	}, [])
 
+	useEffect(() => {
+		void fetchSettings().catch(() => undefined)
+	}, [fetchSettings])
+
+	useEffect(() => {
+		if (language) {
+			setLocale(language as Locale)
+		}
+	}, [language, setLocale])
+
 	const tabs = useMemo<BottomNavTab[]>(
 		() => [
-			{ key: 'home', label: 'Главная', icon: HomeIcon },
-			{ key: 'statistics', label: 'Статистика', icon: BarChart2 },
+			{ key: 'home', label: t('bottomNav.home'), icon: HomeIcon },
+			{ key: 'statistics', label: t('bottomNav.statistics'), icon: BarChart2 },
 			{ key: 'create', variant: 'action' as const },
-			{ key: 'budgets', label: 'Бюджеты', icon: WalletIcon },
-			{ key: 'settings', label: 'Настройки', icon: Settings },
+			{ key: 'budgets', label: t('bottomNav.budgets'), icon: WalletIcon },
+			{ key: 'settings', label: t('bottomNav.settings'), icon: Settings },
 		],
-		[]
+		[t]
 	)
 
 	const clearTransactionError = useCallback(() => setTransactionError(null), [])

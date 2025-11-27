@@ -1,12 +1,9 @@
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 
-const TRANSACTION_TABS = [
-	{ key: 'EXPENSE', label: 'Расход' },
-	{ key: 'INCOME', label: 'Доход' },
-	{ key: 'TRANSFER', label: 'Перевод' },
-] as const
+const TRANSACTION_TABS = ['EXPENSE', 'INCOME', 'TRANSFER'] as const
 
-export type TransactionTypeTabValue = (typeof TRANSACTION_TABS)[number]['key']
+export type TransactionTypeTabValue = (typeof TRANSACTION_TABS)[number]
 
 interface TransactionTypeTabsProps {
 	value: TransactionTypeTabValue
@@ -16,10 +13,15 @@ interface TransactionTypeTabsProps {
 }
 
 export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className, options }: TransactionTypeTabsProps) => {
-	const resolvedOptions = options && options.length > 0 ? options : TRANSACTION_TABS.map(tab => tab.key)
-	const tabsToRender = resolvedOptions
-		.map(option => TRANSACTION_TABS.find(tab => tab.key === option) ?? null)
-		.filter((tab): tab is (typeof TRANSACTION_TABS)[number] => Boolean(tab))
+	const labelKeyMap: Record<TransactionTypeTabValue, string> = {
+		EXPENSE: 'transactions.tabs.expense',
+		INCOME: 'transactions.tabs.income',
+		TRANSFER: 'transactions.tabs.transfer',
+	}
+
+	const { t } = useTranslation()
+	const resolvedOptions = options && options.length > 0 ? options : TRANSACTION_TABS
+	const tabsToRender = resolvedOptions.filter((option): option is TransactionTypeTabValue => TRANSACTION_TABS.includes(option))
 
 	if (tabsToRender.length === 0) {
 		return null
@@ -27,16 +29,17 @@ export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className, op
 
 	return (
 		<div className={cn('flex bg-background-muted p-[2px]', className)}>
-			{tabsToRender.map(tab => {
-				const isActive = tab.key === value
+			{tabsToRender.map(option => {
+				const isActive = option === value
+				const labelKey = labelKeyMap[option]
 				return (
 					<button
-						key={tab.key}
+						key={option}
 						type='button'
-						onClick={() => onChange?.(tab.key)}
+						onClick={() => onChange?.(option)}
 						className={cn('flex-1 rounded-lg px-3 py-2 text-sm', isActive ? 'bg-background text-accent' : 'text-label')}
 					>
-						{tab.label}
+						{t(labelKey)}
 					</button>
 				)
 			})}

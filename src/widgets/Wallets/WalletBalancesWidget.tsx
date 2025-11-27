@@ -1,4 +1,5 @@
 import type { WalletBalanceSummary } from '@/types/entities/wallet'
+import { useTranslation } from '@/i18n'
 
 interface WalletBalancesWidgetProps {
 	balances: WalletBalanceSummary[]
@@ -7,6 +8,7 @@ interface WalletBalancesWidgetProps {
 }
 
 const WalletBalancesWidget = ({ balances, loading = false, error = null }: WalletBalancesWidgetProps) => {
+	const { t } = useTranslation()
 	const shouldRenderSkeleton = loading
 
 	if (shouldRenderSkeleton) {
@@ -24,7 +26,7 @@ const WalletBalancesWidget = ({ balances, loading = false, error = null }: Walle
 	if (!balances.length) {
 		return (
 			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>
-				Здесь будет общий баланс
+				{t('wallets.balancePlaceholder')}
 			</section>
 		)
 	}
@@ -32,7 +34,7 @@ const WalletBalancesWidget = ({ balances, loading = false, error = null }: Walle
 	return (
 		<section className='rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur'>
 			<div className='mb-3 border-b pb-3 border-divider'>
-				<h2 className='text-base'>Баланс</h2>
+				<h2 className='text-base'>{t('wallets.balanceTitle')}</h2>
 			</div>
 
 			<ul className='space-y-2'>

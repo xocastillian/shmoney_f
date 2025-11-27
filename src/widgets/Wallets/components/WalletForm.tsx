@@ -1,8 +1,9 @@
 import { Calculator, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
-import { walletTypeLabels, WalletType } from '@/types/entities/wallet'
+import { WalletType } from '@/types/entities/wallet'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
+import { useTranslation } from '@/i18n'
 
 interface WalletFormProps {
 	name: string
@@ -43,6 +44,7 @@ export function WalletForm({
 	onDelete,
 	disableDelete = false,
 }: WalletFormProps) {
+	const { t } = useTranslation()
 	const handleColorPickerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault()
@@ -65,10 +67,22 @@ export function WalletForm({
 	}
 
 	const colorStyle = selectedColor ? { color: selectedColor } : undefined
-	const typeLabel = walletTypeLabels[selectedType]
+	const typeLabel = t(
+		`wallets.form.type.${
+			selectedType === WalletType.BANK_CARD
+				? 'bankCard'
+				: selectedType === WalletType.SAVINGS_ACCOUNT
+				? 'savingsAccount'
+				: selectedType === WalletType.CRYPTO
+				? 'crypto'
+				: selectedType === WalletType.INVESTMENT_ACCOUNT
+				? 'investmentAccount'
+				: 'cash'
+		}`
+	)
 	const SelectedTypeIcon = typeIcons[selectedType]
 	const selectedCurrency = currencyOptions.find(option => option.value === currencyCode)
-	const currencyLabel = selectedCurrency?.label ?? currencyCode
+	const currencyLabel = selectedCurrency ? t(selectedCurrency.label) : currencyCode
 	const currencyIcon = currencyIconMap[currencyCode]
 	const formattedBalance = formatDecimalForDisplay(balance)
 
@@ -89,7 +103,7 @@ export function WalletForm({
 							<Info className='mr-3 text-label' />
 							<input
 								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
-								placeholder='Название'
+								placeholder={t('wallets.form.name')}
 								value={name}
 								onChange={event => onNameChange(event.target.value)}
 								maxLength={15}
@@ -117,7 +131,7 @@ export function WalletForm({
 								className='flex-1 bg-transparent placeholder:text-label outline-none'
 								type='text'
 								inputMode='decimal'
-								placeholder='Баланс'
+								placeholder={t('wallets.form.balance')}
 								value={formattedBalance}
 								onChange={handleBalanceChange}
 								autoComplete='off'
@@ -148,7 +162,7 @@ export function WalletForm({
 						>
 							<Palette className='mr-3 text-label transition-colors' style={colorStyle} />
 							<span className='text-label transition-colors' style={colorStyle}>
-								Цвет
+								{t('wallets.form.color')}
 							</span>
 						</div>
 					</div>
@@ -157,7 +171,7 @@ export function WalletForm({
 						<div className='border-b border-divider'>
 							<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onDelete} disabled={disableDelete}>
 								<Trash className='mr-3 text-danger' />
-								<span className='text-danger'>Удалить кошелёк</span>
+								<span className='text-danger'>{t('wallets.form.delete')}</span>
 							</button>
 						</div>
 					)}

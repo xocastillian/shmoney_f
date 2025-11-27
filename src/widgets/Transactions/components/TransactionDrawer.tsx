@@ -13,6 +13,7 @@ import type { Category } from '@/types/entities/category'
 import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
+import { useTranslation } from '@/i18n'
 
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
@@ -76,6 +77,7 @@ export const TransactionDrawer = ({
 	const [categoryPickerOpen, setCategoryPickerOpen] = useState(false)
 	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		if (!open) {
@@ -105,9 +107,16 @@ export const TransactionDrawer = ({
 	const fromWalletCurrencyIcon = useMemo(() => (fromWallet?.currencyCode ? currencyIconMap[fromWallet.currencyCode] ?? null : null), [fromWallet])
 	const fromWalletIcon = useMemo(() => getWalletIcon(fromWallet), [fromWallet])
 	const toWalletIcon = useMemo(() => getWalletIcon(toWallet), [toWallet])
-	const fromWalletLabel = fromWallet?.name ?? (availableFromWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите кошелёк')
-	const toWalletLabel = toWallet?.name ?? (availableToWallets.length === 0 ? 'Нет доступных кошельков' : 'Выберите получателя')
-	const submitButtonLabel = mode === 'edit' ? (submitting ? 'Сохранение...' : 'Сохранить') : submitting ? 'Создание...' : 'Создать'
+	const fromWalletLabel =
+		fromWallet?.name ?? (availableFromWallets.length === 0 ? t('transactions.drawer.noWallets') : t('transactions.drawer.selectWallet'))
+	const toWalletLabel =
+		toWallet?.name ?? (availableToWallets.length === 0 ? t('transactions.drawer.noWallets') : t('transactions.drawer.selectRecipient'))
+	const submitButtonLabel = useMemo(() => {
+		if (mode === 'edit') {
+			return submitting ? t('transactions.drawer.saving') : t('transactions.drawer.save')
+		}
+		return submitting ? t('transactions.drawer.creating') : t('transactions.drawer.create')
+	}, [mode, submitting, t])
 	const categoryIconNode = useMemo(() => {
 		if (!selectedCategory) return null
 		const IconComponent = selectedCategory.icon ? lucideIconMap[selectedCategory.icon] : undefined
@@ -121,8 +130,8 @@ export const TransactionDrawer = ({
 			</span>
 		)
 	}, [selectedCategory])
-	const categoryLabel = selectedCategory?.name ?? 'Категория'
-	const formTitle = mode === 'edit' ? 'Редактирование транзакции' : 'Новая транзакция'
+	const categoryLabel = selectedCategory?.name ?? t('transactions.drawer.category')
+	const formTitle = mode === 'edit' ? t('transactions.drawer.editTitle') : t('transactions.drawer.newTitle')
 	const maxTransactionDate = new Date()
 
 	return (
@@ -130,7 +139,7 @@ export const TransactionDrawer = ({
 			<Drawer open={open} onClose={onClose}>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
-						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('transactions.drawer.close')}>
 							<X />
 						</button>
 						<button
@@ -189,7 +198,7 @@ export const TransactionDrawer = ({
 			<TransactionWalletPickerDrawer
 				open={fromPickerOpen}
 				onClose={() => setFromPickerOpen(false)}
-				title='Выберите исходный кошелёк'
+				title={t('transactions.drawer.selectFromWallet')}
 				wallets={availableFromWallets}
 				selectedWalletId={fromWallet?.id ?? null}
 				onSelect={walletId => {
@@ -201,14 +210,14 @@ export const TransactionDrawer = ({
 			<TransactionWalletPickerDrawer
 				open={toPickerOpen}
 				onClose={() => setToPickerOpen(false)}
-				title='Выберите получателя'
+				title={t('transactions.drawer.selectRecipient')}
 				wallets={availableToWallets}
 				selectedWalletId={toWallet?.id ?? null}
 				onSelect={walletId => {
 					onSelectToWallet(walletId)
 					setToPickerOpen(false)
 				}}
-				emptyStateLabel='Нет доступных кошельков для перевода'
+				emptyStateLabel={t('transactions.drawer.noTransferWallets')}
 			/>
 
 			<CategoriesDrawer
@@ -232,7 +241,7 @@ export const TransactionDrawer = ({
 				onClose={closeAddCategoryDrawer}
 				initialCategory={editingCategory ?? undefined}
 				onSubmit={handleSubmitCategory}
-				title={editingCategory ? 'Редактирование категории' : 'Новая категория'}
+				title={editingCategory ? t('categories.drawer.editTitle') : t('categories.drawer.newTitle')}
 				submitting={submitting}
 			/>
 

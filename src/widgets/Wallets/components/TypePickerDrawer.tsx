@@ -3,6 +3,7 @@ import { Check, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import { walletTypeLabels, walletTypeOrder, WalletType } from '@/types/entities/wallet'
 import { typeIcons } from '../types'
+import { useTranslation } from '@/i18n'
 
 interface TypePickerDrawerProps {
 	open: boolean
@@ -12,6 +13,7 @@ interface TypePickerDrawerProps {
 }
 
 export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: TypePickerDrawerProps) {
+	const { t } = useTranslation()
 	return (
 		<Drawer
 			open={open}
@@ -21,13 +23,13 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 		>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('wallets.form.close')}>
 						<X />
 					</button>
 				</div>
 
 				<div className='flex flex-1 flex-col'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>Тип кошелька</h2>
+					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('wallets.form.typeTitle')}</h2>
 					<div className='bg-background-muted'>
 						{walletTypeOrder.map(type => {
 							const isSelected = type === selectedType
@@ -42,7 +44,7 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 								>
 									<div className='flex h-16 items-center px-3'>
 										<Icon className='mr-3 text-label' />
-										<span className='text-text'>{walletTypeLabels[type]}</span>
+										<span className='text-text'>{t(walletTypeLabels[type])}</span>
 										{isSelected && <Check className='ml-auto text-primary' size={16} />}
 									</div>
 								</button>

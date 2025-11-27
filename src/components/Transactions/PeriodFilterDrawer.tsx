@@ -3,6 +3,7 @@ import Drawer from '@/components/Drawer/Drawer'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import type { TransactionPeriodFilter } from './filters'
 import { periodOptions } from './filters'
+import { useTranslation } from '@/i18n'
 
 interface PeriodFilterDrawerProps {
 	open: boolean
@@ -17,17 +18,19 @@ interface PeriodFilterDrawerProps {
 const quickPeriodOptions = periodOptions.filter(option => option.value !== '')
 
 const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, onDateChange }: PeriodFilterDrawerProps) => {
+	const { t, locale } = useTranslation()
+
 	return (
 		<Drawer open={open} onClose={onClose} className='max-h-[85vh] rounded-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
 						<X />
 					</button>
 				</div>
 
 				<div className='flex flex-1 flex-col'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>Период</h2>
+					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('transactions.filters.period.placeholder')}</h2>
 
 					<div className='bg-background-muted'>
 						<div className='flex flex-col'>
@@ -44,7 +47,7 @@ const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, o
 										className='flex h-16 w-full items-center border-b border-divider px-3 text-left focus:outline-none focus-visible:bg-background-muted'
 										aria-pressed={isSelected}
 									>
-										<span className={isSelected ? 'text-text' : 'text-label'}>{option.label}</span>
+										<span className={isSelected ? 'text-text' : 'text-label'}>{t(option.labelKey)}</span>
 										{isSelected && <Check className='ml-auto text-primary' size={16} />}
 									</button>
 								)
@@ -53,9 +56,21 @@ const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, o
 					</div>
 
 					<div className='border-b border-divider bg-background-muted flex'>
-						<MobileDateTimePickerField value={from} onChange={value => onDateChange('from', value)} placeholder='Дата начала' precision='day' />
+						<MobileDateTimePickerField
+							value={from}
+							onChange={value => onDateChange('from', value)}
+							placeholder={t('transactions.filters.period.start')}
+							precision='day'
+							locale={locale}
+						/>
 
-						<MobileDateTimePickerField value={to} onChange={value => onDateChange('to', value)} placeholder='Дата окончания' precision='day' />
+						<MobileDateTimePickerField
+							value={to}
+							onChange={value => onDateChange('to', value)}
+							placeholder={t('transactions.filters.period.end')}
+							precision='day'
+							locale={locale}
+						/>
 					</div>
 				</div>
 			</div>

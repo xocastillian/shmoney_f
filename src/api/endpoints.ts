@@ -37,4 +37,7 @@ export const endpoints = {
 		convert: '/api/exchange-rates/convert',
 		all: '/api/exchange-rates/all',
 	},
+	settings: {
+		base: '/api/settings',
+	},
 } as const

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { ExchangeRate } from '@/types/entities/exchangeRate'
+import { useTranslation } from '@/i18n'
 
 const numberFormatter = new Intl.NumberFormat('ru-RU', {
 	minimumFractionDigits: 2,
@@ -13,9 +14,10 @@ interface ExchangeRatesProps {
 }
 
 const ExchangeRates = ({ rates, loading = false, error = null }: ExchangeRatesProps) => {
+	const { t } = useTranslation()
 	const hasRates = rates.length > 0
 	const shouldRenderSkeleton = loading
-	const title = useMemo(() => 'Курсы валют', [])
+	const title = useMemo(() => t('exchangeRates.title'), [t])
 
 	if (shouldRenderSkeleton) {
 		return <ExchangeRatesSkeleton />
@@ -42,7 +44,7 @@ const ExchangeRates = ({ rates, loading = false, error = null }: ExchangeRatesPr
 					))}
 				</ul>
 			) : (
-				<div className='text-sm '>Курсы пока недоступны</div>
+				<div className='text-sm '>{t('exchangeRates.unavailable')}</div>
 			)}
 		</section>
 	)

@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import TransactionTypeTabs, { type TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
+import { useTranslation } from '@/i18n'
 
 interface TransactionFormProps {
 	formId: string
@@ -71,6 +72,7 @@ export const TransactionForm = ({
 	onDateTimeChange,
 	maxDate,
 }: TransactionFormProps) => {
+	const { t, locale } = useTranslation()
 	const formattedAmount = formatDecimalForDisplay(amount)
 	const isEditMode = mode === 'edit'
 	const isEditingTransfer = isEditMode && transactionType === 'TRANSFER'
@@ -105,7 +107,7 @@ export const TransactionForm = ({
 								className='flex-1 bg-transparent placeholder:text-label outline-none'
 								type='text'
 								inputMode='decimal'
-								placeholder='Сумма'
+								placeholder={t('transactions.form.amount')}
 								value={formattedAmount}
 								onChange={handleAmountChange}
 								autoComplete='off'
@@ -121,7 +123,9 @@ export const TransactionForm = ({
 					>
 						<div className='flex h-16 items-center px-3'>
 							{fromWalletIcon ?? <WalletIcon className='mr-3 text-label' />}
-							<span className={fromWalletSelected ? 'text-text' : 'text-label'}>{fromWalletSelected ? fromWalletLabel : 'Откуда'}</span>
+							<span className={fromWalletSelected ? 'text-text' : 'text-label'}>
+								{fromWalletSelected ? fromWalletLabel : t('transactions.form.from')}
+							</span>
 						</div>
 					</button>
 
@@ -134,7 +138,9 @@ export const TransactionForm = ({
 						>
 							<div className='flex h-16 items-center px-3'>
 								{toWalletIcon ?? <WalletIcon className='mr-3 text-label' />}
-								<span className={toWalletSelected ? 'text-text' : 'text-label'}>{toWalletSelected ? toWalletLabel : 'Куда'}</span>
+								<span className={toWalletSelected ? 'text-text' : 'text-label'}>
+									{toWalletSelected ? toWalletLabel : t('transactions.form.to')}
+								</span>
 							</div>
 						</button>
 					) : (
@@ -146,7 +152,9 @@ export const TransactionForm = ({
 						>
 							<div className='flex h-16 items-center px-3'>
 								{categoryIcon ?? <FolderHeart className='mr-3 text-label' />}
-								<span className={categorySelected ? 'text-text' : 'text-label'}>{categorySelected ? categoryLabel : 'Категория'}</span>
+								<span className={categorySelected ? 'text-text' : 'text-label'}>
+									{categorySelected ? categoryLabel : t('transactions.form.categoryFallback')}
+								</span>
 							</div>
 						</button>
 					)}
@@ -160,7 +168,7 @@ export const TransactionForm = ({
 								onChange={event => onDescriptionChange(event.target.value)}
 								maxLength={30}
 								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
-								placeholder='Описание (опционально)'
+								placeholder={t('transactions.form.description')}
 								autoComplete='off'
 							/>
 							<span className='text-[11px] text-label'>{description.length}/30</span>
@@ -172,7 +180,8 @@ export const TransactionForm = ({
 							value={dateTime}
 							onChange={onDateTimeChange}
 							icon={<CalendarClock className={'text-label'} />}
-							placeholder='Дата и время'
+							placeholder={t('transactions.form.date')}
+							locale={locale}
 							maxDate={maxDate}
 						/>
 					</div>
@@ -186,7 +195,7 @@ export const TransactionForm = ({
 							disabled={deleteDisabled}
 						>
 							<Trash className='mr-3 text-danger' />
-							Удалить
+							{t('transactions.form.delete')}
 						</button>
 					</div>
 				)}
