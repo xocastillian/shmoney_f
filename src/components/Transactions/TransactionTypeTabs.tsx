@@ -34,7 +34,7 @@ export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className, op
 						key={tab.key}
 						type='button'
 						onClick={() => onChange?.(tab.key)}
-						className={cn('flex-1 rounded-lg px-3 py-2 text-sm transition-colors', isActive ? 'bg-background text-accent-orange' : 'text-label')}
+						className={cn('flex-1 rounded-lg px-3 py-2 text-sm', isActive ? 'bg-background text-accent-orange' : 'text-label')}
 					>
 						{tab.label}
 					</button>

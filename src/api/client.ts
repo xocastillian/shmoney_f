@@ -9,6 +9,7 @@ import {
 	TelegramAuthRequestSchema,
 	WalletCreateRequestSchema,
 	WalletResponseSchema,
+	WalletBalanceResponseSchema,
 	WalletTransactionRequestSchema,
 	WalletTransactionResponseSchema,
 	WalletTransactionUpdateRequestSchema,
@@ -33,6 +34,7 @@ import type {
 	ExchangeRateResponse,
 	WalletCreateRequest,
 	WalletResponse,
+	WalletBalanceResponse,
 	WalletTransactionRequest,
 	WalletTransactionResponse,
 	WalletTransactionUpdateRequest,
@@ -65,6 +67,11 @@ export async function listWallets(): Promise<WalletResponse[]> {
 export async function getWallet(id: number): Promise<WalletResponse> {
 	const data = await get<unknown>(endpoints.wallets.byId(id))
 	return WalletResponseSchema.parse(data)
+}
+
+export async function listWalletBalances(): Promise<WalletBalanceResponse[]> {
+	const data = await get<unknown>(endpoints.wallets.balances)
+	return WalletBalanceResponseSchema.array().parse(data)
 }
 
 export async function createWallet(payload: WalletCreateRequest): Promise<WalletResponse> {
@@ -210,6 +217,7 @@ export async function getTransactionFeed(params?: {
 	subcategoryId?: number
 	from?: Date | string
 	to?: Date | string
+	period?: string
 }): Promise<TransactionFeedResponse> {
 	const query = new URLSearchParams()
 	if (typeof params?.page === 'number') query.set('page', String(params.page))
@@ -220,6 +228,7 @@ export async function getTransactionFeed(params?: {
 	if (typeof params?.subcategoryId === 'number') query.set('subcategoryId', String(params.subcategoryId))
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
+	if (params?.period) query.set('period', params.period)
 	const queryString = query.toString()
 	const url = queryString ? `${endpoints.transactionsFeed.base}?${queryString}` : endpoints.transactionsFeed.base
 	const data = await get<unknown>(url)

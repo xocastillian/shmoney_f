@@ -71,6 +71,11 @@ export const WalletUpdateRequestSchema = z.object({
 	ownerId: z.number().int().positive().optional(),
 })
 
+export const WalletBalanceResponseSchema = z.object({
+	currencyCode: z.string(),
+	totalBalance: z.coerce.number(),
+})
+
 export const WalletTransactionRequestSchema = z.object({
 	fromWalletId: z.number().int(),
 	toWalletId: z.number().int(),

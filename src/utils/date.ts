@@ -30,3 +30,14 @@ export const formatDateTimeDisplay = (date: Date, locale = 'ru-RU') => {
 
 	return `${day} ${month} ${year}, ${hour}:${minute}`
 }
+
+const DATE_ONLY_DISPLAY_OPTIONS: Intl.DateTimeFormatOptions = {
+	day: '2-digit',
+	month: 'long',
+	year: 'numeric',
+}
+
+export const formatDateDisplay = (date: Date, locale = 'ru-RU') => {
+	const formatter = new Intl.DateTimeFormat(locale, DATE_ONLY_DISPLAY_OPTIONS)
+	return formatter.format(date)
+}

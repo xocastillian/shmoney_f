@@ -1,8 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
-import { createWallet as apiCreateWallet, deleteWallet as apiDeleteWallet, listWallets, updateWallet as apiUpdateWallet } from '@api/client'
-import type { WalletCreateRequest, WalletResponse, WalletUpdateRequest } from '@api/types'
+import {
+	createWallet as apiCreateWallet,
+	deleteWallet as apiDeleteWallet,
+	listWallets,
+	listWalletBalances,
+	updateWallet as apiUpdateWallet,
+} from '@api/client'
+import type { WalletBalanceResponse, WalletCreateRequest, WalletResponse, WalletUpdateRequest } from '@api/types'
 import { useWalletsStore } from '@/store/walletsStore'
-import type { Wallet } from '@/types/entities/wallet'
+import type { Wallet, WalletBalanceSummary } from '@/types/entities/wallet'
 
 function mapWallet(response: WalletResponse): Wallet {
 	return {
@@ -15,13 +21,24 @@ function mapWallet(response: WalletResponse): Wallet {
 	}
 }
 
+function mapWalletBalance(response: WalletBalanceResponse): WalletBalanceSummary {
+	return {
+		currencyCode: response.currencyCode,
+		totalBalance: response.totalBalance,
+	}
+}
+
 export function useWallets() {
 	const wallets = useWalletsStore(state => state.wallets)
 	const loading = useWalletsStore(state => state.loading)
+	const balances = useWalletsStore(state => state.balances)
+	const balancesLoading = useWalletsStore(state => state.balancesLoading)
 	const setWallets = useWalletsStore(state => state.setWallets)
 	const addWallet = useWalletsStore(state => state.addWallet)
 	const removeWallet = useWalletsStore(state => state.removeWallet)
 	const setLoading = useWalletsStore(state => state.setLoading)
+	const setBalances = useWalletsStore(state => state.setBalances)
+	const setBalancesLoading = useWalletsStore(state => state.setBalancesLoading)
 	const clearWalletsStore = useWalletsStore(state => state.clear)
 
 	const clearWallets = useCallback(() => {
@@ -48,6 +65,23 @@ export function useWallets() {
 			setLoading(false)
 		}
 	}, [setLoading, setWallets])
+
+	const fetchWalletBalances = useCallback(async () => {
+		setBalancesLoading(true)
+		try {
+			const data = await listWalletBalances()
+			const mapped = data.map(mapWalletBalance)
+			setBalances(mapped)
+			setError(null)
+			return mapped
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Не удалось загрузить балансы кошельков'
+			setError(message)
+			throw err
+		} finally {
+			setBalancesLoading(false)
+		}
+	}, [setBalances, setBalancesLoading])
 
 	const createWallet = useCallback(
 		async (payload: WalletCreateRequest) => {
@@ -112,10 +146,13 @@ export function useWallets() {
 	return {
 		wallets,
 		loading,
+		balances,
+		balancesLoading,
 		actionLoading,
 		isBusy,
 		error,
 		fetchWallets,
+		fetchWalletBalances,
 		clearWallets,
 		createWallet,
 		updateWallet,

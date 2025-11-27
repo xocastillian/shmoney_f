@@ -11,6 +11,9 @@ interface TransactionWalletPickerDrawerProps {
 	selectedWalletId: number | null
 	onSelect: (walletId: number) => void
 	emptyStateLabel?: string
+	showAllOption?: boolean
+	allOptionLabel?: string
+	onSelectAll?: () => void
 }
 
 export const TransactionWalletPickerDrawer = ({
@@ -21,6 +24,9 @@ export const TransactionWalletPickerDrawer = ({
 	selectedWalletId,
 	onSelect,
 	emptyStateLabel,
+	showAllOption = false,
+	allOptionLabel = 'Все кошельки',
+	onSelectAll,
 }: TransactionWalletPickerDrawerProps) => {
 	return (
 		<Drawer
@@ -36,13 +42,28 @@ export const TransactionWalletPickerDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col'>
+				<div className='flex flex-1 flex-col pb-10 overflow-y-auto'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title}</h2>
 
 					{wallets.length === 0 ? (
 						<div className='flex flex-1 items-center justify-center px-3 text-sm text-label'>{emptyStateLabel ?? 'Нет доступных кошельков'}</div>
 					) : (
 						<div className='bg-background-muted'>
+							{showAllOption && (
+								<button
+									type='button'
+									onClick={() => {
+										onSelectAll?.()
+									}}
+									className='w-full border-b border-divider text-left focus:outline-none focus-visible:bg-background-muted'
+								>
+									<div className='flex h-16 items-center px-3'>
+										<WalletIcon className='mr-3 h-6 w-6 text-label' />
+										<span className='text-text'>{allOptionLabel}</span>
+										{selectedWalletId == null && <Check className='ml-auto text-primary' size={16} />}
+									</div>
+								</button>
+							)}
 							{wallets.map(wallet => {
 								const isSelected = wallet.id === selectedWalletId
 								const Icon = wallet.type ? typeIcons[wallet.type] ?? WalletIcon : WalletIcon

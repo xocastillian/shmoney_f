@@ -27,6 +27,14 @@ import {
 	Dumbbell,
 	Plane,
 	BanknoteX,
+	Music,
+	RadioTower,
+	Popcorn,
+	Heart,
+	HandMetal,
+	Guitar,
+	Scissors,
+	Venus,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -59,6 +67,14 @@ export const categoryIconMap: Record<string, LucideIcon> = {
 	Dumbbell: Dumbbell,
 	Plane: Plane,
 	BanknoteX: BanknoteX,
+	Music: Music,
+	RadioTower: RadioTower,
+	Popcorn: Popcorn,
+	Heart: Heart,
+	HandMetal: HandMetal,
+	Guitar: Guitar,
+	Scissors: Scissors,
+	Venus: Venus,
 }
 
 export const categoryIconOptions = Object.entries(categoryIconMap).map(([key, Icon]) => ({

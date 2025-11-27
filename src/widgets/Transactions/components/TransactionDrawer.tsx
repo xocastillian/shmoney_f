@@ -11,6 +11,7 @@ import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
+import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
 
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
@@ -72,14 +73,33 @@ export const TransactionDrawer = ({
 	const [fromPickerOpen, setFromPickerOpen] = useState(false)
 	const [toPickerOpen, setToPickerOpen] = useState(false)
 	const [categoryPickerOpen, setCategoryPickerOpen] = useState(false)
+	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
+	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
 	useEffect(() => {
 		if (!open) {
 			setFromPickerOpen(false)
 			setToPickerOpen(false)
 			setCategoryPickerOpen(false)
+			setAddCategoryDrawerOpen(false)
+			setEditingCategory(null)
 		}
 	}, [open])
+
+	const handleOpenAddCategoryDrawer = () => {
+		setEditingCategory(null)
+		setAddCategoryDrawerOpen(true)
+	}
+
+	const closeAddCategoryDrawer = () => {
+		setEditingCategory(null)
+		setAddCategoryDrawerOpen(false)
+	}
+
+	const handleSubmitCategory = () => {
+		setEditingCategory(null)
+		setAddCategoryDrawerOpen(false)
+	}
 
 	const fromWalletCurrencyIcon = useMemo(() => (fromWallet?.currencyCode ? currencyIconMap[fromWallet.currencyCode] ?? null : null), [fromWallet])
 	const fromWalletIcon = useMemo(() => getWalletIcon(fromWallet), [fromWallet])
@@ -102,6 +122,7 @@ export const TransactionDrawer = ({
 	}, [selectedCategory])
 	const categoryLabel = selectedCategory?.name ?? 'Категория'
 	const formTitle = mode === 'edit' ? 'Редактирование транзакции' : 'Новая транзакция'
+	const maxTransactionDate = new Date()
 
 	return (
 		<>
@@ -153,13 +174,13 @@ export const TransactionDrawer = ({
 						categoryLabel={categoryLabel}
 						categorySelected={Boolean(selectedCategory)}
 						categoryIcon={categoryIconNode}
-						categoryColor={selectedCategory?.color ?? null}
 						onOpenCategoryPicker={() => setCategoryPickerOpen(true)}
 						categoryPickerDisabled={transactionType === 'TRANSFER'}
 						description={description}
 						onDescriptionChange={onDescriptionChange}
 						dateTime={dateTime}
 						onDateTimeChange={onDateTimeChange}
+						maxDate={maxTransactionDate}
 					/>
 				</div>
 			</Drawer>
@@ -192,11 +213,24 @@ export const TransactionDrawer = ({
 			<CategoriesDrawer
 				open={categoryPickerOpen}
 				onClose={() => setCategoryPickerOpen(false)}
-				showAddButton={false}
+				selectable
+				selectedCategoryId={selectedCategory?.id ?? null}
 				onSelect={category => {
 					onSelectCategory(category)
 					setCategoryPickerOpen(false)
 				}}
+				onAdd={() => {
+					setCategoryPickerOpen(false)
+					handleOpenAddCategoryDrawer()
+				}}
+				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
+			/>
+			<AddOrEditCategoryDrawer
+				open={isAddCategoryDrawerOpen}
+				onClose={closeAddCategoryDrawer}
+				initialCategory={editingCategory ?? undefined}
+				onSubmit={handleSubmitCategory}
+				title={editingCategory ? 'Редактирование категории' : 'Новая категория'}
 			/>
 		</>
 	)

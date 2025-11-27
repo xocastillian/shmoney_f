@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-
 import Drawer from '@/components/Drawer/Drawer'
 import { useCategories } from '@/hooks/useCategories'
 import type { Category } from '@/types/entities/category'
@@ -12,12 +11,28 @@ interface CategoriesDrawerProps {
 	onSelect?: (category: Category) => void
 	onAdd?: () => void
 	showAddButton?: boolean
+	className?: string
+	selectable?: boolean
+	allOptionLabel?: string
+	onSelectAll?: () => void
+	selectedCategoryId?: number | null
 }
 
 const CloseIcon = LucideIcons.X
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
-const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true }: CategoriesDrawerProps) => {
+const CategoriesDrawer = ({
+	open,
+	onClose,
+	onSelect,
+	onAdd,
+	showAddButton = true,
+	className,
+	selectable = false,
+	allOptionLabel = 'Все категории',
+	onSelectAll,
+	selectedCategoryId = null,
+}: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
 
@@ -32,7 +47,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true
 	const hasCategories = categories.length > 0
 
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-[100vh]' overlayClassName='bg-black/80 backdrop-blur-sm'>
+		<Drawer open={open} onClose={onClose} className={`max-h-[100vh] ${className}`} overlayClassName='bg-black/80 backdrop-blur-sm'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
@@ -40,14 +55,28 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto'>
+				<div className='flex-1 overflow-y-auto pb-10'>
 					{hasCategories && (
 						<>
 							<h2 className='mb-3 px-3 text-sm font-medium text-label'>Категории</h2>
 							<div className='overflow-hidden bg-background-muted'>
+								{selectable && (
+									<button
+										type='button'
+										onClick={() => onSelectAll?.()}
+										className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
+									>
+										<div className='flex h-16 items-center px-3'>
+											<LucideIcons.FolderHeart className='mr-3 text-label' />
+											<span className='text-text'>{allOptionLabel}</span>
+											{selectable && selectedCategoryId == null && <LucideIcons.Check className='ml-auto text-primary' size={16} />}
+										</div>
+									</button>
+								)}
 								{categories.map(category => {
 									const IconComponent = category.icon ? lucideIconMap[category.icon] : undefined
 									const initials = category.name.slice(0, 2).toUpperCase()
+									const isSelected = selectable && selectedCategoryId === category.id
 
 									return (
 										<button
@@ -67,6 +96,7 @@ const CategoriesDrawer = ({ open, onClose, onSelect, onAdd, showAddButton = true
 													)}
 												</div>
 												<span className='text-text'>{category.name}</span>
+												{isSelected && <LucideIcons.Check className='ml-auto text-primary' size={16} />}
 											</div>
 										</button>
 									)

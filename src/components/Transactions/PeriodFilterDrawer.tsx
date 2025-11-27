@@ -1,0 +1,66 @@
+import { Check, X } from 'lucide-react'
+import Drawer from '@/components/Drawer/Drawer'
+import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
+import type { TransactionPeriodFilter } from './filters'
+import { periodOptions } from './filters'
+
+interface PeriodFilterDrawerProps {
+	open: boolean
+	onClose: () => void
+	from: string
+	to: string
+	period: TransactionPeriodFilter
+	onPeriodChange: (period: TransactionPeriodFilter) => void
+	onDateChange: (field: 'from' | 'to', value: string) => void
+}
+
+const quickPeriodOptions = periodOptions.filter(option => option.value !== '')
+
+const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, onDateChange }: PeriodFilterDrawerProps) => {
+	return (
+		<Drawer open={open} onClose={onClose} className='max-h-[85vh] rounded-lg bg-background-secondary'>
+			<div className='flex h-full flex-col'>
+				<div className='flex justify-end p-3'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+						<X />
+					</button>
+				</div>
+
+				<div className='flex flex-1 flex-col'>
+					<h2 className='mb-4 px-3 text-sm font-medium text-label'>Период</h2>
+
+					<div className='bg-background-muted'>
+						<div className='flex flex-col'>
+							{quickPeriodOptions.map(option => {
+								const isSelected = period === option.value
+								return (
+									<button
+										key={option.value}
+										type='button'
+										onClick={() => {
+											onPeriodChange(isSelected ? '' : option.value)
+											onClose()
+										}}
+										className='flex h-16 w-full items-center border-b border-divider px-3 text-left focus:outline-none focus-visible:bg-background-muted'
+										aria-pressed={isSelected}
+									>
+										<span className={isSelected ? 'text-text' : 'text-label'}>{option.label}</span>
+										{isSelected && <Check className='ml-auto text-primary' size={16} />}
+									</button>
+								)
+							})}
+						</div>
+					</div>
+
+					<div className='border-b border-divider bg-background-muted flex'>
+						<MobileDateTimePickerField value={from} onChange={value => onDateChange('from', value)} placeholder='Дата начала' precision='day' />
+
+						<MobileDateTimePickerField value={to} onChange={value => onDateChange('to', value)} placeholder='Дата окончания' precision='day' />
+					</div>
+				</div>
+			</div>
+		</Drawer>
+	)
+}
+
+export default PeriodFilterDrawer
