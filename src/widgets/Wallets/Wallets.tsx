@@ -20,7 +20,7 @@ interface WalletsProps {
 const defaultWalletType = WalletType.CASH
 
 const Wallets = ({ wallets }: WalletsProps) => {
-	const { createWallet, updateWallet, deleteWallet, actionLoading } = useWallets()
+	const { createWallet, updateWallet, deleteWallet, actionLoading, fetchWalletBalances } = useWallets()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
 	const [currencyCode, setCurrencyCode] = useState(currencyOptions[0].value)
@@ -99,6 +99,7 @@ const Wallets = ({ wallets }: WalletsProps) => {
 					type: selectedType,
 				})
 			}
+			await fetchWalletBalances()
 			setFormError(null)
 			setOpen(false)
 		} catch (err) {
@@ -116,6 +117,7 @@ const Wallets = ({ wallets }: WalletsProps) => {
 			await deleteWallet(editingWalletId)
 			setFormError(null)
 			setOpen(false)
+			await fetchWalletBalances()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : 'Не удалось удалить кошелёк'
 			setFormError(message)

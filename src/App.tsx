@@ -29,7 +29,7 @@ function App() {
 	const [activeTab, setActiveTab] = useState<TabKey>('home')
 	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const formId = useId()
-	const { wallets, fetchWallets } = useWallets()
+	const { wallets, fetchWallets, fetchWalletBalances } = useWallets()
 	const {
 		createWalletTransaction,
 		createCategoryTransaction,
@@ -273,6 +273,7 @@ function App() {
 				await deleteCategoryTransaction(editingTransaction.id)
 			}
 			void fetchWallets().catch(() => undefined)
+			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
 			handleDrawerClose()
 		} catch (error) {
@@ -281,7 +282,15 @@ function App() {
 		} finally {
 			setTransactionSubmitting(false)
 		}
-	}, [editingTransaction, deleteWalletTransaction, deleteCategoryTransaction, fetchWallets, fetchTransactionFeed, handleDrawerClose])
+	}, [
+		editingTransaction,
+		deleteWalletTransaction,
+		deleteCategoryTransaction,
+		fetchWalletBalances,
+		fetchWallets,
+		fetchTransactionFeed,
+		handleDrawerClose,
+	])
 
 	const handleSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
@@ -353,6 +362,7 @@ function App() {
 				}
 
 				void fetchWallets().catch(() => undefined)
+				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
 				handleDrawerClose()
 			} catch (err) {
@@ -379,6 +389,7 @@ function App() {
 			fetchTransactionFeed,
 			fetchWallets,
 			handleDrawerClose,
+			fetchWalletBalances,
 		]
 	)
 
