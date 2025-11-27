@@ -179,9 +179,8 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 
 	return (
 		<div className='min-h-full p-3 pb-24'>
-			{walletsError && <div className='text-sm text-red-400'>{walletsError}</div>}
-			<Wallets wallets={wallets} />
-			{walletsLoading && <div className='mt-2 text-sm '>Загрузка...</div>}
+			{walletsError && <div className='text-sm text-danger'>{walletsError}</div>}
+			<Wallets wallets={wallets} loading={walletsLoading} />
 
 			<div className='mt-4'>
 				<WalletBalancesWidget balances={balances} loading={balancesLoading} error={walletsError} />
