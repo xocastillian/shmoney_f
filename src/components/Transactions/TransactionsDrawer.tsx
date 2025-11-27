@@ -65,7 +65,7 @@ const TransactionsDrawer = ({
 					<div className='flex items-center gap-2'>
 						{onOpenFilters && (
 							<button type='button' onClick={onOpenFilters} className='rounded-full p-2' aria-label='Открыть фильтры'>
-								<Filter className={`h-5 w-5 ${filtersActive ? 'text-accent-orange' : 'text-foreground'}`} />
+								<Filter className={`h-5 w-5 ${filtersActive ? 'text-accent' : ''}`} />
 							</button>
 						)}
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
@@ -75,13 +75,13 @@ const TransactionsDrawer = ({
 				</header>
 
 				{initialLoading ? (
-					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg text-muted-foreground'>Загрузка...</div>
+					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>Загрузка...</div>
 				) : items.length === 0 ? (
-					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg text-muted-foreground'>Нет данных</div>
+					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>Нет данных</div>
 				) : (
 					<div className='flex-1 overflow-y-auto pb-10' onScroll={handleScroll}>
 						<TransactionsList items={items} walletById={walletById} categoryById={categoryById} onItemClick={onItemClick} />
-						{loadingMore && <div className='py-3 text-center text-sm text-muted-foreground'>Загрузка...</div>}
+						{loadingMore && <div className='py-3 text-center text-sm '>Загрузка...</div>}
 					</div>
 				)}
 				{error && <div className='px-3 pb-4 text-sm text-danger'>{error}</div>}

@@ -282,6 +282,7 @@ const TransactionsFilterDrawer = ({
 					setCategoryPickerOpen(false)
 				}}
 				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
+				allOptionLabel='Все категории'
 			/>
 			<PeriodFilterDrawer
 				open={isPeriodPickerOpen}

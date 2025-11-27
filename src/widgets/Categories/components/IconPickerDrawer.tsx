@@ -36,7 +36,7 @@ const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerD
 									type='button'
 									onClick={() => onSelect(key)}
 									className={`flex flex-col items-center rounded-xl border px-3 py-3 text-xs transition-colors ${
-										isActive ? 'border-accent-orange text-text' : 'border-transparent text-label'
+										isActive ? 'border-accent text-text' : 'border-transparent text-label'
 									}`}
 								>
 									<Icon className='h-6 w-6' />

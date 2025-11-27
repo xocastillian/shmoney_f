@@ -20,7 +20,7 @@ export const TransactionsWidget = ({
 	limit = 5,
 }: TransactionsWidgetProps) => {
 	if (loading) {
-		return <div className='mt-3 text-sm text-muted-foreground'>Загрузка транзакций...</div>
+		return <div className='mt-3 text-sm '>Загрузка транзакций...</div>
 	}
 
 	if (error) {
@@ -32,7 +32,9 @@ export const TransactionsWidget = ({
 	}
 
 	if (!items.length) {
-		return <div className='mt-3 text-sm text-muted-foreground'>Транзакции не найдены</div>
+		return (
+			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>Здесь будут транзакции</section>
+		)
 	}
 
 	return (

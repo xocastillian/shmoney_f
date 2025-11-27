@@ -50,7 +50,7 @@ export const BottomNav = ({ tabs, activeKey, onTabChange, onCreate, createButton
 										onCreate?.()
 										tab.onClick?.()
 									}}
-									className='flex items-center justify-center rounded-full bg-accent-orange p-3 text-background'
+									className='flex items-center justify-center rounded-full bg-accent p-3 text-background'
 									aria-label={tab.ariaLabel ?? 'Добавить элемент'}
 								>
 									{content}
@@ -71,7 +71,7 @@ export const BottomNav = ({ tabs, activeKey, onTabChange, onCreate, createButton
 								}}
 								className={cn(
 									'flex flex-col items-center justify-between gap-1 text-xs font-medium transition-colors',
-									isActive ? 'text-accent-orange' : ''
+									isActive ? 'text-accent' : ''
 								)}
 							>
 								<Icon className='h-6 w-6' />

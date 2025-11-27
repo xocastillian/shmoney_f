@@ -120,7 +120,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 						<button
 							type='submit'
 							form={formId}
-							className='rounded-md px-4 py-2 text-sm font-medium bg-accent-orange text-text-dark disabled:bg-background-muted disabled:text-accent-orange disabled:opacity-50 transition-colors duration-300 ease-in-out'
+							className='rounded-md px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
 							disabled={isSubmitDisabled}
 						>
 							Сохранить

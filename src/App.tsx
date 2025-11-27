@@ -17,6 +17,7 @@ import type { TransactionTypeTabValue } from '@/components/Transactions/Transact
 import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 import { useCategories } from '@/hooks/useCategories'
+import Aurora from './components/ui/Aurora/Aurora'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
 type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
@@ -29,7 +30,7 @@ function App() {
 	const [activeTab, setActiveTab] = useState<TabKey>('home')
 	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const formId = useId()
-	const { wallets, fetchWallets } = useWallets()
+	const { wallets, fetchWallets, fetchWalletBalances } = useWallets()
 	const {
 		createWalletTransaction,
 		createCategoryTransaction,
@@ -273,6 +274,7 @@ function App() {
 				await deleteCategoryTransaction(editingTransaction.id)
 			}
 			void fetchWallets().catch(() => undefined)
+			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
 			handleDrawerClose()
 		} catch (error) {
@@ -281,7 +283,15 @@ function App() {
 		} finally {
 			setTransactionSubmitting(false)
 		}
-	}, [editingTransaction, deleteWalletTransaction, deleteCategoryTransaction, fetchWallets, fetchTransactionFeed, handleDrawerClose])
+	}, [
+		editingTransaction,
+		deleteWalletTransaction,
+		deleteCategoryTransaction,
+		fetchWalletBalances,
+		fetchWallets,
+		fetchTransactionFeed,
+		handleDrawerClose,
+	])
 
 	const handleSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
@@ -353,6 +363,7 @@ function App() {
 				}
 
 				void fetchWallets().catch(() => undefined)
+				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
 				handleDrawerClose()
 			} catch (err) {
@@ -379,67 +390,78 @@ function App() {
 			fetchTransactionFeed,
 			fetchWallets,
 			handleDrawerClose,
+			fetchWalletBalances,
 		]
 	)
 
 	return (
-		<div className='relative min-h-screen bg-background'>
-			<main>
-				<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
-					<HomeScreen onTransactionSelect={handleTransactionSelect} />
-				</section>
-
-				<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
-					<StatisticsScreen />
-				</section>
-
-				<section className={cn('min-h-screen', activeTab === 'budgets' ? 'block' : 'hidden')}>
-					<BudgetsScreen />
-				</section>
-
-				<section className={cn('min-h-screen', activeTab === 'settings' ? 'block' : 'hidden')}>
-					<SettingsScreen />
-				</section>
-			</main>
-
-			<BottomNav
-				tabs={tabs}
-				activeKey={activeTab}
-				onTabChange={value => setActiveTab(value as TabKey)}
-				onCreate={() => {
-					resetForm()
-					setEditingTransaction(null)
-					setTransactionDrawerOpen(true)
-				}}
+		<div className='relative min-h-screen bg-background overflow-hidden'>
+			<Aurora
+				colorStops={['var(--accent)', 'var(--accent-1)', 'var(--accent-2)']}
+				blend={1000}
+				amplitude={1}
+				speed={1}
+				className='pointer-events-none fixed inset-0 z-0 opacity-30'
 			/>
 
-			<TransactionDrawer
-				open={transactionDrawerOpen}
-				onClose={handleDrawerClose}
-				formId={formId}
-				amount={amount}
-				onAmountChange={handleAmountChange}
-				fromWallet={fromWallet}
-				toWallet={toWallet}
-				availableFromWallets={availableFromWallets}
-				availableToWallets={availableToWallets}
-				onSelectFromWallet={handleSelectFromWallet}
-				onSelectToWallet={handleSelectToWallet}
-				transactionType={transactionType}
-				onTransactionTypeChange={handleTransactionTypeChange}
-				selectedCategory={selectedCategory}
-				onSelectCategory={handleSelectCategory}
-				description={description}
-				onDescriptionChange={handleDescriptionChange}
-				dateTime={dateTime}
-				onDateTimeChange={handleDateTimeChange}
-				onSubmit={handleSubmit}
-				submitDisabled={submitDisabled}
-				submitting={transactionSubmitting}
-				error={combinedError}
-				mode={isEditMode ? 'edit' : 'create'}
-				onDelete={isEditMode ? handleDeleteTransaction : undefined}
-			/>
+			<div className='relative z-10'>
+				<main>
+					<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
+						<HomeScreen onTransactionSelect={handleTransactionSelect} />
+					</section>
+
+					<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
+						<StatisticsScreen />
+					</section>
+
+					<section className={cn('min-h-screen', activeTab === 'budgets' ? 'block' : 'hidden')}>
+						<BudgetsScreen />
+					</section>
+
+					<section className={cn('min-h-screen', activeTab === 'settings' ? 'block' : 'hidden')}>
+						<SettingsScreen />
+					</section>
+				</main>
+
+				<BottomNav
+					tabs={tabs}
+					activeKey={activeTab}
+					onTabChange={value => setActiveTab(value as TabKey)}
+					onCreate={() => {
+						resetForm()
+						setEditingTransaction(null)
+						setTransactionDrawerOpen(true)
+					}}
+				/>
+
+				<TransactionDrawer
+					open={transactionDrawerOpen}
+					onClose={handleDrawerClose}
+					formId={formId}
+					amount={amount}
+					onAmountChange={handleAmountChange}
+					fromWallet={fromWallet}
+					toWallet={toWallet}
+					availableFromWallets={availableFromWallets}
+					availableToWallets={availableToWallets}
+					onSelectFromWallet={handleSelectFromWallet}
+					onSelectToWallet={handleSelectToWallet}
+					transactionType={transactionType}
+					onTransactionTypeChange={handleTransactionTypeChange}
+					selectedCategory={selectedCategory}
+					onSelectCategory={handleSelectCategory}
+					description={description}
+					onDescriptionChange={handleDescriptionChange}
+					dateTime={dateTime}
+					onDateTimeChange={handleDateTimeChange}
+					onSubmit={handleSubmit}
+					submitDisabled={submitDisabled}
+					submitting={transactionSubmitting}
+					error={combinedError}
+					mode={isEditMode ? 'edit' : 'create'}
+					onDelete={isEditMode ? handleDeleteTransaction : undefined}
+				/>
+			</div>
 		</div>
 	)
 }
