@@ -31,7 +31,7 @@ const ExchangeRates = ({ rates, loading = false, error = null }: ExchangeRatesPr
 
 			{error && <div className='mb-2 text-sm text-danger'>{error}</div>}
 
-			{!hasRates ? (
+			{hasRates ? (
 				<ul className='flex items-center justify-between'>
 					{rates.map(rate => (
 						<li key={`${rate.sourceCurrency}-${rate.targetCurrency}`} className='flex flex-col items-center'>
