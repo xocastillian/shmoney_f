@@ -210,6 +210,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 					setName(value)
 					setFormError(null)
 				}}
+				submitting={actionLoading}
 				currencyCode={currencyCode}
 				currencyOptions={currencyOptions}
 				onOpenCurrencyPicker={() => setCurrencyPickerOpen(true)}
