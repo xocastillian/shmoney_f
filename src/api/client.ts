@@ -210,6 +210,7 @@ export async function getTransactionFeed(params?: {
 	subcategoryId?: number
 	from?: Date | string
 	to?: Date | string
+	period?: string
 }): Promise<TransactionFeedResponse> {
 	const query = new URLSearchParams()
 	if (typeof params?.page === 'number') query.set('page', String(params.page))
@@ -220,6 +221,7 @@ export async function getTransactionFeed(params?: {
 	if (typeof params?.subcategoryId === 'number') query.set('subcategoryId', String(params.subcategoryId))
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
+	if (params?.period) query.set('period', params.period)
 	const queryString = query.toString()
 	const url = queryString ? `${endpoints.transactionsFeed.base}?${queryString}` : endpoints.transactionsFeed.base
 	const data = await get<unknown>(url)

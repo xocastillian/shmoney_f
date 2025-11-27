@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-
 import Drawer from '@/components/Drawer/Drawer'
 import { useCategories } from '@/hooks/useCategories'
 import type { Category } from '@/types/entities/category'

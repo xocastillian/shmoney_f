@@ -198,7 +198,7 @@ export const TransactionDrawer = ({
 					onSelectCategory(category)
 					setCategoryPickerOpen(false)
 				}}
-				className='max-h-[70vh] bg-background-secondary'
+				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
 			/>
 		</>
 	)
