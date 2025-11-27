@@ -12,6 +12,7 @@ import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
 import { WalletType } from '@/types/entities/wallet'
 import { sanitizeDecimalInput } from '@/utils/number'
 import { colorOptions, currencyOptions } from './constants'
+import { useTranslation } from '@/i18n'
 
 interface WalletsProps {
 	wallets: Wallet[]
@@ -22,6 +23,7 @@ const defaultWalletType = WalletType.CASH
 
 const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const { createWallet, updateWallet, deleteWallet, actionLoading, fetchWalletBalances } = useWallets()
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
 	const [currencyCode, setCurrencyCode] = useState(currencyOptions[0].value)
@@ -63,22 +65,22 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		const parsedBalance = sanitizedBalance.length > 0 ? Number.parseFloat(sanitizedBalance) : NaN
 
 		if (trimmedName.length === 0) {
-			setFormError('Введите название кошелька')
+			setFormError(t('wallets.form.errors.nameRequired'))
 			return
 		}
 
 		if (trimmedCurrency.length === 0) {
-			setFormError('Укажите валюту')
+			setFormError(t('wallets.form.errors.currencyRequired'))
 			return
 		}
 
 		if (Number.isNaN(parsedBalance)) {
-			setFormError('Введите корректный баланс')
+			setFormError(t('wallets.form.errors.balanceInvalid'))
 			return
 		}
 
 		if (parsedBalance < 0) {
-			setFormError('Баланс не может быть отрицательным')
+			setFormError(t('wallets.form.errors.balanceNegative'))
 			return
 		}
 
@@ -104,7 +106,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 			setFormError(null)
 			setOpen(false)
 		} catch (err) {
-			const defaultMessage = isEditing ? 'Не удалось сохранить кошелёк' : 'Не удалось создать кошелёк'
+			const defaultMessage = isEditing ? t('wallets.errors.saveFailed') : t('wallets.errors.createFailed')
 			const message = err instanceof Error ? err.message : defaultMessage
 			setFormError(message)
 		}
@@ -112,7 +114,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 
 	const handleDelete = async () => {
 		if (!isEditing || editingWalletId === null) return
-		const confirmed = window.confirm('Реально?')
+		const confirmed = window.confirm(t('wallets.form.confirmDelete'))
 		if (!confirmed) return
 		try {
 			await deleteWallet(editingWalletId)
@@ -120,7 +122,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 			setOpen(false)
 			await fetchWalletBalances()
 		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Не удалось удалить кошелёк'
+			const message = err instanceof Error ? err.message : t('wallets.errors.deleteFailed')
 			setFormError(message)
 		}
 	}
@@ -225,8 +227,8 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				}}
 				error={formError}
 				submitDisabled={submitDisabled}
-				title={isEditing ? 'Редактирование кошелька' : 'Создание кошелька'}
-				submitLabel={isEditing ? 'Сохранить' : 'Готово'}
+				title={isEditing ? t('wallets.form.editTitle') : t('wallets.form.createTitle')}
+				submitLabel={isEditing ? t('wallets.form.save') : t('wallets.form.ready')}
 				onDelete={isEditing ? handleDelete : undefined}
 				disableDelete={actionLoading}
 			/>

@@ -16,12 +16,12 @@ export const walletTypeOrder: WalletType[] = [
 	WalletType.INVESTMENT_ACCOUNT,
 ]
 
-export const walletTypeLabels: Record<WalletType, string> = {
-	[WalletType.CASH]: 'Наличные',
-	[WalletType.BANK_CARD]: 'Банковская карта',
-	[WalletType.SAVINGS_ACCOUNT]: 'Накопительный счёт',
-	[WalletType.CRYPTO]: 'Криптокошелёк',
-	[WalletType.INVESTMENT_ACCOUNT]: 'Инвестиционный счёт',
+export const walletTypeLabels: Record<WalletType, keyof TranslationDictionary> = {
+	[WalletType.CASH]: 'wallets.form.type.cash',
+	[WalletType.BANK_CARD]: 'wallets.form.type.bankCard',
+	[WalletType.SAVINGS_ACCOUNT]: 'wallets.form.type.savingsAccount',
+	[WalletType.CRYPTO]: 'wallets.form.type.crypto',
+	[WalletType.INVESTMENT_ACCOUNT]: 'wallets.form.type.investmentAccount',
 }
 
 export type Wallet = {

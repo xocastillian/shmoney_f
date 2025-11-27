@@ -2,6 +2,7 @@ import { Check, X } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
 import type { CurrencyOption } from '../types'
 import { currencyIconMap } from '../types'
+import { useTranslation } from '@/i18n'
 
 interface CurrencyPickerDrawerProps {
 	open: boolean
@@ -12,6 +13,7 @@ interface CurrencyPickerDrawerProps {
 }
 
 export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onSelect }: CurrencyPickerDrawerProps) {
+	const { t } = useTranslation()
 	return (
 		<Drawer
 			open={open}
@@ -21,13 +23,13 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 		>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
-					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
+					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('wallets.form.close')}>
 						<X />
 					</button>
 				</div>
 
 				<div className='flex flex-1 flex-col'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>Валюта</h2>
+					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('wallets.form.currencyTitle')}</h2>
 					<div className='bg-background-muted'>
 						{options.map(option => {
 							const isSelected = option.value === selectedCode
@@ -42,7 +44,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 								>
 									<div className='flex h-16 items-center px-3'>
 										{iconSrc && <img src={iconSrc} alt='' className='mr-3 h-6 w-6' />}
-										<span className='text-text'>{option.label}</span>
+										<span className='text-text'>{t(option.label)}</span>
 										{isSelected && <Check className='ml-auto' size={16} />}
 									</div>
 								</button>
