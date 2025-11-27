@@ -2,6 +2,7 @@ import { X } from 'lucide-react'
 import { useId } from 'react'
 import type { FormEvent } from 'react'
 import Drawer from '@/components/Drawer/Drawer'
+import Loader from '@/components/ui/Loader/Loader'
 import { WalletForm } from './WalletForm'
 import type { CurrencyOption } from '../types'
 import type { WalletType } from '@/types/entities/wallet'
@@ -27,6 +28,7 @@ interface WalletFormDrawerProps {
 	submitLabel?: string
 	onDelete?: () => void
 	disableDelete?: boolean
+	submitting?: boolean
 }
 
 export function WalletFormDrawer({
@@ -50,6 +52,7 @@ export function WalletFormDrawer({
 	submitLabel = 'Готово',
 	onDelete,
 	disableDelete = false,
+	submitting = false,
 }: WalletFormDrawerProps) {
 	const formId = useId()
 
@@ -95,6 +98,14 @@ export function WalletFormDrawer({
 					disableDelete={disableDelete}
 				/>
 			</div>
+
+			{open && submitting && (
+				<div className='fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm'>
+					<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+						<Loader />
+					</div>
+				</div>
+			)}
 		</Drawer>
 	)
 }

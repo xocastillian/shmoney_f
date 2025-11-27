@@ -1,7 +1,7 @@
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
-
 import Drawer from '@/components/Drawer/Drawer'
+import Loader from '@/components/ui/Loader/Loader'
 import type { Category } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
@@ -18,21 +18,30 @@ interface AddOrEditCategoryDrawerProps {
 	initialCategory?: Category
 	onSubmit?: (values: CategoryFormValues) => void
 	title?: string
+	submitting?: boolean
 }
 
 const DEFAULT_ICON = categoryIconOptions[0]?.key ?? 'apple'
 const DEFAULT_COLOR = colorOptions[0] ?? '#F97316'
 
-const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, title = 'Новая категория' }: AddOrEditCategoryDrawerProps) => {
+const AddOrEditCategoryDrawer = ({
+	open,
+	onClose,
+	initialCategory,
+	onSubmit,
+	title = 'Новая категория',
+	submitting = false,
+}: AddOrEditCategoryDrawerProps) => {
 	const [name, setName] = useState('')
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [icon, setIcon] = useState(DEFAULT_ICON)
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
 	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
-	const [isSubmitting, setSubmitting] = useState(false)
+	const [internalSubmitting, setSubmitting] = useState(false)
 	const formId = useId()
 	const { createCategory, updateCategory, deleteCategory } = useCategories()
 	const isEditMode = Boolean(initialCategory)
+	const isBusy = internalSubmitting || submitting
 
 	useEffect(() => {
 		if (!open) {
@@ -45,7 +54,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		setIcon(initialCategory?.icon ?? DEFAULT_ICON)
 	}, [initialCategory, open])
 
-	const isSubmitDisabled = isSubmitting || !name.trim() || !color || !icon
+	const isSubmitDisabled = isBusy || !name.trim() || !color || !icon
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -86,7 +95,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	}
 
 	const handleDelete = async () => {
-		if (!initialCategory || isSubmitting) return
+		if (!initialCategory || isBusy) return
 
 		try {
 			setSubmitting(true)
@@ -138,7 +147,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 							icon={icon}
 							onOpenIconPicker={() => setIconPickerOpen(true)}
 							onDelete={isEditMode ? handleDelete : undefined}
-							disableDelete={isSubmitting}
+							disableDelete={isBusy}
 							onSubmit={handleSubmit}
 						/>
 					</div>
@@ -154,6 +163,14 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 			/>
 
 			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
+
+			{open && isBusy && (
+				<div className='fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm'>
+					<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+						<Loader />
+					</div>
+				</div>
+			)}
 		</>
 	)
 }

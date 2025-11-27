@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Drawer from '@/components/Drawer/Drawer'
+import Loader from '@/components/ui/Loader/Loader'
 import { TransactionForm } from './TransactionForm'
 import TransactionWalletPickerDrawer from './TransactionWalletPickerDrawer'
 import { currencyIconMap } from '@/widgets/Wallets/types'
@@ -225,13 +226,23 @@ export const TransactionDrawer = ({
 				}}
 				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
 			/>
+
 			<AddOrEditCategoryDrawer
 				open={isAddCategoryDrawerOpen}
 				onClose={closeAddCategoryDrawer}
 				initialCategory={editingCategory ?? undefined}
 				onSubmit={handleSubmitCategory}
 				title={editingCategory ? 'Редактирование категории' : 'Новая категория'}
+				submitting={submitting}
 			/>
+
+			{open && submitting && (
+				<div className='fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm'>
+					<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+						<Loader />
+					</div>
+				</div>
+			)}
 		</>
 	)
 }

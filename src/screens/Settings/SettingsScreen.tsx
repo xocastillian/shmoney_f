@@ -4,11 +4,13 @@ import SettingsItem from '@/components/SettingsItem/SettingsItem'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
 import { createSettings } from './settings'
+import { useCategories } from '@/hooks/useCategories'
 
 const SettingsScreen = () => {
 	const [isCategoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false)
 	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+	const { actionLoading: categoriesSubmitting } = useCategories()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
 	const closeCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(false), [])
@@ -52,11 +54,13 @@ const SettingsScreen = () => {
 			</div>
 
 			<CategoriesDrawer open={isCategoriesDrawerOpen} onClose={closeCategoriesDrawer} onSelect={handleSelectCategory} onAdd={handleAddCategory} />
+
 			<AddOrEditCategoryDrawer
 				open={isAddCategoryDrawerOpen}
 				onClose={closeAddCategoryDrawer}
 				initialCategory={editingCategory ?? undefined}
 				onSubmit={handleSubmitCategory}
+				submitting={categoriesSubmitting}
 				title={editingCategory ? 'Редактирование категории' : 'Новая категория'}
 			/>
 		</>
