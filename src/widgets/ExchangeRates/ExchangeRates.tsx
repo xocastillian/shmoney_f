@@ -1,24 +1,33 @@
 import { useMemo } from 'react'
-import { useExchangeRates } from '@/hooks/useExchangeRates'
+import type { ExchangeRate } from '@/types/entities/exchangeRate'
 
 const numberFormatter = new Intl.NumberFormat('ru-RU', {
 	minimumFractionDigits: 2,
 	maximumFractionDigits: 2,
 })
 
-const ExchangeRates = () => {
-	const { rates, loading, error } = useExchangeRates()
+interface ExchangeRatesProps {
+	rates: ExchangeRate[]
+	loading?: boolean
+	error?: string | null
+}
+
+const ExchangeRates = ({ rates, loading = false, error = null }: ExchangeRatesProps) => {
 	const hasRates = rates.length > 0
+	const shouldRenderSkeleton = loading
 	const title = useMemo(() => 'Курсы валют', [])
 
+	if (shouldRenderSkeleton) {
+		return <ExchangeRatesSkeleton />
+	}
+
 	return (
-		<section className='mt-4 rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur'>
+		<section className='rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur'>
 			<div className='mb-3 flex items-center justify-between gap-2 border-b pb-3 border-divider'>
 				<h2 className='text-base'>{title}</h2>
-				{loading && <span className='text-xs '>Обновление...</span>}
 			</div>
 
-			{error && <div className='mb-2 text-sm text-red-400'>{error}</div>}
+			{error && <div className='mb-2 text-sm text-danger'>{error}</div>}
 
 			{hasRates ? (
 				<ul className='flex items-center justify-between'>
@@ -33,8 +42,26 @@ const ExchangeRates = () => {
 					))}
 				</ul>
 			) : (
-				<div className='text-sm '>{loading ? 'Загрузка курсов…' : 'Курсы пока недоступны'}</div>
+				<div className='text-sm '>Курсы пока недоступны</div>
 			)}
+		</section>
+	)
+}
+
+const ExchangeRatesSkeleton = () => {
+	return (
+		<section className='rounded-xl bg-background-muted p-3 shadow-sm backdrop-blur animate-pulse'>
+			<div className='mb-3 flex items-center justify-between '>
+				<div className='h-5 w-28 rounded bg-background-muted-2/60' />
+			</div>
+			<ul className='flex items-center justify-between'>
+				{Array.from({ length: 1 }).map((_, index) => (
+					<li key={`rates-skeleton-${index}`} className='flex flex-col items-center gap-2 w-full'>
+						<div className='h-3 w-16 rounded bg-background-muted-2/60' />
+						<div className='h-5 w-20 rounded bg-background-muted-2/60' />
+					</li>
+				))}
+			</ul>
 		</section>
 	)
 }

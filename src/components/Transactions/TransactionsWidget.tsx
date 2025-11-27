@@ -19,8 +19,10 @@ export const TransactionsWidget = ({
 	onItemClick,
 	limit = 5,
 }: TransactionsWidgetProps) => {
-	if (loading) {
-		return <div className='mt-3 text-sm '>Загрузка транзакций...</div>
+	const shouldRenderSkeleton = loading
+
+	if (shouldRenderSkeleton) {
+		return <TransactionsWidgetSkeleton />
 	}
 
 	if (error) {
@@ -47,6 +49,35 @@ export const TransactionsWidget = ({
 
 			<div className='mt-3 px-3 ml-auto w-fit'>
 				<Button text='Показать все' onClick={onOpenDrawer} />
+			</div>
+		</section>
+	)
+}
+
+const TransactionsWidgetSkeleton = () => {
+	return (
+		<section className='rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur animate-pulse'>
+			<div className='mb-3 flex items-center justify-between gap-2 px-3'>
+				<div className='h-5 w-32 rounded bg-background-muted-2/60' />
+			</div>
+
+			<ul className='space-y-3 px-3'>
+				{Array.from({ length: 1 }).map((_, index) => (
+					<li key={`transactions-skeleton-${index}`} className='flex flex-col '>
+						<div className='flex items-center justify-between'>
+							<div className='h-4 w-48 rounded bg-background-muted-2/60' />
+							<div className='h-4 w-16 rounded bg-background-muted-2/60' />
+						</div>
+						<div className='flex items-center justify-between'>
+							<div className='h-3 w-32 rounded bg-background-muted-2/60' />
+							<div className='h-3 w-20 rounded bg-background-muted-2/60' />
+						</div>
+					</li>
+				))}
+			</ul>
+
+			<div className='mt-3 px-3 ml-auto w-fit'>
+				<div className='h-9 w-32 rounded-full bg-background-muted-2/60' />
 			</div>
 		</section>
 	)

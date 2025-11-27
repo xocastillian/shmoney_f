@@ -34,7 +34,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		fetchWalletBalances,
 		clearWallets,
 	} = useWallets()
-	const { fetchExchangeRates, clearRates } = useExchangeRates()
+	const { rates, loading: ratesLoading, error: ratesError, fetchExchangeRates, clearRates } = useExchangeRates()
 	const { categories, fetchCategories, clearCategories: resetCategories } = useCategories()
 	const { feed, feedLoading, feedError, fetchTransactionFeed, clearTransactions } = useTransactions()
 	const [isTransactionsDrawerOpen, setTransactionsDrawerOpen] = useState(false)
@@ -198,8 +198,8 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				/>
 			</div>
 
-			<div className='mb-3'>
-				<ExchangeRates />
+			<div className='mb-3 mt-4'>
+				<ExchangeRates rates={rates} loading={ratesLoading} error={ratesError} />
 			</div>
 
 			<TransactionsDrawer

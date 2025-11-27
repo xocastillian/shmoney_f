@@ -274,7 +274,7 @@ function WalletsSkeleton() {
 			{Array.from({ length: 2 }).map((_, index) => (
 				<div
 					key={`wallet-skeleton-${index}`}
-					className='min-h-[110px] h-[110px] rounded-xl border border-divider bg-background-muted p-3 animate-pulse flex flex-col gap-3'
+					className='min-h-[110px] h-[110px] rounded-xl bg-background-muted p-3 animate-pulse flex flex-col gap-3'
 				>
 					<div className='h-7 w-7 rounded-full bg-background-muted-2/60' />
 					<div className='mt-auto flex flex-col gap-2'>
