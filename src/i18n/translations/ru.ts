@@ -72,4 +72,8 @@ export const ru: TranslationDictionary = {
 	'wallets.currency.eur': 'Евро',
 	'wallets.currency.cny': 'Юань',
 	'wallets.currency.aed': 'Дирхам ОАЭ',
+	'wallets.balanceTitle': 'Баланс',
+	'wallets.balancePlaceholder': 'Здесь будет общий баланс',
+'exchangeRates.title': 'Курсы валют',
+'exchangeRates.unavailable': 'Курсы пока недоступны',
 }
