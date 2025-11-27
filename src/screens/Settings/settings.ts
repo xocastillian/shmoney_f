@@ -3,24 +3,24 @@ import { FolderHeart, Languages, SunMoon } from 'lucide-react'
 
 interface SettingsOptions {
 	onCategoriesPress: () => void
+	onLanguagePress: () => void
 }
 
-export const createSettings = ({ onCategoriesPress }: SettingsOptions): Setting[] => [
+export const createSettings = ({ onCategoriesPress, onLanguagePress }: SettingsOptions): Setting[] => [
 	{
 		title: 'Категории',
 		onClick: onCategoriesPress,
 		icon: FolderHeart,
 	},
 	{
+		title: 'Язык',
+		onClick: onLanguagePress,
+		icon: Languages,
+	},
+	{
 		title: 'Тема',
 		onClick: () => {},
 		icon: SunMoon,
-		disabled: true,
-	},
-	{
-		title: 'Язык',
-		onClick: () => {},
-		icon: Languages,
 		disabled: true,
 	},
 ]

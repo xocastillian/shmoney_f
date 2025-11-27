@@ -5,22 +5,29 @@ import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
 import { createSettings } from './settings'
 import { useCategories } from '@/hooks/useCategories'
+import LanguageSettingsDrawer from './components/LanguageSettingsDrawer'
+import { useSettings } from '@/hooks/useSettings'
 
 const SettingsScreen = () => {
 	const [isCategoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false)
 	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
+	const [isLanguageDrawerOpen, setLanguageDrawerOpen] = useState(false)
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 	const { actionLoading: categoriesSubmitting } = useCategories()
+	const { supportedLanguages, language, loading: settingsLoading, error: settingsError, changeLanguage } = useSettings()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
 	const closeCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(false), [])
+	const openLanguageDrawer = useCallback(() => setLanguageDrawerOpen(true), [])
+	const closeLanguageDrawer = useCallback(() => setLanguageDrawerOpen(false), [])
 
 	const settings = useMemo(
 		() =>
 			createSettings({
 				onCategoriesPress: openCategoriesDrawer,
+				onLanguagePress: openLanguageDrawer,
 			}),
-		[openCategoriesDrawer]
+		[openCategoriesDrawer, openLanguageDrawer]
 	)
 
 	const handleSelectCategory = useCallback((category: Category) => {
@@ -43,6 +50,18 @@ const SettingsScreen = () => {
 		setAddCategoryDrawerOpen(false)
 	}, [])
 
+	const handleSelectLanguage = useCallback(
+		async (nextLanguage: string) => {
+			try {
+				await changeLanguage(nextLanguage)
+				setLanguageDrawerOpen(false)
+			} catch {
+				// errors handled in useSettings
+			}
+		},
+		[changeLanguage]
+	)
+
 	return (
 		<>
 			<div className='p-3 text-lg font-medium'>Настройки</div>
@@ -62,6 +81,16 @@ const SettingsScreen = () => {
 				onSubmit={handleSubmitCategory}
 				submitting={categoriesSubmitting}
 				title={editingCategory ? 'Редактирование категории' : 'Новая категория'}
+			/>
+
+			<LanguageSettingsDrawer
+				open={isLanguageDrawerOpen}
+				onClose={closeLanguageDrawer}
+				languages={supportedLanguages}
+				selectedLanguage={language}
+				loading={settingsLoading}
+				error={settingsError}
+				onSelect={handleSelectLanguage}
 			/>
 		</>
 	)

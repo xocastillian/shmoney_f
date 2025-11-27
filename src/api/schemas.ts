@@ -200,6 +200,15 @@ export const CurrencyConversionResponseSchema = z.object({
 	convertedAmount: z.coerce.number(),
 })
 
+export const SettingsResponseSchema = z.object({
+	defaultLanguage: z.string(),
+	supportedLanguages: z.array(z.string()),
+})
+
+export const SettingsUpdateRequestSchema = z.object({
+	language: z.string(),
+})
+
 export const SubcategoryResponseSchema = z.object({
 	id: z.number().int(),
 	name: z.string(),

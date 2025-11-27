@@ -25,6 +25,8 @@ import {
 	CategoryTransactionUpdateRequestSchema,
 	CategoryTransactionPageResponseSchema,
 	TransactionFeedResponseSchema,
+	SettingsResponseSchema,
+	SettingsUpdateRequestSchema,
 } from './schemas'
 import type {
 	AuthResponse,
@@ -50,6 +52,8 @@ import type {
 	CategoryTransactionUpdateRequest,
 	CategoryTransactionPageResponse,
 	TransactionFeedResponse,
+	SettingsResponse,
+	SettingsUpdateRequest,
 } from './types'
 
 export async function telegramLogin(params: { initData: string }): Promise<AuthResponse> {
@@ -196,6 +200,17 @@ export async function createCategoryTransaction(payload: CategoryTransactionCrea
 export async function getCategoryTransaction(id: number): Promise<CategoryTransactionResponse> {
 	const data = await get<unknown>(endpoints.categoryTransactions.byId(id))
 	return CategoryTransactionResponseSchema.parse(data)
+}
+
+export async function getSettings(): Promise<SettingsResponse> {
+	const data = await get<unknown>(endpoints.settings.base)
+	return SettingsResponseSchema.parse(data)
+}
+
+export async function updateSettings(payload: SettingsUpdateRequest): Promise<SettingsResponse> {
+	const body = SettingsUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.settings.base, body)
+	return SettingsResponseSchema.parse(data)
 }
 
 export async function updateCategoryTransaction(id: number, payload: CategoryTransactionUpdateRequest): Promise<CategoryTransactionResponse> {

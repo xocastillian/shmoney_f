@@ -29,6 +29,8 @@ import {
 	TransactionFeedItemSchema,
 	TransactionFeedResponseSchema,
 	TransactionFeedTypeSchema,
+	SettingsResponseSchema,
+	SettingsUpdateRequestSchema,
 } from './schemas'
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>
@@ -63,3 +65,5 @@ export type CategoryTransactionPageResponse = z.infer<typeof CategoryTransaction
 export type TransactionFeedItem = z.infer<typeof TransactionFeedItemSchema>
 export type TransactionFeedResponse = z.infer<typeof TransactionFeedResponseSchema>
 export type TransactionFeedType = z.infer<typeof TransactionFeedTypeSchema>
+export type SettingsResponse = z.infer<typeof SettingsResponseSchema>
+export type SettingsUpdateRequest = z.infer<typeof SettingsUpdateRequestSchema>

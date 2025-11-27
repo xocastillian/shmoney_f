@@ -18,6 +18,7 @@ import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 import { useCategories } from '@/hooks/useCategories'
 import { useAuthStore } from '@/store/authStore'
+import { useSettings } from '@/hooks/useSettings'
 import Loader from './components/ui/Loader/Loader'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
@@ -45,6 +46,7 @@ function App() {
 	} = useTransactions()
 	const { categories, fetchCategories: fetchCategoriesData } = useCategories()
 	const authLoading = useAuthStore(state => state.loading)
+	const { fetchSettings } = useSettings()
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
 	const [toWalletId, setToWalletId] = useState<number | null>(null)
@@ -65,6 +67,10 @@ function App() {
 			enableVerticalSwipes()
 		}
 	}, [])
+
+	useEffect(() => {
+		void fetchSettings().catch(() => undefined)
+	}, [fetchSettings])
 
 	const tabs = useMemo<BottomNavTab[]>(
 		() => [
