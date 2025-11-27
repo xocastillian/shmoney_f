@@ -1,6 +1,7 @@
 import type { TransactionFeedItem } from '@api/types'
 import Button from '../ui/Button/Button'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
+import { useTranslation } from '@/i18n'
 
 export interface TransactionsWidgetProps extends Omit<TransactionsListProps, 'items'> {
 	items: TransactionFeedItem[]
@@ -19,6 +20,7 @@ export const TransactionsWidget = ({
 	onItemClick,
 	limit = 5,
 }: TransactionsWidgetProps) => {
+	const { t } = useTranslation()
 	const shouldRenderSkeleton = loading
 
 	if (shouldRenderSkeleton) {
@@ -35,20 +37,20 @@ export const TransactionsWidget = ({
 
 	if (!items.length) {
 		return (
-			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>Здесь будут транзакции</section>
+			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>{t('transactions.placeholder')}</section>
 		)
 	}
 
 	return (
 		<section className='rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur'>
 			<div className='mb-3 flex items-center justify-between gap-2 px-3'>
-				<h2 className='text-base border-b border-divider pb-3 w-full'>Последние транзакции</h2>
+				<h2 className='text-base border-b border-divider pb-3 w-full'>{t('transactions.widget.title')}</h2>
 			</div>
 
 			<TransactionsList items={items} walletById={walletById} categoryById={categoryById} limit={limit} onItemClick={onItemClick} />
 
 			<div className='mt-3 px-3 ml-auto w-fit'>
-				<Button text='Показать все' onClick={onOpenDrawer} />
+				<Button text={t('transactions.widget.showAll')} onClick={onOpenDrawer} />
 			</div>
 		</section>
 	)

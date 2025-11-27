@@ -74,6 +74,11 @@ export const ru: TranslationDictionary = {
 	'wallets.currency.aed': 'Дирхам ОАЭ',
 	'wallets.balanceTitle': 'Баланс',
 	'wallets.balancePlaceholder': 'Здесь будет общий баланс',
-'exchangeRates.title': 'Курсы валют',
-'exchangeRates.unavailable': 'Курсы пока недоступны',
+	'exchangeRates.title': 'Курсы валют',
+	'exchangeRates.unavailable': 'Курсы пока недоступны',
+	'transactions.widget.title': 'Последние транзакции',
+	'transactions.widget.showAll': 'Показать все',
+	'transactions.item.transfer': 'Перевод, снятие',
+	'transactions.item.transaction': 'Транзакция',
+	'transactions.list.unknownDate': 'Неизвестная дата',
 }

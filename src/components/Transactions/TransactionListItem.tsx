@@ -1,10 +1,10 @@
-import { format } from 'date-fns'
 import { BanknoteArrowDown } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { TransactionFeedItem } from '@api/types'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 import { categoryIconMap } from '@/widgets/Categories/icons'
+import { useTranslation } from '@/i18n'
 
 interface TransactionListItemProps {
 	item: TransactionFeedItem
@@ -14,11 +14,12 @@ interface TransactionListItemProps {
 }
 
 export const TransactionListItem = ({ item, walletById = {}, categoryById = {}, onClick }: TransactionListItemProps) => {
+	const { t, locale } = useTranslation()
 	const category = item.categoryId ? categoryById[item.categoryId] : undefined
 	const wallet = item.walletId ? walletById[item.walletId] : undefined
 	const counterpartyWallet = item.counterpartyWalletId ? walletById[item.counterpartyWalletId] : undefined
-	const typeLabel = item.entryType === 'TRANSFER' ? 'Перевод, снятие' : category?.name ?? 'Транзакция'
-	const timeLabel = item.occurredAt ? format(new Date(item.occurredAt), 'HH:mm') : ''
+	const typeLabel = item.entryType === 'TRANSFER' ? t('transactions.item.transfer') : category?.name ?? t('transactions.item.transaction')
+	const timeLabel = item.occurredAt ? new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(item.occurredAt)) : ''
 	const walletLabel = wallet?.name ?? item.walletId ?? '—'
 	const counterpartyLabel = counterpartyWallet?.name ?? item.counterpartyWalletId ?? null
 	const walletDisplay = item.entryType === 'TRANSFER' && counterpartyLabel ? `${walletLabel} → ${counterpartyLabel}` : walletLabel

@@ -72,8 +72,13 @@ export const en = {
 	'wallets.currency.aed': 'UAE Dirham',
 	'wallets.balanceTitle': 'Balance',
 	'wallets.balancePlaceholder': 'Total balance will appear here',
-'exchangeRates.title': 'Exchange rates',
-'exchangeRates.unavailable': 'Exchange rates are currently unavailable',
+	'exchangeRates.title': 'Exchange rates',
+	'exchangeRates.unavailable': 'Exchange rates are currently unavailable',
+	'transactions.widget.title': 'Recent transactions',
+	'transactions.widget.showAll': 'Show all',
+	'transactions.item.transfer': 'Transfer, withdrawal',
+	'transactions.item.transaction': 'Transaction',
+	'transactions.list.unknownDate': 'Unknown date',
 } as const
 
 export type TranslationDictionary = Record<keyof typeof en, string>

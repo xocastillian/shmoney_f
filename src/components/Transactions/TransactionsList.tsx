@@ -1,9 +1,9 @@
 import { format } from 'date-fns'
-import { ru } from 'date-fns/locale'
 import type { TransactionFeedItem } from '@api/types'
 import type { Category } from '@/types/entities/category'
 import type { Wallet } from '@/types/entities/wallet'
 import TransactionListItem from './TransactionListItem'
+import { useTranslation } from '@/i18n'
 
 export interface TransactionsListProps {
 	items: TransactionFeedItem[]
@@ -14,6 +14,7 @@ export interface TransactionsListProps {
 }
 
 export const TransactionsList = ({ items, walletById = {}, categoryById = {}, limit, onItemClick }: TransactionsListProps) => {
+	const { t, locale } = useTranslation()
 	const normalizedLimit = typeof limit === 'number' && limit > 0 ? limit : null
 	const visibleItems = normalizedLimit ? items.slice(0, normalizedLimit) : items
 
@@ -34,7 +35,10 @@ export const TransactionsList = ({ items, walletById = {}, categoryById = {}, li
 		<div className='space-y-3'>
 			{sortedDates.map(dateKey => {
 				const itemsForDate = grouped[dateKey]
-				const dateLabel = dateKey === 'unknown' ? 'Неизвестная дата' : format(new Date(dateKey), 'd MMMM', { locale: ru })
+				const dateLabel =
+					dateKey === 'unknown'
+						? t('transactions.list.unknownDate')
+						: new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' }).format(new Date(dateKey))
 
 				return (
 					<div key={dateKey} className='bg-background-muted-2 px-3 pb-3 p-3'>
