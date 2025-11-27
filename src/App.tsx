@@ -397,11 +397,11 @@ function App() {
 	return (
 		<div className='relative min-h-screen bg-background overflow-hidden'>
 			<Aurora
-				colorStops={['var(--accent-orange)', 'var(--accent-orange)', 'var(--accent-orange)']}
+				colorStops={['var(--accent)', 'var(--accent-1)', 'var(--accent-2)']}
 				blend={1000}
 				amplitude={1}
-				speed={0.5}
-				className='pointer-events-none fixed inset-0 z-0 opacity-40'
+				speed={1}
+				className='pointer-events-none fixed inset-0 z-0 opacity-30'
 			/>
 
 			<div className='relative z-10'>

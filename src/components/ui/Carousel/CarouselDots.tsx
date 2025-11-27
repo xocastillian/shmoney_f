@@ -24,7 +24,7 @@ export const CarouselDots = ({ count, activeIndex, onSelect, className }: Carous
 						aria-label={`Перейти к блоку ${index + 1}`}
 						className={cn(
 							'h-1 w-2.5 rounded-full transition-all duration-200',
-							isActive ? 'bg-accent-orange scale-110' : 'bg-background-muted opacity-70 hover:opacity-100'
+							isActive ? 'bg-accent scale-110' : 'bg-background-muted opacity-70 hover:opacity-100'
 						)}
 						onClick={() => onSelect?.(index)}
 					/>

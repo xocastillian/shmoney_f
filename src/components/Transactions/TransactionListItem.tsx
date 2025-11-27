@@ -34,7 +34,7 @@ export const TransactionListItem = ({ item, walletById = {}, categoryById = {}, 
 			<button
 				type='button'
 				onClick={() => onClick?.(item)}
-				className='w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
+				className='w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
 			>
 				<div className='flex items-center gap-3'>
 					<div className='flex h-[48px] w-[48px] items-center justify-center rounded-full bg-background-muted'>

@@ -64,7 +64,7 @@ const CategoriesDrawer = ({
 									<button
 										type='button'
 										onClick={() => onSelectAll?.()}
-										className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
+										className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
 									>
 										<div className='flex h-16 items-center px-3'>
 											<LucideIcons.FolderHeart className='mr-3 text-label' />
@@ -83,7 +83,7 @@ const CategoriesDrawer = ({
 											key={category.id}
 											type='button'
 											onClick={() => onSelect?.(category)}
-											className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-orange'
+											className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
 										>
 											<div className='flex h-16 items-center px-3'>
 												<div className='mr-3'>

@@ -65,7 +65,7 @@ const TransactionsDrawer = ({
 					<div className='flex items-center gap-2'>
 						{onOpenFilters && (
 							<button type='button' onClick={onOpenFilters} className='rounded-full p-2' aria-label='Открыть фильтры'>
-								<Filter className={`h-5 w-5 ${filtersActive ? 'text-accent-orange' : ''}`} />
+								<Filter className={`h-5 w-5 ${filtersActive ? 'text-accent' : ''}`} />
 							</button>
 						)}
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
