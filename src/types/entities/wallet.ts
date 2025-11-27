@@ -32,3 +32,8 @@ export type Wallet = {
 	color: string
 	type: WalletType
 }
+
+export type WalletBalanceSummary = {
+	currencyCode: string
+	totalBalance: number
+}

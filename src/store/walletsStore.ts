@@ -1,19 +1,25 @@
 import { create } from 'zustand'
-import type { Wallet } from '@/types/entities/wallet'
+import type { Wallet, WalletBalanceSummary } from '@/types/entities/wallet'
 
 interface WalletsState {
 	wallets: Wallet[]
 	loading: boolean
+	balances: WalletBalanceSummary[]
+	balancesLoading: boolean
 	setWallets: (wallets: Wallet[]) => void
 	addWallet: (wallet: Wallet) => void
 	removeWallet: (walletId: number) => void
 	setLoading: (loading: boolean) => void
+	setBalances: (balances: WalletBalanceSummary[]) => void
+	setBalancesLoading: (loading: boolean) => void
 	clear: () => void
 }
 
 export const useWalletsStore = create<WalletsState>(set => ({
 	wallets: [],
 	loading: false,
+	balances: [],
+	balancesLoading: false,
 	setWallets: wallets => set({ wallets }),
 	addWallet: wallet =>
 		set(state => {
@@ -24,5 +30,7 @@ export const useWalletsStore = create<WalletsState>(set => ({
 		}),
 	removeWallet: walletId => set(state => ({ wallets: state.wallets.filter(w => w.id !== walletId) })),
 	setLoading: loading => set({ loading }),
-	clear: () => set({ wallets: [] }),
+	setBalances: balances => set({ balances }),
+	setBalancesLoading: loading => set({ balancesLoading: loading }),
+	clear: () => set({ wallets: [], loading: false, balances: [], balancesLoading: false }),
 }))

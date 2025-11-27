@@ -36,7 +36,7 @@ export const TransactionsWidget = ({
 	}
 
 	return (
-		<section className='mt-4 rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur mb-3'>
+		<section className='rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur'>
 			<div className='mb-3 flex items-center justify-between gap-2 px-3'>
 				<h2 className='text-base border-b border-divider pb-3 w-full'>Последние транзакции</h2>
 			</div>

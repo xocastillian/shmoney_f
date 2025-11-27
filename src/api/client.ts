@@ -9,6 +9,7 @@ import {
 	TelegramAuthRequestSchema,
 	WalletCreateRequestSchema,
 	WalletResponseSchema,
+	WalletBalanceResponseSchema,
 	WalletTransactionRequestSchema,
 	WalletTransactionResponseSchema,
 	WalletTransactionUpdateRequestSchema,
@@ -33,6 +34,7 @@ import type {
 	ExchangeRateResponse,
 	WalletCreateRequest,
 	WalletResponse,
+	WalletBalanceResponse,
 	WalletTransactionRequest,
 	WalletTransactionResponse,
 	WalletTransactionUpdateRequest,
@@ -65,6 +67,11 @@ export async function listWallets(): Promise<WalletResponse[]> {
 export async function getWallet(id: number): Promise<WalletResponse> {
 	const data = await get<unknown>(endpoints.wallets.byId(id))
 	return WalletResponseSchema.parse(data)
+}
+
+export async function listWalletBalances(): Promise<WalletBalanceResponse[]> {
+	const data = await get<unknown>(endpoints.wallets.balances)
+	return WalletBalanceResponseSchema.array().parse(data)
 }
 
 export async function createWallet(payload: WalletCreateRequest): Promise<WalletResponse> {

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
 import AuthDiagnostics from '@/components/auth/auth-diagnostics'
 import Wallets from '@/widgets/Wallets/Wallets'
+import WalletBalancesWidget from '@/widgets/Wallets/WalletBalancesWidget'
 import ExchangeRates from '@/widgets/ExchangeRates/ExchangeRates'
 import TransactionsWidget from '@/components/Transactions/TransactionsWidget'
 import TransactionsDrawer from '@/components/Transactions/TransactionsDrawer'
@@ -24,7 +25,16 @@ interface HomeScreenProps {
 const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	const { status, error: authError, isInTelegram, login } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
-	const { wallets, loading: walletsLoading, error: walletsError, fetchWallets, clearWallets } = useWallets()
+	const {
+		wallets,
+		balances,
+		loading: walletsLoading,
+		balancesLoading,
+		error: walletsError,
+		fetchWallets,
+		fetchWalletBalances,
+		clearWallets,
+	} = useWallets()
 	const { fetchExchangeRates, clearRates } = useExchangeRates()
 	const { categories, fetchCategories, clearCategories: resetCategories } = useCategories()
 	const { feed, feedLoading, feedError, fetchTransactionFeed, clearTransactions } = useTransactions()
@@ -106,9 +116,20 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		}
 
 		void fetchWallets()
+		void fetchWalletBalances().catch(() => undefined)
 		void fetchExchangeRates().catch(() => undefined)
 		void fetchCategories().catch(() => undefined)
-	}, [authenticated, fetchWallets, fetchExchangeRates, fetchCategories, clearWallets, clearRates, resetCategories, clearTransactions])
+	}, [
+		authenticated,
+		fetchWallets,
+		fetchWalletBalances,
+		fetchExchangeRates,
+		fetchCategories,
+		clearWallets,
+		clearRates,
+		resetCategories,
+		clearTransactions,
+	])
 
 	useEffect(() => {
 		if (!authenticated) {
@@ -166,16 +187,27 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 					{walletsError && <div className='text-sm text-red-400'>{walletsError}</div>}
 					<Wallets wallets={wallets} />
 					{walletsLoading && <div className='mt-2 text-sm text-muted-foreground'>Загрузка...</div>}
-					<ExchangeRates />
-					<TransactionsWidget
-						items={feed}
-						loading={feedLoading}
-						error={feedError}
-						walletById={walletById}
-						categoryById={categoryById}
-						onItemClick={onTransactionSelect}
-						onOpenDrawer={() => setTransactionsDrawerOpen(true)}
-					/>
+
+					<div className='mt-4'>
+						<WalletBalancesWidget balances={balances} loading={balancesLoading} error={walletsError} />
+					</div>
+
+					<div className='mt-4'>
+						<TransactionsWidget
+							items={feed}
+							loading={feedLoading}
+							error={feedError}
+							walletById={walletById}
+							categoryById={categoryById}
+							onItemClick={onTransactionSelect}
+							onOpenDrawer={() => setTransactionsDrawerOpen(true)}
+						/>
+					</div>
+
+					<div className='mb-3'>
+						<ExchangeRates />
+					</div>
+
 					<TransactionsDrawer
 						open={isTransactionsDrawerOpen}
 						onClose={() => setTransactionsDrawerOpen(false)}
