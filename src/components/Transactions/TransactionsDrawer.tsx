@@ -1,10 +1,10 @@
 import { useCallback, useRef, type UIEvent } from 'react'
 import { Filter, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import type { TransactionFeedItem } from '@api/types'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
 import Loader from '../ui/Loader/Loader'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
 
 export interface TransactionsDrawerProps extends TransactionsListProps {
 	open: boolean
@@ -61,7 +61,7 @@ const TransactionsDrawer = ({
 	)
 
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-screen rounded-t-3xl bg-background'>
+		<DrawerWrapper open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<header className='flex items-center justify-between gap-3 p-3'>
 					<h2 className='text-lg font-semibold'>{title}</h2>
@@ -92,7 +92,7 @@ const TransactionsDrawer = ({
 				)}
 				{error && <div className='px-3 pb-4 text-sm text-danger'>{error}</div>}
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 

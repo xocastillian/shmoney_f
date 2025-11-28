@@ -1,7 +1,6 @@
 import { X } from 'lucide-react'
-
-import Drawer from '@/components/Drawer/Drawer'
 import { categoryIconOptions } from '../icons'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 interface IconPickerDrawerProps {
 	open: boolean
@@ -12,12 +11,7 @@ interface IconPickerDrawerProps {
 
 const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerDrawerProps) => {
 	return (
-		<Drawer
-			open={open}
-			onClose={onClose}
-			className='max-h-[85vh] rounded-t-lg !bg-background-secondary'
-			overlayClassName='bg-black/80 backdrop-blur-sm'
-		>
+		<DrawerWrapper open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2'>
@@ -25,7 +19,7 @@ const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerD
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto px-4 pb-4'>
+				<div className='flex-1 overflow-y-auto px-4 pb-10'>
 					<h2 className='mb-4 text-sm font-medium text-label'>Выбор иконки</h2>
 					<div className='grid grid-cols-4 gap-3'>
 						{categoryIconOptions.map(({ key, Icon }) => {
@@ -46,7 +40,7 @@ const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerD
 					</div>
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 

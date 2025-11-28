@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import Loader from '@/components/ui/Loader/Loader'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 interface LanguageSettingsDrawerProps {
 	open: boolean
@@ -21,12 +21,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 	}
 
 	return (
-		<Drawer
-			open={open}
-			onClose={handleClose}
-			className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
-			overlayClassName='bg-black/80 backdrop-blur-sm'
-		>
+		<DrawerWrapper open={open} onClose={handleClose} className='max-h-[70vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={handleClose} className='rounded-full p-2' aria-label='Закрыть'>
@@ -34,7 +29,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col'>
+				<div className='flex flex-1 flex-col pb-10'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('settings.language')}</h2>
 					<div className='bg-background-muted'>
 						{languages.map(language => {
@@ -66,7 +61,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 					</div>
 				)}
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 

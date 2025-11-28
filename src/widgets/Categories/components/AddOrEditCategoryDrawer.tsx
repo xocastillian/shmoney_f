@@ -1,6 +1,5 @@
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import Loader from '@/components/ui/Loader/Loader'
 import type { Category } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
@@ -10,6 +9,8 @@ import CategoryForm from './CategoryForm'
 import { categoryIconOptions } from '../icons'
 import useCategories from '@/hooks/useCategories'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import { createPortal } from 'react-dom'
 
 export type CategoryFormValues = Pick<Category, 'name' | 'color' | 'icon'>
 
@@ -111,12 +112,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 
 	return (
 		<>
-			<Drawer
-				open={open}
-				onClose={onClose}
-				className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
-				overlayClassName='bg-black/80 backdrop-blur-sm'
-			>
+			<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full' aria-label={t('categories.drawer.close')}>
@@ -132,7 +128,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 						</button>
 					</div>
 
-					<div className='flex-1 overflow-y-auto'>
+					<div className='flex-1 overflow-y-auto pb-10'>
 						<CategoryForm
 							formId={formId}
 							title={computedTitle}
@@ -148,7 +144,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 						/>
 					</div>
 				</div>
-			</Drawer>
+			</DrawerWrapper>
 
 			<ColorPickerDrawer
 				open={isColorPickerOpen}
@@ -160,13 +156,17 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 
 			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
 
-			{open && isBusy && (
-				<div className='fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm'>
-					<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
-						<Loader />
-					</div>
-				</div>
-			)}
+			{open &&
+				isBusy &&
+				typeof document !== 'undefined' &&
+				createPortal(
+					<div className='fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center pointer-events-auto'>
+						<div className='p-2'>
+							<Loader />
+						</div>
+					</div>,
+					document.body
+				)}
 		</>
 	)
 }

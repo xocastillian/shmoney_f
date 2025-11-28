@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import type { TransactionFilterType } from './filters'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
 
 const typeOptions: { value: TransactionFilterType; labelKey: string }[] = [
 	{ value: '', labelKey: 'transactions.filters.type.all' },
@@ -22,7 +22,7 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 	const { t } = useTranslation()
 
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-[70vh] rounded-t-lg bg-background-secondary'>
+		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='p-2' aria-label={t('common.close')}>
@@ -30,7 +30,7 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col'>
+				<div className='flex flex-1 flex-col pb-10'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title ?? t('transactions.filters.type.title')}</h2>
 					<div className='bg-background-muted'>
 						{typeOptions.map(option => {
@@ -55,6 +55,6 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 					</div>
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }

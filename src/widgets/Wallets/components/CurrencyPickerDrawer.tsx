@@ -1,8 +1,8 @@
 import { Check, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import type { CurrencyOption } from '../types'
 import { currencyIconMap } from '../types'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 interface CurrencyPickerDrawerProps {
 	open: boolean
@@ -14,13 +14,9 @@ interface CurrencyPickerDrawerProps {
 
 export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onSelect }: CurrencyPickerDrawerProps) {
 	const { t } = useTranslation()
+
 	return (
-		<Drawer
-			open={open}
-			onClose={onClose}
-			className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
-			overlayClassName='bg-black/80 backdrop-blur-sm'
-		>
+		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('wallets.form.close')}>
@@ -28,7 +24,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col'>
+				<div className='flex flex-col pb-10'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('wallets.form.currencyTitle')}</h2>
 					<div className='bg-background-muted'>
 						{options.map(option => {
@@ -53,7 +49,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 					</div>
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 
