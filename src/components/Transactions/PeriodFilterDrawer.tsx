@@ -2,7 +2,8 @@ import { Check, X } from 'lucide-react'
 import type { TransactionPeriodFilter } from './filters'
 import { periodOptions } from './filters'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
+import Drawer from '../Drawer/Drawer'
+import MobileDateTimePickerField from '../DateTimePicker/MobileDateTimePickerField'
 
 interface PeriodFilterDrawerProps {
 	open: boolean
@@ -16,12 +17,11 @@ interface PeriodFilterDrawerProps {
 
 const quickPeriodOptions = periodOptions.filter(option => option.value !== '')
 
-const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange }: PeriodFilterDrawerProps) => {
-	const { t } = useTranslation()
-	// const { locale } = useTranslation()
+const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange, from, to, onDateChange }: PeriodFilterDrawerProps) => {
+	const { t, locale } = useTranslation()
 
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
@@ -55,7 +55,7 @@ const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange }: PeriodFil
 						</div>
 					</div>
 
-					{/* <div className='border-b border-divider bg-background-muted flex'>
+					<div className='border-b border-divider bg-background-muted flex'>
 						<MobileDateTimePickerField
 							value={from}
 							onChange={value => onDateChange('from', value)}
@@ -71,10 +71,10 @@ const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange }: PeriodFil
 							precision='day'
 							locale={locale}
 						/>
-					</div> */}
+					</div>
 				</div>
 			</div>
-		</DrawerWrapper>
+		</Drawer>
 	)
 }
 

@@ -8,8 +8,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 function resolveHttpsConfig(env: Record<string, string>) {
-	const keyPath = env.VITE_DEV_SSL_KEY || path.resolve(__dirname, 'app.localhost.direct-key.pem')
-	const certPath = env.VITE_DEV_SSL_CERT || path.resolve(__dirname, 'app.localhost.direct.pem')
+	const keyPath = env.VITE_DEV_SSL_KEY || path.resolve(__dirname, 'app.localhost.direct+3-key.pem')
+	const certPath = env.VITE_DEV_SSL_CERT || path.resolve(__dirname, 'app.localhost.direct+3.pem')
 
 	if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
 		return undefined
@@ -40,9 +40,14 @@ export default defineConfig(({ mode }) => {
 	return {
 		plugins: [react()],
 		server: {
-			host: preferredHost,
+			host: true,
 			https: httpsConfig,
-			allowedHosts: Array.from(allowed),
+			allowedHosts: true,
+			hmr: {
+				protocol: 'wss',
+				host: '192.168.0.17',
+				port: 5173,
+			},
 			proxy: {
 				'/api': {
 					target: devProxyTarget,

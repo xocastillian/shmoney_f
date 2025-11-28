@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
 import Loader from '@/components/ui/Loader/Loader'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import Drawer from '@/components/Drawer/Drawer'
 
 interface LanguageSettingsDrawerProps {
 	open: boolean
@@ -21,7 +21,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 	}
 
 	return (
-		<DrawerWrapper open={open} onClose={handleClose} className='max-h-[70vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={handleClose} className='rounded-t-lg bg-background-secondary h-[50vh]'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={handleClose} className='rounded-full p-2' aria-label='Закрыть'>
@@ -61,7 +61,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 					</div>
 				)}
 			</div>
-		</DrawerWrapper>
+		</Drawer>
 	)
 }
 

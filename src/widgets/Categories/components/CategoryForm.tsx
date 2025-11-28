@@ -53,9 +53,7 @@ const CategoryForm = ({
 					<div className='border-b border-divider'>
 						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenColorPicker}>
 							<Palette className='mr-3 text-label transition-colors' style={{ color }} />
-							<span className='text-text' style={{ color }}>
-								{t('categories.form.color')}
-							</span>
+							<span className='text-text'>{t('categories.form.color')}</span>
 						</button>
 					</div>
 
