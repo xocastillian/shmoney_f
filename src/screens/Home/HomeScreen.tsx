@@ -51,7 +51,6 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		walletId: null,
 		categoryId: null,
 	})
-	const [drawerFeed, setDrawerFeed] = useState<TransactionFeedItem[]>([])
 	const [drawerNextPage, setDrawerNextPage] = useState<number | null>(null)
 	const [drawerLoading, setDrawerLoading] = useState(false)
 	const [drawerError, setDrawerError] = useState<string | null>(null)
@@ -151,7 +150,6 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 
 			try {
 				const response = await getTransactionFeed({ ...feedQueryParams, page })
-				setDrawerFeed(prev => (append ? [...prev, ...response.results] : response.results))
 				setDrawerNextPage(response.next ?? null)
 				setDrawerError(null)
 			} catch (error) {
@@ -207,7 +205,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 			<TransactionsDrawer
 				open={isTransactionsDrawerOpen}
 				onClose={() => setTransactionsDrawerOpen(false)}
-				items={drawerFeed}
+				items={feed}
 				walletById={walletById}
 				categoryById={categoryById}
 				hasMore={drawerNextPage != null}
@@ -220,6 +218,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				filtersActive={hasActiveFeedFilters}
 				title={t('transactions.drawer.all')}
 			/>
+
 			<TransactionsFilterDrawer
 				open={isFiltersDrawerOpen}
 				onClose={() => setFiltersDrawerOpen(false)}

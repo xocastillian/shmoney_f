@@ -37,7 +37,9 @@ export const TransactionsWidget = ({
 
 	if (!items.length) {
 		return (
-			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>{t('transactions.placeholder')}</section>
+			<section className='rounded-xl bg-background-muted p-6 text-center text-sm text-label shadow-sm backdrop-blur'>
+				{t('transactions.placeholder')}
+			</section>
 		)
 	}
 
