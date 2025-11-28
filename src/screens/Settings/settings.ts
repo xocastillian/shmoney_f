@@ -1,5 +1,5 @@
 import type { Setting } from '@/types/entities/setting'
-import { FolderHeart, Languages, SunMoon } from 'lucide-react'
+import { FolderHeart, Languages } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { useMemo } from 'react'
 
@@ -22,12 +22,6 @@ export const useSettingsList = ({ onCategoriesPress, onLanguagePress }: Settings
 				title: t('settings.language'),
 				onClick: onLanguagePress,
 				icon: Languages,
-			},
-			{
-				title: t('settings.theme'),
-				onClick: () => {},
-				icon: SunMoon,
-				disabled: true,
 			},
 		],
 		[onCategoriesPress, onLanguagePress, t]
