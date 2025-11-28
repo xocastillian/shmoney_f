@@ -1,7 +1,8 @@
-import { CalendarClock, CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart } from 'lucide-react'
+import { CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart } from 'lucide-react'
+// import { CalendarClock } from 'lucide-react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
-import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
+// import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import TransactionTypeTabs, { type TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 import { useTranslation } from '@/i18n'
 
@@ -68,11 +69,12 @@ export const TransactionForm = ({
 	categoryPickerDisabled = false,
 	description,
 	onDescriptionChange,
-	dateTime,
-	onDateTimeChange,
-	maxDate,
-}: TransactionFormProps) => {
-	const { t, locale } = useTranslation()
+}: // dateTime,
+// onDateTimeChange,
+// maxDate,
+TransactionFormProps) => {
+	const { t } = useTranslation()
+	// const { locale } = useTranslation()
 	const formattedAmount = formatDecimalForDisplay(amount)
 	const isEditMode = mode === 'edit'
 	const isEditingTransfer = isEditMode && transactionType === 'TRANSFER'
@@ -138,9 +140,7 @@ export const TransactionForm = ({
 						>
 							<div className='flex h-16 items-center px-3'>
 								{toWalletIcon ?? <WalletIcon className='mr-3 text-label' />}
-								<span className={toWalletSelected ? 'text-text' : 'text-label'}>
-									{toWalletSelected ? toWalletLabel : t('transactions.form.to')}
-								</span>
+								<span className={toWalletSelected ? 'text-text' : 'text-label'}>{toWalletSelected ? toWalletLabel : t('transactions.form.to')}</span>
 							</div>
 						</button>
 					) : (
@@ -175,7 +175,7 @@ export const TransactionForm = ({
 						</div>
 					</div>
 
-					<div className='border-b border-divider'>
+					{/* <div className='border-b border-divider'>
 						<MobileDateTimePickerField
 							value={dateTime}
 							onChange={onDateTimeChange}
@@ -184,7 +184,7 @@ export const TransactionForm = ({
 							locale={locale}
 							maxDate={maxDate}
 						/>
-					</div>
+					</div> */}
 				</div>
 				{mode === 'edit' && onDelete && (
 					<div className='border-b border-divider'>

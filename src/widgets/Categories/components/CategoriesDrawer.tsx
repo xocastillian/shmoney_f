@@ -49,7 +49,7 @@ const CategoriesDrawer = ({
 	const hasCategories = categories.length > 0
 
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className={`h-[100vh] ${className}`}>
+		<DrawerWrapper open={open} onClose={onClose} className={`h-[100vh] bg-background-secondary ${className}`}>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
