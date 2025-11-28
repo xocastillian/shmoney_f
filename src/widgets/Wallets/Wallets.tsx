@@ -114,8 +114,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 
 	const handleDelete = async () => {
 		if (!isEditing || editingWalletId === null) return
-		const confirmed = window.confirm(t('wallets.form.confirmDelete'))
-		if (!confirmed) return
+
 		try {
 			await deleteWallet(editingWalletId)
 			setFormError(null)

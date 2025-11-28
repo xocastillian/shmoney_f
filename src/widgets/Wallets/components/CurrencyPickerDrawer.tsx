@@ -45,7 +45,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 									<div className='flex h-16 items-center px-3'>
 										{iconSrc && <img src={iconSrc} alt='' className='mr-3 h-6 w-6' />}
 										<span className='text-text'>{t(option.label)}</span>
-										{isSelected && <Check className='ml-auto' size={16} />}
+										{isSelected && <Check className='ml-auto text-accent' size={16} />}
 									</div>
 								</button>
 							)

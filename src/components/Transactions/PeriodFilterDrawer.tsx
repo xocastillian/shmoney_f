@@ -48,7 +48,7 @@ const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, o
 										aria-pressed={isSelected}
 									>
 										<span className={isSelected ? 'text-text' : 'text-label'}>{t(option.labelKey)}</span>
-										{isSelected && <Check className='ml-auto text-primary' size={16} />}
+										{isSelected && <Check className='ml-auto text-accent' size={16} />}
 									</button>
 								)
 							})}

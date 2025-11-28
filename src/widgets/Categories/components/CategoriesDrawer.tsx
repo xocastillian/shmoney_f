@@ -71,7 +71,7 @@ const CategoriesDrawer = ({
 										<div className='flex h-16 items-center px-3'>
 											<LucideIcons.FolderHeart className='mr-3 text-label' />
 											<span className='text-text'>{allOptionLabel}</span>
-											{selectable && selectedCategoryId == null && <LucideIcons.Check className='ml-auto text-primary' size={16} />}
+											{selectable && selectedCategoryId == null && <LucideIcons.Check className='ml-auto text-accent' size={16} />}
 										</div>
 									</button>
 								)}
@@ -98,7 +98,7 @@ const CategoriesDrawer = ({
 													)}
 												</div>
 												<span className='text-text'>{category.name}</span>
-												{isSelected && <LucideIcons.Check className='ml-auto text-primary' size={16} />}
+												{isSelected && <LucideIcons.Check className='ml-auto text-accent' size={16} />}
 											</div>
 										</button>
 									)
