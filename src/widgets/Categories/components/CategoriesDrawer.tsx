@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import { useCategories } from '@/hooks/useCategories'
 import type { Category } from '@/types/entities/category'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 interface CategoriesDrawerProps {
 	open: boolean
@@ -49,7 +49,7 @@ const CategoriesDrawer = ({
 	const hasCategories = categories.length > 0
 
 	return (
-		<Drawer open={open} onClose={onClose} className={`max-h-[100vh] ${className}`} overlayClassName='bg-black/80 backdrop-blur-sm'>
+		<DrawerWrapper open={open} onClose={onClose} className={`h-[100vh] ${className}`}>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
@@ -117,7 +117,7 @@ const CategoriesDrawer = ({
 					)}
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 
