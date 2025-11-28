@@ -70,7 +70,7 @@ export const BottomNav = ({ tabs, activeKey, onTabChange, onCreate, createButton
 									tab.onClick?.()
 								}}
 								className={cn(
-									'flex flex-col items-center justify-between gap-1 text-xs font-medium transition-colors',
+									'flex flex-col items-center justify-between gap-1 text-xs font-medium transition-colors p-5 -m-5',
 									isActive ? 'text-accent' : ''
 								)}
 							>
