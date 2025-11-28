@@ -108,4 +108,5 @@ export const ru: TranslationDictionary = {
 	'transactions.filters.walletPicker.empty': 'Нет доступных кошельков',
 	'transactions.filters.resetButton': 'Сбросить фильтры',
 	'transactions.drawer.filters': 'Фильтры',
+	'transactions.placeholder': 'Нет транзакций',
 }

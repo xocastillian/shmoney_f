@@ -45,7 +45,7 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 									<div className='flex h-16 items-center px-3'>
 										<Icon className='mr-3 text-label' />
 										<span className='text-text'>{t(walletTypeLabels[type])}</span>
-										{isSelected && <Check className='ml-auto text-primary' size={16} />}
+										{isSelected && <Check className='ml-auto text-accent' size={16} />}
 									</div>
 								</button>
 							)

@@ -4,6 +4,7 @@ import Drawer from '@/components/Drawer/Drawer'
 import type { TransactionFeedItem } from '@api/types'
 import TransactionsList, { type TransactionsListProps } from './TransactionsList'
 import Loader from '../ui/Loader/Loader'
+import { useTranslation } from '@/i18n'
 
 export interface TransactionsDrawerProps extends TransactionsListProps {
 	open: boolean
@@ -38,6 +39,7 @@ const TransactionsDrawer = ({
 	onItemClick,
 }: TransactionsDrawerProps) => {
 	const scrollDebounceRef = useRef<number | null>(null)
+	const { t } = useTranslation()
 
 	const handleScroll = useCallback(
 		(event: UIEvent<HTMLDivElement>) => {
@@ -82,7 +84,7 @@ const TransactionsDrawer = ({
 						</div>
 					</div>
 				) : items.length === 0 ? (
-					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>Нет данных</div>
+					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>{t('transactions.placeholder')}</div>
 				) : (
 					<div className='flex-1 overflow-y-auto pb-10' onScroll={handleScroll}>
 						<TransactionsList items={items} walletById={walletById} categoryById={categoryById} onItemClick={onItemClick} />

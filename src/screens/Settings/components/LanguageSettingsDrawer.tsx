@@ -50,7 +50,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 								>
 									<div className='flex h-16 items-center px-3'>
 										<span className='text-text uppercase'>{language}</span>
-										{isSelected && <Check className='ml-auto' size={16} />}
+										{isSelected && <Check className='ml-auto text-accent' size={16} />}
 									</div>
 								</button>
 							)

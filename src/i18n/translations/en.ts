@@ -106,6 +106,7 @@ export const en = {
 	'transactions.filters.walletPicker.empty': 'No wallets available',
 	'transactions.filters.resetButton': 'Reset filters',
 	'transactions.drawer.filters': 'Filters',
+	'transactions.placeholder': 'No transactions yet',
 } as const
 
 export type TranslationDictionary = Record<keyof typeof en, string>

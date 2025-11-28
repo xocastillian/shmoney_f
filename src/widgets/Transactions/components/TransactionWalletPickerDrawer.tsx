@@ -64,7 +64,7 @@ export const TransactionWalletPickerDrawer = ({
 									<div className='flex h-16 items-center px-3'>
 										<WalletIcon className='mr-3 h-6 w-6 text-label' />
 										<span className='text-text'>{allOptionLabel ?? t('transactions.filters.wallet.all')}</span>
-										{selectedWalletId == null && <Check className='ml-auto text-primary' size={16} />}
+										{selectedWalletId == null && <Check className='ml-auto text-accent' size={16} />}
 									</div>
 								</button>
 							)}
@@ -85,7 +85,7 @@ export const TransactionWalletPickerDrawer = ({
 										<div className='flex h-16 items-center px-3'>
 											<Icon className={iconClassName} style={iconStyle} />
 											<span className='text-text'>{wallet.name}</span>
-											{isSelected && <Check className='ml-auto text-primary' size={16} />}
+											{isSelected && <Check className='ml-auto text-accent' size={16} />}
 										</div>
 									</button>
 								)

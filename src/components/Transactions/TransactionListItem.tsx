@@ -45,7 +45,7 @@ export const TransactionListItem = ({ item, walletById = {}, categoryById = {}, 
 					<div className='flex flex-1 items-start justify-between'>
 						<div className='flex flex-col gap-1'>
 							<span className='text-base text-text'>{typeLabel}</span>
-							<span className='text-label'>{walletDisplay}</span>
+							<span className='text-accent'>{walletDisplay}</span>
 						</div>
 
 						<div className='text-right flex flex-col gap-1'>
