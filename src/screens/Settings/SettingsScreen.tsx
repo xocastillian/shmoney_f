@@ -70,13 +70,7 @@ const SettingsScreen = () => {
 				))}
 			</div>
 
-			<CategoriesDrawer
-				open={isCategoriesDrawerOpen}
-				onClose={closeCategoriesDrawer}
-				onSelect={handleSelectCategory}
-				onAdd={handleAddCategory}
-				className='bg-background-secondary rounded-t-lg'
-			/>
+			<CategoriesDrawer open={isCategoriesDrawerOpen} onClose={closeCategoriesDrawer} onSelect={handleSelectCategory} onAdd={handleAddCategory} />
 
 			<AddOrEditCategoryDrawer
 				open={isAddCategoryDrawerOpen}

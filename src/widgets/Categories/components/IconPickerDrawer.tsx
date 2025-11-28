@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
 import { categoryIconOptions } from '../icons'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import Drawer from '@/components/Drawer/Drawer'
 
 interface IconPickerDrawerProps {
 	open: boolean
@@ -11,7 +11,7 @@ interface IconPickerDrawerProps {
 
 const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerDrawerProps) => {
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2'>
@@ -40,7 +40,7 @@ const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerD
 					</div>
 				</div>
 			</div>
-		</DrawerWrapper>
+		</Drawer>
 	)
 }
 

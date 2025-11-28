@@ -2,7 +2,7 @@ import { Check, Wallet as WalletIcon, X } from 'lucide-react'
 import { typeIcons } from '@/widgets/Wallets/types'
 import type { WalletType } from '@/types/entities/wallet'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import Drawer from '@/components/Drawer/Drawer'
 
 interface TransactionWalletPickerDrawerProps {
 	open: boolean
@@ -30,8 +30,9 @@ export const TransactionWalletPickerDrawer = ({
 	onSelectAll,
 }: TransactionWalletPickerDrawerProps) => {
 	const { t } = useTranslation()
+
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
@@ -89,7 +90,7 @@ export const TransactionWalletPickerDrawer = ({
 					)}
 				</div>
 			</div>
-		</DrawerWrapper>
+		</Drawer>
 	)
 }
 

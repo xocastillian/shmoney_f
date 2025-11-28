@@ -13,7 +13,7 @@ import type { TransactionTypeTabValue } from '@/components/Transactions/Transact
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import Drawer from '@/components/Drawer/Drawer'
 
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
@@ -136,7 +136,7 @@ export const TransactionDrawer = ({
 
 	return (
 		<>
-			<DrawerWrapper open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
+			<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('transactions.drawer.close')}>
@@ -195,7 +195,7 @@ export const TransactionDrawer = ({
 						/>
 					</div>
 				</div>
-			</DrawerWrapper>
+			</Drawer>
 
 			<TransactionWalletPickerDrawer
 				open={fromPickerOpen}

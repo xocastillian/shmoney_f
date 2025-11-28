@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
 import type { TransactionFilterType } from './filters'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
+import Drawer from '../Drawer/Drawer'
 
 const typeOptions: { value: TransactionFilterType; labelKey: string }[] = [
 	{ value: '', labelKey: 'transactions.filters.type.all' },
@@ -22,7 +22,7 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 	const { t } = useTranslation()
 
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='p-2' aria-label={t('common.close')}>
@@ -55,6 +55,6 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 					</div>
 				</div>
 			</div>
-		</DrawerWrapper>
+		</Drawer>
 	)
 }

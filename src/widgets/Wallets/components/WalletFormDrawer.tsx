@@ -5,7 +5,7 @@ import Loader from '@/components/ui/Loader/Loader'
 import { WalletForm } from './WalletForm'
 import type { CurrencyOption } from '../types'
 import type { WalletType } from '@/types/entities/wallet'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import Drawer from '@/components/Drawer/Drawer'
 
 interface WalletFormDrawerProps {
 	open: boolean
@@ -57,7 +57,7 @@ export function WalletFormDrawer({
 	const formId = useId()
 
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
+		<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
 			<div className='flex h-full flex-col'>
 				<div className='flex items-center justify-between gap-3 p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
@@ -108,7 +108,7 @@ export function WalletFormDrawer({
 					</div>
 				</div>
 			)}
-		</DrawerWrapper>
+		</Drawer>
 	)
 }
 

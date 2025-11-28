@@ -13,7 +13,7 @@ import { formatDateDisplay } from '@/utils/date'
 import PeriodFilterDrawer from './PeriodFilterDrawer'
 import { periodOptions } from './filters'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
+import Drawer from '../Drawer/Drawer'
 
 interface TransactionsFilterDrawerProps {
 	open: boolean
@@ -107,7 +107,7 @@ const TransactionsFilterDrawer = ({
 
 	return (
 		<>
-			<DrawerWrapper open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
+			<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
 				<div className='flex h-full flex-col'>
 					<div className='flex justify-end p-3'>
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
@@ -244,7 +244,7 @@ const TransactionsFilterDrawer = ({
 						)}
 					</div>
 				</div>
-			</DrawerWrapper>
+			</Drawer>
 
 			<TransactionTypePickerDrawer
 				open={isTypePickerOpen}

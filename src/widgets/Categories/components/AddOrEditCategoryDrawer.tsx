@@ -9,8 +9,8 @@ import CategoryForm from './CategoryForm'
 import { categoryIconOptions } from '../icons'
 import useCategories from '@/hooks/useCategories'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 import { createPortal } from 'react-dom'
+import Drawer from '@/components/Drawer/Drawer'
 
 export type CategoryFormValues = Pick<Category, 'name' | 'color' | 'icon'>
 
@@ -112,7 +112,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 
 	return (
 		<>
-			<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
+			<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary h-[100vh]'>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full' aria-label={t('categories.drawer.close')}>
@@ -144,7 +144,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 						/>
 					</div>
 				</div>
-			</DrawerWrapper>
+			</Drawer>
 
 			<ColorPickerDrawer
 				open={isColorPickerOpen}

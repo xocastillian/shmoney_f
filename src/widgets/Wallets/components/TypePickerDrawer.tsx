@@ -2,7 +2,7 @@ import { Check, X } from 'lucide-react'
 import { walletTypeLabels, walletTypeOrder, WalletType } from '@/types/entities/wallet'
 import { typeIcons } from '../types'
 import { useTranslation } from '@/i18n'
-import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
+import Drawer from '@/components/Drawer/Drawer'
 
 interface TypePickerDrawerProps {
 	open: boolean
@@ -15,7 +15,7 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 	const { t } = useTranslation()
 
 	return (
-		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('wallets.form.close')}>
@@ -48,7 +48,7 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 					</div>
 				</div>
 			</div>
-		</DrawerWrapper>
+		</Drawer>
 	)
 }
 
