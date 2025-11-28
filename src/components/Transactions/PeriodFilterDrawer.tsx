@@ -1,9 +1,8 @@
 import { Check, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
-import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import type { TransactionPeriodFilter } from './filters'
 import { periodOptions } from './filters'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
 
 interface PeriodFilterDrawerProps {
 	open: boolean
@@ -17,11 +16,12 @@ interface PeriodFilterDrawerProps {
 
 const quickPeriodOptions = periodOptions.filter(option => option.value !== '')
 
-const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, onDateChange }: PeriodFilterDrawerProps) => {
-	const { t, locale } = useTranslation()
+const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange }: PeriodFilterDrawerProps) => {
+	const { t } = useTranslation()
+	// const { locale } = useTranslation()
 
 	return (
-		<Drawer open={open} onClose={onClose} className='max-h-[85vh] rounded-lg bg-background-secondary'>
+		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
@@ -29,7 +29,7 @@ const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, o
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col'>
+				<div className='flex flex-1 flex-col pb-10'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('transactions.filters.period.placeholder')}</h2>
 
 					<div className='bg-background-muted'>
@@ -55,7 +55,7 @@ const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, o
 						</div>
 					</div>
 
-					<div className='border-b border-divider bg-background-muted flex'>
+					{/* <div className='border-b border-divider bg-background-muted flex'>
 						<MobileDateTimePickerField
 							value={from}
 							onChange={value => onDateChange('from', value)}
@@ -71,10 +71,10 @@ const PeriodFilterDrawer = ({ open, onClose, from, to, period, onPeriodChange, o
 							precision='day'
 							locale={locale}
 						/>
-					</div>
+					</div> */}
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 

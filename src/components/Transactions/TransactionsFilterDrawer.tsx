@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { ClockFading, FolderHeart, ListFilter, RotateCcw, Wallet as WalletIcon, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import type { TransactionsFilterState, TransactionFilterType, TransactionPeriodFilter } from './filters'
 import TransactionTypePickerDrawer from './TransactionTypePickerDrawer'
 import TransactionWalletPickerDrawer from '@/widgets/Transactions/components/TransactionWalletPickerDrawer'
@@ -14,6 +13,7 @@ import { formatDateDisplay } from '@/utils/date'
 import PeriodFilterDrawer from './PeriodFilterDrawer'
 import { periodOptions } from './filters'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '../DrawerWrapper/DrawerWrapper'
 
 interface TransactionsFilterDrawerProps {
 	open: boolean
@@ -64,7 +64,6 @@ const TransactionsFilterDrawer = ({
 	const selectedCategory = filters.categoryId ? categories.find(category => category.id === filters.categoryId) ?? null : null
 	const categoryLabel = selectedCategory?.name ?? t('transactions.filters.category.all')
 	const categoryTextClass = selectedCategory ? 'text-text' : 'text-label'
-	const categoryTextStyle = selectedCategory?.color ? { color: selectedCategory.color } : undefined
 	const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 	const CategoryIcon = selectedCategory?.icon ? lucideIconMap[selectedCategory.icon] : undefined
 
@@ -108,7 +107,7 @@ const TransactionsFilterDrawer = ({
 
 	return (
 		<>
-			<Drawer open={open} onClose={onClose} className='max-h-full rounded-lg bg-background'>
+			<DrawerWrapper open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
 				<div className='flex h-full flex-col'>
 					<div className='flex justify-end p-3'>
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
@@ -116,7 +115,7 @@ const TransactionsFilterDrawer = ({
 						</button>
 					</div>
 
-					<div className='flex flex-1 flex-col'>
+					<div className='flex flex-1 flex-col pb-10'>
 						<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title ?? t('transactions.filters.title')}</h2>
 
 						<div className='relative border-b border-divider bg-background-muted'>
@@ -186,9 +185,7 @@ const TransactionsFilterDrawer = ({
 								) : (
 									<FolderHeart className='mr-3 text-label' />
 								)}
-								<span className={categoryTextClass} style={categoryTextStyle}>
-									{categoryLabel}
-								</span>
+								<span className={categoryTextClass}>{categoryLabel}</span>
 							</button>
 							{selectedCategory && (
 								<button
@@ -247,7 +244,7 @@ const TransactionsFilterDrawer = ({
 						)}
 					</div>
 				</div>
-			</Drawer>
+			</DrawerWrapper>
 
 			<TransactionTypePickerDrawer
 				open={isTypePickerOpen}
@@ -289,7 +286,6 @@ const TransactionsFilterDrawer = ({
 					onFiltersChange({ categoryId: null })
 					setCategoryPickerOpen(false)
 				}}
-				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
 				allOptionLabel={t('transactions.filters.category.all')}
 			/>
 

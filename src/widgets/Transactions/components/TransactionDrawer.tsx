@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import Loader from '@/components/ui/Loader/Loader'
 import { TransactionForm } from './TransactionForm'
 import TransactionWalletPickerDrawer from './TransactionWalletPickerDrawer'
@@ -14,6 +13,7 @@ import type { TransactionTypeTabValue } from '@/components/Transactions/Transact
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
@@ -136,7 +136,7 @@ export const TransactionDrawer = ({
 
 	return (
 		<>
-			<Drawer open={open} onClose={onClose}>
+			<DrawerWrapper open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('transactions.drawer.close')}>
@@ -159,41 +159,43 @@ export const TransactionDrawer = ({
 						</div>
 					)}
 
-					<TransactionForm
-						formId={formId}
-						onSubmit={onSubmit}
-						title={formTitle}
-						mode={mode}
-						onDelete={onDelete}
-						deleteDisabled={submitting}
-						transactionType={transactionType}
-						onTransactionTypeChange={onTransactionTypeChange}
-						amount={amount}
-						onAmountChange={onAmountChange}
-						fromWalletCurrencyIcon={fromWalletCurrencyIcon}
-						fromWalletIcon={fromWalletIcon}
-						fromWalletLabel={fromWalletLabel}
-						fromWalletSelected={Boolean(fromWallet)}
-						onOpenFromWalletPicker={() => setFromPickerOpen(true)}
-						fromWalletPickerDisabled={availableFromWallets.length === 0}
-						toWalletIcon={toWalletIcon}
-						toWalletLabel={toWalletLabel}
-						toWalletSelected={Boolean(toWallet)}
-						onOpenToWalletPicker={() => setToPickerOpen(true)}
-						toWalletPickerDisabled={availableToWallets.length === 0}
-						categoryLabel={categoryLabel}
-						categorySelected={Boolean(selectedCategory)}
-						categoryIcon={categoryIconNode}
-						onOpenCategoryPicker={() => setCategoryPickerOpen(true)}
-						categoryPickerDisabled={transactionType === 'TRANSFER'}
-						description={description}
-						onDescriptionChange={onDescriptionChange}
-						dateTime={dateTime}
-						onDateTimeChange={onDateTimeChange}
-						maxDate={maxTransactionDate}
-					/>
+					<div className='pb-10'>
+						<TransactionForm
+							formId={formId}
+							onSubmit={onSubmit}
+							title={formTitle}
+							mode={mode}
+							onDelete={onDelete}
+							deleteDisabled={submitting}
+							transactionType={transactionType}
+							onTransactionTypeChange={onTransactionTypeChange}
+							amount={amount}
+							onAmountChange={onAmountChange}
+							fromWalletCurrencyIcon={fromWalletCurrencyIcon}
+							fromWalletIcon={fromWalletIcon}
+							fromWalletLabel={fromWalletLabel}
+							fromWalletSelected={Boolean(fromWallet)}
+							onOpenFromWalletPicker={() => setFromPickerOpen(true)}
+							fromWalletPickerDisabled={availableFromWallets.length === 0}
+							toWalletIcon={toWalletIcon}
+							toWalletLabel={toWalletLabel}
+							toWalletSelected={Boolean(toWallet)}
+							onOpenToWalletPicker={() => setToPickerOpen(true)}
+							toWalletPickerDisabled={availableToWallets.length === 0}
+							categoryLabel={categoryLabel}
+							categorySelected={Boolean(selectedCategory)}
+							categoryIcon={categoryIconNode}
+							onOpenCategoryPicker={() => setCategoryPickerOpen(true)}
+							categoryPickerDisabled={transactionType === 'TRANSFER'}
+							description={description}
+							onDescriptionChange={onDescriptionChange}
+							dateTime={dateTime}
+							onDateTimeChange={onDateTimeChange}
+							maxDate={maxTransactionDate}
+						/>
+					</div>
 				</div>
-			</Drawer>
+			</DrawerWrapper>
 
 			<TransactionWalletPickerDrawer
 				open={fromPickerOpen}
@@ -233,7 +235,6 @@ export const TransactionDrawer = ({
 					setCategoryPickerOpen(false)
 					handleOpenAddCategoryDrawer()
 				}}
-				className='max-h-[70vh] bg-background-secondary rounded-t-lg'
 			/>
 
 			<AddOrEditCategoryDrawer

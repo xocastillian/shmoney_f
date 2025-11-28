@@ -4,6 +4,7 @@ import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
 import { WalletType } from '@/types/entities/wallet'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 import { useTranslation } from '@/i18n'
+import { cn } from '@/lib/utils'
 
 interface WalletFormProps {
 	name: string
@@ -45,6 +46,7 @@ export function WalletForm({
 	disableDelete = false,
 }: WalletFormProps) {
 	const { t } = useTranslation()
+
 	const handleColorPickerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault()
@@ -161,9 +163,7 @@ export function WalletForm({
 							onKeyDown={handleColorPickerKeyDown}
 						>
 							<Palette className='mr-3 text-label transition-colors' style={colorStyle} />
-							<span className='text-label transition-colors' style={colorStyle}>
-								{t('wallets.form.color')}
-							</span>
+							<span className={cn('transition-colors', selectedColor ? 'text-text' : 'text-label')}>{t('wallets.form.color')}</span>
 						</div>
 					</div>
 

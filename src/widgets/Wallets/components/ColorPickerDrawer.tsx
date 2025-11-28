@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 interface ColorPickerDrawerProps {
 	open: boolean
@@ -13,13 +13,9 @@ interface ColorPickerDrawerProps {
 
 export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedColor }: ColorPickerDrawerProps) {
 	const { t } = useTranslation()
+
 	return (
-		<Drawer
-			open={open}
-			onClose={onClose}
-			className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
-			overlayClassName='bg-black/80 backdrop-blur-sm'
-		>
+		<DrawerWrapper open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2'>
@@ -27,7 +23,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col px-4 pb-6'>
+				<div className='flex flex-col px-4 flex-1 overflow-y-auto pb-10'>
 					<h2 className='mb-4 text-sm font-medium text-label'>{t('wallets.form.colorPickerTitle')}</h2>
 					<div className='grid grid-cols-4 gap-3 gap-y-7 place-items-center'>
 						{colors.map(color => (
@@ -49,7 +45,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 					</div>
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 

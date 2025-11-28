@@ -1,8 +1,8 @@
 import { Check, Wallet as WalletIcon, X } from 'lucide-react'
-import Drawer from '@/components/Drawer/Drawer'
 import { typeIcons } from '@/widgets/Wallets/types'
 import type { WalletType } from '@/types/entities/wallet'
 import { useTranslation } from '@/i18n'
+import DrawerWrapper from '@/components/DrawerWrapper/DrawerWrapper'
 
 interface TransactionWalletPickerDrawerProps {
 	open: boolean
@@ -31,12 +31,7 @@ export const TransactionWalletPickerDrawer = ({
 }: TransactionWalletPickerDrawerProps) => {
 	const { t } = useTranslation()
 	return (
-		<Drawer
-			open={open}
-			onClose={onClose}
-			className='max-h-[70vh] rounded-t-lg !bg-background-secondary'
-			overlayClassName='bg-black/80 backdrop-blur-sm'
-		>
+		<DrawerWrapper open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
@@ -44,7 +39,7 @@ export const TransactionWalletPickerDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col pb-10 overflow-y-auto'>
+				<div className='flex flex-1 flex-col overflow-y-auto'>
 					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title}</h2>
 
 					{wallets.length === 0 ? (
@@ -94,7 +89,7 @@ export const TransactionWalletPickerDrawer = ({
 					)}
 				</div>
 			</div>
-		</Drawer>
+		</DrawerWrapper>
 	)
 }
 
