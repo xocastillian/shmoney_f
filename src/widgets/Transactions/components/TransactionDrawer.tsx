@@ -66,11 +66,11 @@ export const TransactionDrawer = ({
 	dateTime,
 	onDateTimeChange,
 	onSubmit,
+	submitDisabled,
 	submitting,
 	error,
 	mode = 'create',
 	onDelete,
-	submitDisabled,
 }: TransactionDrawerProps) => {
 	const [fromPickerOpen, setFromPickerOpen] = useState(false)
 	const [toPickerOpen, setToPickerOpen] = useState(false)
@@ -111,6 +111,12 @@ export const TransactionDrawer = ({
 		fromWallet?.name ?? (availableFromWallets.length === 0 ? t('transactions.drawer.noWallets') : t('transactions.drawer.selectWallet'))
 	const toWalletLabel =
 		toWallet?.name ?? (availableToWallets.length === 0 ? t('transactions.drawer.noWallets') : t('transactions.drawer.selectRecipient'))
+	const submitButtonLabel = useMemo(() => {
+		if (mode === 'edit') {
+			return submitting ? t('transactions.drawer.saving') : t('transactions.drawer.save')
+		}
+		return submitting ? t('transactions.drawer.creating') : t('transactions.drawer.create')
+	}, [mode, submitting, t])
 	const categoryIconNode = useMemo(() => {
 		if (!selectedCategory) return null
 		const IconComponent = selectedCategory.icon ? lucideIconMap[selectedCategory.icon] : undefined
@@ -132,9 +138,18 @@ export const TransactionDrawer = ({
 		<>
 			<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg' swipeable={false}>
 				<div className='flex h-full flex-col'>
-					<div className='flex items-center justify-between gap-3 p-3 ml-auto'>
+					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('transactions.drawer.close')}>
 							<X />
+						</button>
+						<button
+							type='submit'
+							form={formId}
+							className='rounded-md px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
+							disabled={submitDisabled}
+							aria-busy={submitting}
+						>
+							{submitButtonLabel}
 						</button>
 					</div>
 
@@ -177,7 +192,6 @@ export const TransactionDrawer = ({
 							dateTime={dateTime}
 							onDateTimeChange={onDateTimeChange}
 							maxDate={maxTransactionDate}
-							submitDisabled={submitDisabled}
 						/>
 					</div>
 				</div>
