@@ -1,4 +1,4 @@
-import { Trash, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useId } from 'react'
 import type { FormEvent } from 'react'
 import Loader from '@/components/ui/Loader/Loader'
@@ -6,7 +6,6 @@ import { WalletForm } from './WalletForm'
 import type { CurrencyOption } from '../types'
 import type { WalletType } from '@/types/entities/wallet'
 import Drawer from '@/components/Drawer/Drawer'
-import { useTranslation } from '@/i18n'
 
 interface WalletFormDrawerProps {
 	open: boolean
@@ -56,14 +55,26 @@ export function WalletFormDrawer({
 	submitting = false,
 }: WalletFormDrawerProps) {
 	const formId = useId()
-	const { t } = useTranslation()
 
 	return (
 		<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg' swipeable={false}>
 			<div className='flex h-full flex-col'>
-				<div className='flex items-center justify-between gap-3 p-3 ml-auto'>
+				<div className='flex items-center justify-between gap-3 p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label='Закрыть'>
 						<X />
+					</button>
+					<button
+						type='submit'
+						form={formId}
+						className='
+                        rounded-md px-4 py-2 text-sm font-medium 
+                        bg-accent text-text-dark 
+                        disabled:bg-background-muted disabled:text-accent disabled:opacity-50 
+                        transition-colors duration-300 ease-in-out
+                      '
+						disabled={submitDisabled}
+					>
+						{submitLabel}
 					</button>
 				</div>
 
@@ -90,46 +101,8 @@ export function WalletFormDrawer({
 				</div>
 			</div>
 
-			<div className='fixed left-0 right-0 bottom-0 z-[70] border-t border-divider bg-background-muted p-3 h-[95px]'>
-				<div className='mx-auto flex items-center gap-3 h-10 max-w-3xl w-full'>
-					{onDelete ? (
-						<>
-							<button
-								type='button'
-								onClick={onDelete}
-								disabled={disableDelete}
-								className='flex items-center gap-3 w-1/2 rounded-lg px-4 py-2 text-sm font-medium border border-danger text-danger bg-transparent disabled:opacity-50 justify-center'
-							>
-								<Trash className='text-danger w-5 h-5' />
-								{t('common.delete')}
-							</button>
-
-							<button
-								type='submit'
-								form={formId as string}
-								className='w-1/2 rounded-lg px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
-								disabled={submitDisabled}
-							>
-								{submitLabel}
-							</button>
-						</>
-					) : (
-						<div className='w-full h-10'>
-							<button
-								type='submit'
-								form={formId as string}
-								className='w-full rounded-lg px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-secondary disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
-								disabled={submitDisabled}
-							>
-								{submitLabel}
-							</button>
-						</div>
-					)}
-				</div>
-			</div>
-
 			{open && submitting && (
-				<div className='fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm'>
+				<div className='fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm'>
 					<div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
 						<Loader />
 					</div>

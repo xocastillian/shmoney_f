@@ -20,7 +20,6 @@ export const ru: TranslationDictionary = {
 	'categories.form.delete': 'Удалить категорию',
 	'common.save': 'Сохранить',
 	'common.close': 'Закрыть',
-	'common.delete': 'Удалить',
 	'transactions.drawer.noWallets': 'Нет доступных кошельков',
 	'transactions.drawer.selectWallet': 'Выберите кошелёк',
 	'transactions.drawer.selectRecipient': 'Выберите получателя',
