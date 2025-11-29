@@ -1,4 +1,4 @@
-import { Calculator, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
+import { Calculator, CircleDollarSign, Info, Palette } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
 import { WalletType } from '@/types/entities/wallet'
@@ -42,8 +42,6 @@ export function WalletForm({
 	error,
 	formId,
 	title,
-	onDelete,
-	disableDelete = false,
 }: WalletFormProps) {
 	const { t } = useTranslation()
 
@@ -166,15 +164,6 @@ export function WalletForm({
 							<span className={cn('transition-colors', selectedColor ? 'text-text' : 'text-label')}>{t('wallets.form.color')}</span>
 						</div>
 					</div>
-
-					{onDelete && (
-						<div className='border-b border-divider'>
-							<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onDelete} disabled={disableDelete}>
-								<Trash className='mr-3 text-danger' />
-								<span className='text-danger'>{t('wallets.form.delete')}</span>
-							</button>
-						</div>
-					)}
 				</div>
 			</div>
 
