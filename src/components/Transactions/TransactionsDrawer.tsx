@@ -61,7 +61,7 @@ const TransactionsDrawer = ({
 	)
 
 	return (
-		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary' swipeable={false}>
 			<div className='flex h-full flex-col'>
 				<header className='flex items-center justify-between gap-3 p-3'>
 					<h2 className='text-lg font-semibold'>{title}</h2>

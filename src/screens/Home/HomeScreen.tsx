@@ -7,7 +7,6 @@ import TransactionsWidget from '@/components/Transactions/TransactionsWidget'
 import TransactionsDrawer from '@/components/Transactions/TransactionsDrawer'
 import TransactionsFilterDrawer from '@/components/Transactions/TransactionsFilterDrawer'
 import type { TransactionsFilterState } from '@/components/Transactions/filters'
-import { getTransactionFeed } from '@/api/client'
 import type { TransactionFeedItem } from '@api/types'
 import { serializeUtcDate } from '@/utils/dateTime'
 import { useWallets } from '@/hooks/useWallets'
@@ -149,7 +148,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 			}
 
 			try {
-				const response = await getTransactionFeed({ ...feedQueryParams, page })
+				const response = await fetchTransactionFeed({ ...feedQueryParams, page }, { append })
 				setDrawerNextPage(response.next ?? null)
 				setDrawerError(null)
 			} catch (error) {
@@ -164,7 +163,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				}
 			}
 		},
-		[feedQueryParams]
+		[feedQueryParams, fetchTransactionFeed]
 	)
 
 	useEffect(() => {

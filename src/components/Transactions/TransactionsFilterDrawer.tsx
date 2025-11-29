@@ -107,7 +107,7 @@ const TransactionsFilterDrawer = ({
 
 	return (
 		<>
-			<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg'>
+			<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg' swipeable={false}>
 				<div className='flex h-full flex-col'>
 					<div className='flex justify-end p-3'>
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
