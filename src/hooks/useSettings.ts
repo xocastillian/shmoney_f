@@ -21,7 +21,11 @@ export function useSettings() {
 			const response = await getSettings()
 			setSettings(response)
 
-			if (!language || !response.supportedLanguages.includes(language)) {
+			const serverLang = response.defaultLanguage
+
+			if (response.supportedLanguages.includes(serverLang)) {
+				setLanguage(serverLang)
+			} else if (!language || !response.supportedLanguages.includes(language)) {
 				setLanguage(response.defaultLanguage)
 			}
 

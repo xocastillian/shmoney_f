@@ -32,5 +32,5 @@ export const useSettingsStore = create<SettingsState>(set => ({
 	setLanguage: language => set({ language }),
 	setLoading: loading => set({ loading }),
 	setError: error => set({ error }),
-	clear: () => set(initialState),
+	clear: () => set({ ...initialState }),
 }))
