@@ -17,6 +17,7 @@ export const en = {
 	'categories.form.icon': 'Icon',
 	'categories.form.delete': 'Delete category',
 	'common.save': 'Save',
+	'common.delete': 'Delete',
 	'common.close': 'Close',
 	'transactions.drawer.noWallets': 'No wallets available',
 	'transactions.drawer.selectWallet': 'Select wallet',
