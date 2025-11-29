@@ -73,8 +73,6 @@ export const TransactionForm = ({
 	dateTime,
 	onDateTimeChange,
 	maxDate,
-	submitDisabled = false,
-	submitting = false,
 }: TransactionFormProps) => {
 	const { t, locale } = useTranslation()
 	const formattedAmount = formatDecimalForDisplay(amount)
@@ -199,43 +197,16 @@ export const TransactionForm = ({
 				</div>
 			</form>
 
-			<div className='fixed left-0 right-0 bottom-0 z-[70] border-t border-divider bg-background-muted p-3 h-[95px]'>
-				<div className='mx-auto flex items-center gap-3 h-10 max-w-3xl w-full'>
-					{onDelete ? (
-						<>
-							<button
-								type='button'
-								onClick={onDelete}
-								disabled={deleteDisabled}
-								className='flex items-center gap-3 w-1/2 rounded-lg px-4 py-2 text-sm font-medium border border-danger text-danger bg-transparent disabled:opacity-50 justify-center'
-							>
-								<Trash className='text-danger w-5 h-5' />
-								{t('common.delete')}
-							</button>
-
-							<button
-								type='submit'
-								form={formId}
-								className='w-1/2 rounded-lg px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
-								disabled={submitDisabled}
-								aria-busy={submitting}
-							>
-								{submitButtonLabel}
-							</button>
-						</>
-					) : (
-						<div className='w-full h-10'>
-							<button
-								type='submit'
-								form={formId}
-								className='w-full h-full rounded-lg px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-secondary disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
-								disabled={submitDisabled}
-								aria-busy={submitting}
-							>
-								{submitButtonLabel}
-							</button>
-						</div>
-					)}
+					<div className='border-b border-divider'>
+						<MobileDateTimePickerField
+							value={dateTime}
+							onChange={onDateTimeChange}
+							icon={<CalendarClock className={'text-label'} />}
+							placeholder={t('transactions.form.date')}
+							locale={locale}
+							maxDate={maxDate}
+						/>
+					</div>
 				</div>
 			</div>
 		</>
