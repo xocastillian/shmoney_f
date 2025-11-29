@@ -112,7 +112,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 
 	return (
 		<>
-			<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary h-[100vh]'>
+			<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary h-[100vh]' swipeable={false}>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3'>
 						<button type='button' onClick={onClose} className='rounded-full' aria-label={t('categories.drawer.close')}>

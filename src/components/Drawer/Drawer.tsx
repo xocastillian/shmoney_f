@@ -7,9 +7,10 @@ interface DrawerProps {
 	children: ReactNode
 	className?: string
 	overlayClassName?: string
+	swipeable?: boolean
 }
 
-export default function Drawer({ open, onClose, children, className, overlayClassName }: DrawerProps) {
+export default function Drawer({ open, onClose, children, className, overlayClassName, swipeable = true }: DrawerProps) {
 	const rootRef = useRef<HTMLDivElement | null>(null)
 	const contentRef = useRef<HTMLDivElement | null>(null)
 	const startYRef = useRef(0)
@@ -53,6 +54,7 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 	const getHeight = () => Math.max(1, contentRef.current?.clientHeight ?? window.innerHeight)
 
 	const onPointerDown = (e: React.PointerEvent) => {
+		if (!swipeable) return
 		pointerIdRef.current = e.pointerId
 		startYRef.current = e.clientY
 		lastYRef.current = e.clientY
@@ -66,7 +68,7 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 	}
 
 	const onPointerMove = (e: React.PointerEvent) => {
-		// ignore moves unless we have an active pointer started by pointerdown
+		if (!swipeable) return
 		if (pointerIdRef.current === null) return
 		if (e.pointerId !== pointerIdRef.current) return
 
@@ -94,7 +96,7 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 	}
 
 	const onPointerUp = (e: React.PointerEvent) => {
-		// ignore unrelated pointerups
+		if (!swipeable) return
 		if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return
 		try {
 			;(e.target as Element).releasePointerCapture?.(e.pointerId)
@@ -148,6 +150,7 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 	}
 
 	const onPointerCancel = () => {
+		if (!swipeable) return
 		pointerIdRef.current = null
 		if (draggingRef.current) {
 			setTranslateY(0)
@@ -168,7 +171,7 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 	const blurPx = overlayOpacity * baseBlurPx
 	const overlayTransition = isDragging ? 'none' : 'opacity 300ms ease-out, backdrop-filter 300ms ease-out'
 
-	const translateStyle = isDragging || translateY > 0 ? { transform: `translateY(${translateY}px)` } : undefined
+	const translateStyle = swipeable && (isDragging || translateY > 0) ? { transform: `translateY(${translateY}px)` } : undefined
 
 	return (
 		<div
@@ -192,10 +195,10 @@ export default function Drawer({ open, onClose, children, className, overlayClas
 				role='dialog'
 				aria-modal='true'
 				ref={contentRef}
-				onPointerDown={onPointerDown}
-				onPointerMove={onPointerMove}
-				onPointerUp={onPointerUp}
-				onPointerCancel={onPointerCancel}
+				onPointerDown={swipeable ? onPointerDown : undefined}
+				onPointerMove={swipeable ? onPointerMove : undefined}
+				onPointerUp={swipeable ? onPointerUp : undefined}
+				onPointerCancel={swipeable ? onPointerCancel : undefined}
 				onClick={e => e.stopPropagation()}
 				className={cn(
 					'relative w-full h-full overflow-y-auto overscroll-contain bg-background shadow-lg',

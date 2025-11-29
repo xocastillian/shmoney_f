@@ -11,7 +11,7 @@ interface IconPickerDrawerProps {
 
 const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerDrawerProps) => {
 	return (
-		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary' swipeable={false}>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-end p-3'>
 					<button type='button' onClick={onClose} className='rounded-full p-2'>
