@@ -77,6 +77,9 @@ export const TransactionForm = ({
 }: TransactionFormProps) => {
 	const { t, locale } = useTranslation()
 	const formattedAmount = formatDecimalForDisplay(amount)
+	const amountSign = transactionType === 'EXPENSE' ? '-' : transactionType === 'INCOME' ? '+' : ''
+	const amountColorClass = transactionType === 'EXPENSE' ? 'text-danger' : transactionType === 'INCOME' ? 'text-accent' : 'text-text'
+	const displayAmount = formattedAmount ? `${amountSign}${formattedAmount}` : ''
 	const isEditMode = mode === 'edit'
 	const isEditingTransfer = isEditMode && transactionType === 'TRANSFER'
 	const shouldRenderTransactionTypeTabs = !isEditingTransfer
@@ -84,9 +87,18 @@ export const TransactionForm = ({
 	const resolvedSubmitLabel = submitLabel ?? (isEditMode ? t('transactions.drawer.save') : t('transactions.drawer.create'))
 
 	const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-		const sanitized = sanitizeDecimalInput(event.target.value)
+		const rawValue = event.target.value.replace(/^[+-]/, '')
+		let sanitized = sanitizeDecimalInput(rawValue)
+		if (sanitized.startsWith('.')) {
+			sanitized = `0${sanitized}`
+		}
 		const digitCount = sanitized.replace(/\./g, '').length
 		if (digitCount > 9) return
+		const shouldReplaceDefaultZero = amount === '0' && sanitized && sanitized !== '0' && !sanitized.startsWith('0.')
+		if (shouldReplaceDefaultZero) {
+			const stripped = sanitized.replace(/^0+/, '')
+			sanitized = stripped.length > 0 ? stripped : sanitized
+		}
 		onAmountChange(sanitized)
 	}
 
@@ -111,11 +123,11 @@ export const TransactionForm = ({
 								<CircleDollarSign className='mr-3 text-label' />
 							)}
 							<input
-								className='flex-1 bg-transparent placeholder:text-label outline-none'
+								className={cn('flex-1 bg-transparent placeholder:text-label outline-none', amountColorClass)}
 								type='text'
 								inputMode='decimal'
 								placeholder={t('transactions.form.amount')}
-								value={formattedAmount}
+								value={displayAmount}
 								onChange={handleAmountChange}
 								autoComplete='off'
 							/>

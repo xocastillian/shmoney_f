@@ -4,7 +4,7 @@ import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Loader from '@/components/ui/Loader/Loader'
 import { TransactionForm } from './TransactionForm'
-import TransactionWalletPickerDrawer from './TransactionWalletPickerDrawer'
+import WalletsDrawer from '../../Wallets/components/WalletsDrawer'
 import { currencyIconMap } from '@/widgets/Wallets/types'
 import { getWalletIcon, type WalletPickerOption } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
@@ -191,7 +191,7 @@ export const TransactionDrawer = ({
 				</div>
 			</Drawer>
 
-			<TransactionWalletPickerDrawer
+			<WalletsDrawer
 				open={fromPickerOpen}
 				onClose={() => setFromPickerOpen(false)}
 				title={t('transactions.drawer.selectFromWallet')}
@@ -201,9 +201,10 @@ export const TransactionDrawer = ({
 					onSelectFromWallet(walletId)
 					setFromPickerOpen(false)
 				}}
+				showCheckIcon
 			/>
 
-			<TransactionWalletPickerDrawer
+			<WalletsDrawer
 				open={toPickerOpen}
 				onClose={() => setToPickerOpen(false)}
 				title={t('transactions.drawer.selectRecipient')}
@@ -213,6 +214,7 @@ export const TransactionDrawer = ({
 					onSelectToWallet(walletId)
 					setToPickerOpen(false)
 				}}
+				showCheckIcon
 				emptyStateLabel={t('transactions.drawer.noTransferWallets')}
 			/>
 

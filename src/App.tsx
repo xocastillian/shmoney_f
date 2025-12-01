@@ -51,7 +51,7 @@ function App() {
 	const isAuthenticated = authStatus === 'authenticated'
 	const { fetchSettings, language, clear: clearSettings } = useSettings()
 	const { t, setLocale } = useTranslation()
-	const [amount, setAmount] = useState('')
+	const [amount, setAmount] = useState('0')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
 	const [toWalletId, setToWalletId] = useState<number | null>(null)
 	const [description, setDescription] = useState('')
@@ -101,7 +101,7 @@ function App() {
 	const clearTransactionError = useCallback(() => setTransactionError(null), [])
 
 	const resetForm = useCallback(() => {
-		setAmount('')
+		setAmount('0')
 		setDescription('')
 		setDateTime(getCurrentDateTimeString())
 		setFromWalletId(null)

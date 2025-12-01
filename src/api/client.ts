@@ -10,6 +10,7 @@ import {
 	WalletCreateRequestSchema,
 	WalletResponseSchema,
 	WalletBalanceResponseSchema,
+	WalletStatusUpdateRequestSchema,
 	WalletTransactionRequestSchema,
 	WalletTransactionResponseSchema,
 	WalletTransactionUpdateRequestSchema,
@@ -37,6 +38,7 @@ import type {
 	WalletCreateRequest,
 	WalletResponse,
 	WalletBalanceResponse,
+	WalletStatusUpdateRequest,
 	WalletTransactionRequest,
 	WalletTransactionResponse,
 	WalletTransactionUpdateRequest,
@@ -90,8 +92,10 @@ export async function updateWallet(id: number, payload: WalletUpdateRequest): Pr
 	return WalletResponseSchema.parse(data)
 }
 
-export async function deleteWallet(id: number): Promise<void> {
-	await del<void>(endpoints.wallets.byId(id))
+export async function updateWalletStatus(id: number, payload: WalletStatusUpdateRequest): Promise<WalletResponse> {
+	const body = WalletStatusUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.wallets.status(id), body)
+	return WalletResponseSchema.parse(data)
 }
 
 export async function listWalletTransactions(params?: { walletId?: number }): Promise<WalletTransactionResponse[]> {

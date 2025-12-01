@@ -9,7 +9,7 @@ import { WalletFormDrawer } from './components/WalletFormDrawer'
 import { ColorPickerDrawer } from './components/ColorPickerDrawer'
 import { TypePickerDrawer } from './components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
-import { WalletType } from '@/types/entities/wallet'
+import { WalletStatus, WalletType } from '@/types/entities/wallet'
 import { sanitizeDecimalInput } from '@/utils/number'
 import { colorOptions, currencyOptions } from './constants'
 import { useTranslation } from '@/i18n'
@@ -22,7 +22,7 @@ interface WalletsProps {
 const defaultWalletType = WalletType.CASH
 
 const Wallets = ({ wallets, loading = false }: WalletsProps) => {
-	const { createWallet, updateWallet, deleteWallet, actionLoading, fetchWalletBalances } = useWallets()
+	const { createWallet, updateWallet, actionLoading, fetchWalletBalances, updateWalletStatus } = useWallets()
 	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
@@ -35,6 +35,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const [selectedType, setSelectedType] = useState<WalletType>(defaultWalletType)
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
+	const [editingWalletStatus, setEditingWalletStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 
 	const isEditing = editingWalletId !== null
 
@@ -49,6 +50,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setSelectedType(defaultWalletType)
 		setCurrencyPickerOpen(false)
 		setEditingWalletId(null)
+		setEditingWalletStatus(WalletStatus.ACTIVE)
 	}
 
 	useEffect(() => {
@@ -112,11 +114,11 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		}
 	}
 
-	const handleDelete = async () => {
+	const handleArchive = async () => {
 		if (!isEditing || editingWalletId === null) return
 
 		try {
-			await deleteWallet(editingWalletId)
+			await updateWalletStatus(editingWalletId, { status: WalletStatus.ARCHIVED })
 			setFormError(null)
 			setOpen(false)
 			await fetchWalletBalances()
@@ -148,6 +150,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setBalance(sanitizeDecimalInput(String(wallet.balance)))
 		setSelectedColor(wallet.color || colorOptions[0])
 		setSelectedType(wallet.type || defaultWalletType)
+		setEditingWalletStatus(wallet.status || WalletStatus.ACTIVE)
 		setFormError(null)
 		setColorPickerOpen(false)
 		setCurrencyPickerOpen(false)
@@ -155,8 +158,10 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setOpen(true)
 	}
 
+	const activeWallets = useMemo(() => wallets.filter(wallet => wallet.status === WalletStatus.ACTIVE), [wallets])
+
 	const pages = useMemo(() => {
-		const items: Array<Wallet | null> = [...wallets, null]
+		const items: Array<Wallet | null> = [...activeWallets, null]
 		const result: Array<Array<Wallet | null>> = []
 
 		for (let index = 0; index < items.length; index += 2) {
@@ -164,7 +169,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		}
 
 		return result
-	}, [wallets])
+	}, [activeWallets])
 
 	const shouldRenderSkeleton = loading
 
@@ -228,8 +233,9 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				submitDisabled={submitDisabled}
 				title={isEditing ? t('wallets.form.editTitle') : t('wallets.form.createTitle')}
 				submitLabel={isEditing ? t('wallets.form.save') : t('wallets.form.ready')}
-				onDelete={isEditing ? handleDelete : undefined}
-				disableDelete={actionLoading}
+				onArchive={isEditing ? handleArchive : undefined}
+				disableArchive={actionLoading}
+				walletStatus={isEditing ? editingWalletStatus : undefined}
 			/>
 
 			<ColorPickerDrawer

@@ -7,6 +7,7 @@ import {
 	WalletResponseSchema,
 	WalletCreateRequestSchema,
 	WalletUpdateRequestSchema,
+	WalletStatusUpdateRequestSchema,
 	WalletTransactionRequestSchema,
 	WalletTransactionResponseSchema,
 	WalletTransactionUpdateRequestSchema,
@@ -41,6 +42,7 @@ export type UserResponse = z.infer<typeof UserResponseSchema>
 export type WalletResponse = z.infer<typeof WalletResponseSchema>
 export type WalletCreateRequest = z.infer<typeof WalletCreateRequestSchema>
 export type WalletUpdateRequest = z.infer<typeof WalletUpdateRequestSchema>
+export type WalletStatusUpdateRequest = z.infer<typeof WalletStatusUpdateRequestSchema>
 
 export type WalletTransactionRequest = z.infer<typeof WalletTransactionRequestSchema>
 export type WalletTransactionResponse = z.infer<typeof WalletTransactionResponseSchema>

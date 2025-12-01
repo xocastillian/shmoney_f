@@ -4,7 +4,7 @@ import type { FormEvent } from 'react'
 import Loader from '@/components/ui/Loader/Loader'
 import { WalletForm } from './WalletForm'
 import type { CurrencyOption } from '../types'
-import type { WalletType } from '@/types/entities/wallet'
+import { WalletStatus, type WalletType } from '@/types/entities/wallet'
 import Drawer from '@/components/Drawer/Drawer'
 
 interface WalletFormDrawerProps {
@@ -26,9 +26,10 @@ interface WalletFormDrawerProps {
 	submitDisabled?: boolean
 	title: string
 	submitLabel?: string
-	onDelete?: () => void
-	disableDelete?: boolean
+	onArchive?: () => void
+	disableArchive?: boolean
 	submitting?: boolean
+	walletStatus?: WalletStatus
 }
 
 export function WalletFormDrawer({
@@ -50,11 +51,13 @@ export function WalletFormDrawer({
 	submitDisabled = false,
 	title,
 	submitLabel = 'Готово',
-	onDelete,
-	disableDelete = false,
+	onArchive,
+	disableArchive = false,
 	submitting = false,
+	walletStatus,
 }: WalletFormDrawerProps) {
 	const formId = useId()
+	const isArchived = walletStatus === WalletStatus.ARCHIVED
 
 	return (
 		<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg' swipeable={false}>
@@ -88,10 +91,11 @@ export function WalletFormDrawer({
 						onBalanceChange={onBalanceChange}
 						error={error}
 						formId={formId}
-						onDelete={onDelete}
-						disableDelete={disableDelete}
+						onArchive={onArchive}
+						disableArchive={disableArchive}
 						submitLabel={submitLabel}
 						submitDisabled={submitDisabled}
+						isArchived={isArchived}
 					/>
 				</div>
 			</div>
