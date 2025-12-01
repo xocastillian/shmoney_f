@@ -24,14 +24,15 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 	return (
 		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
-				<div className='flex justify-end p-3'>
+				<div className='flex justify-between items-center p-3'>
+					<h2 className='text-lg font-medium'>{title ?? t('transactions.filters.type.title')}</h2>
+
 					<button type='button' onClick={onClose} className='p-2' aria-label={t('common.close')}>
 						<X />
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col pb-10'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title ?? t('transactions.filters.type.title')}</h2>
+				<div className='flex flex-1 flex-col pb-3'>
 					<div className='bg-background-muted'>
 						{typeOptions.map(option => {
 							const isSelected = option.value === selectedType

@@ -23,14 +23,14 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 	return (
 		<Drawer open={open} onClose={handleClose} className='rounded-t-lg bg-background-secondary h-[50vh]'>
 			<div className='flex h-full flex-col'>
-				<div className='flex justify-end p-3'>
+				<div className='flex justify-between items-center p-3'>
+					<h1 className='text-lg font-medium'>{t('settings.language')}</h1>
 					<button type='button' onClick={handleClose} className='rounded-full p-2' aria-label='Закрыть'>
 						<X />
 					</button>
 				</div>
 
 				<div className='flex flex-1 flex-col pb-10'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{t('settings.language')}</h2>
 					<div className='bg-background-muted'>
 						{languages.map(language => {
 							const isSelected = language === selectedLanguage

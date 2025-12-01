@@ -1,4 +1,4 @@
-import { Calculator, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
+import { Calculator, Check, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
 import { WalletType } from '@/types/entities/wallet'
@@ -21,9 +21,10 @@ interface WalletFormProps {
 	onBalanceChange: (value: string) => void
 	error: string | null
 	formId: string
-	title: string
 	onDelete?: () => void
 	disableDelete?: boolean
+	submitLabel?: string
+	submitDisabled?: boolean
 }
 
 export function WalletForm({
@@ -41,9 +42,10 @@ export function WalletForm({
 	onBalanceChange,
 	error,
 	formId,
-	title,
 	onDelete,
 	disableDelete = false,
+	submitLabel = 'Готово',
+	submitDisabled = false,
 }: WalletFormProps) {
 	const { t } = useTranslation()
 
@@ -98,84 +100,91 @@ export function WalletForm({
 	return (
 		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
-				<h1 className='text-sm px-3 mb-3'>{title}</h1>
-				<div className='bg-background-muted'>
-					<div className='border-b border-divider'>
-						<div className='flex items-center px-3 h-16'>
-							<Info className='mr-3 text-label' />
-							<input
-								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
-								placeholder={t('wallets.form.name')}
-								value={name}
-								onChange={event => onNameChange(event.target.value)}
-								maxLength={15}
-							/>
-						</div>
+				<h1 className='text-sm px-3 mb-3'>{t('common.general')}</h1>
+				<div className='border-b border-divider bg-background-muted'>
+					<div className='flex items-center px-3 h-16'>
+						<Info className='mr-3 text-label' />
+						<input
+							className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
+							placeholder={t('wallets.form.name')}
+							value={name}
+							onChange={event => onNameChange(event.target.value)}
+							maxLength={15}
+						/>
 					</div>
-
-					<div className='border-b border-divider'>
-						<div
-							className='flex h-16 cursor-pointer items-center px-3'
-							role='button'
-							tabIndex={0}
-							onClick={onOpenCurrencyPicker}
-							onKeyDown={handleCurrencyPickerKeyDown}
-						>
-							{currencyIcon ? <img src={currencyIcon} alt='' className='mr-3 h-6 w-6' /> : <CircleDollarSign className='mr-3 text-label' />}
-							<span className='text-text'>{currencyLabel}</span>
-						</div>
-					</div>
-
-					<div className='border-b border-divider'>
-						<div className='flex items-center px-3 h-16'>
-							<Calculator className='mr-3 text-label' />
-							<input
-								className='flex-1 bg-transparent placeholder:text-label outline-none'
-								type='text'
-								inputMode='decimal'
-								placeholder={t('wallets.form.balance')}
-								value={formattedBalance}
-								onChange={handleBalanceChange}
-								autoComplete='off'
-							/>
-						</div>
-					</div>
-
-					<div className='border-b border-divider'>
-						<div
-							className='flex h-16 cursor-pointer items-center px-3'
-							role='button'
-							tabIndex={0}
-							onClick={onOpenTypePicker}
-							onKeyDown={handleTypePickerKeyDown}
-						>
-							<SelectedTypeIcon className='mr-3 text-label' />
-							<span className='text-text'>{typeLabel}</span>
-						</div>
-					</div>
-
-					<div className='border-b border-divider'>
-						<div
-							className='flex h-16 cursor-pointer items-center px-3'
-							role='button'
-							tabIndex={0}
-							onClick={onOpenColorPicker}
-							onKeyDown={handleColorPickerKeyDown}
-						>
-							<Palette className='mr-3 text-label transition-colors' style={colorStyle} />
-							<span className={cn('transition-colors', selectedColor ? 'text-text' : 'text-label')}>{t('wallets.form.color')}</span>
-						</div>
-					</div>
-
-					{onDelete && (
-						<div className='border-b border-divider'>
-							<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onDelete} disabled={disableDelete}>
-								<Trash className='mr-3 text-danger' />
-								<span className='text-danger'>{t('wallets.form.delete')}</span>
-							</button>
-						</div>
-					)}
 				</div>
+
+				<div className='border-b border-divider bg-background-muted'>
+					<div
+						className='flex h-16 cursor-pointer items-center px-3'
+						role='button'
+						tabIndex={0}
+						onClick={onOpenCurrencyPicker}
+						onKeyDown={handleCurrencyPickerKeyDown}
+					>
+						{currencyIcon ? <img src={currencyIcon} alt='' className='mr-3 h-6 w-6' /> : <CircleDollarSign className='mr-3 text-label' />}
+						<span className='text-text'>{currencyLabel}</span>
+					</div>
+				</div>
+
+				<div className='border-b border-divider bg-background-muted'>
+					<div className='flex items-center px-3 h-16'>
+						<Calculator className='mr-3 text-label' />
+						<input
+							className='flex-1 bg-transparent placeholder:text-label outline-none'
+							type='text'
+							inputMode='decimal'
+							placeholder={t('wallets.form.balance')}
+							value={formattedBalance}
+							onChange={handleBalanceChange}
+							autoComplete='off'
+						/>
+					</div>
+				</div>
+
+				<div className='border-b border-divider bg-background-muted'>
+					<div
+						className='flex h-16 cursor-pointer items-center px-3'
+						role='button'
+						tabIndex={0}
+						onClick={onOpenTypePicker}
+						onKeyDown={handleTypePickerKeyDown}
+					>
+						<SelectedTypeIcon className='mr-3 text-label' />
+						<span className='text-text'>{typeLabel}</span>
+					</div>
+				</div>
+
+				<div className='border-b border-divider bg-background-muted'>
+					<div
+						className='flex h-16 cursor-pointer items-center px-3'
+						role='button'
+						tabIndex={0}
+						onClick={onOpenColorPicker}
+						onKeyDown={handleColorPickerKeyDown}
+					>
+						<Palette className='mr-3 text-label transition-colors' style={colorStyle} />
+						<span className={cn('transition-colors', selectedColor ? 'text-text' : 'text-label')} style={colorStyle}>{t('wallets.form.color')}</span>
+					</div>
+				</div>
+
+				<h2 className='text-sm m-3'>{t('common.actions')}</h2>
+
+				<div className='border-b border-divider bg-background-muted'>
+					<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
+						<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
+						<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{submitLabel}</span>
+					</button>
+				</div>
+
+				{onDelete && (
+					<div className='border-b border-divider bg-background-muted'>
+						<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onDelete} disabled={disableDelete}>
+							<Trash className='mr-3 text-danger' />
+							<span className='text-danger'>{t('wallets.form.delete')}</span>
+						</button>
+					</div>
+				)}
 			</div>
 
 			{error && <p className='px-3 text-xs text-danger'>{error}</p>}

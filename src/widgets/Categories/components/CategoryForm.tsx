@@ -1,11 +1,11 @@
-import { Info, Palette, Shapes, Trash } from 'lucide-react'
+import { Check, Info, Palette, Shapes, Trash } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { categoryIconMap } from '../icons'
 import { useTranslation } from '@/i18n'
+import { cn } from '@/lib/utils'
 
 interface CategoryFormProps {
 	formId: string
-	title: string
 	name: string
 	onNameChange: (value: string) => void
 	color: string
@@ -15,11 +15,12 @@ interface CategoryFormProps {
 	onDelete?: () => void
 	disableDelete?: boolean
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
+	submitLabel?: string
+	submitDisabled?: boolean
 }
 
 const CategoryForm = ({
 	formId,
-	title,
 	name,
 	onNameChange,
 	color,
@@ -29,13 +30,16 @@ const CategoryForm = ({
 	onDelete,
 	disableDelete,
 	onSubmit,
+	submitLabel,
+	submitDisabled = false,
 }: CategoryFormProps) => {
 	const { t } = useTranslation()
+	const resolvedSubmitLabel = submitLabel ?? t('common.save')
 
 	return (
-		<form id={formId} className='flex h-full flex-col gap-5' onSubmit={onSubmit}>
+		<form id={formId} className='flex h-full flex-col' onSubmit={onSubmit}>
 			<div>
-				<h2 className='mb-3 px-3 text-sm font-medium text-label'>{title}</h2>
+				<h2 className='mb-3 px-3 text-sm font-medium text-label'>{t('common.general')}</h2>
 				<div className='overflow-hidden bg-background-muted'>
 					<div className='border-b border-divider'>
 						<div className='flex h-16 items-center px-3'>
@@ -66,22 +70,30 @@ const CategoryForm = ({
 							<span className='text-text'>{t('categories.form.icon')}</span>
 						</button>
 					</div>
-
-					{onDelete && (
-						<div className='border-b border-divider'>
-							<button
-								type='button'
-								onClick={onDelete}
-								className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
-								disabled={disableDelete}
-							>
-								<Trash className='mr-3 text-danger' />
-								<span className='text-danger'>{t('categories.form.delete')}</span>
-							</button>
-						</div>
-					)}
 				</div>
 			</div>
+			<h2 className='m-3 text-sm font-medium text-label'>{t('common.actions')}</h2>
+
+			<div className='border-b border-divider bg-background-muted'>
+				<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
+					<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
+					<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{resolvedSubmitLabel}</span>
+				</button>
+			</div>
+
+			{onDelete && (
+				<div className='border-b border-divider  bg-background-muted'>
+					<button
+						type='button'
+						onClick={onDelete}
+						className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
+						disabled={disableDelete}
+					>
+						<Trash className='mr-3 text-danger' />
+						<span className='text-danger'>{t('categories.form.delete')}</span>
+					</button>
+				</div>
+			)}
 		</form>
 	)
 }

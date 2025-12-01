@@ -114,24 +114,16 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		<>
 			<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary h-[100vh]' swipeable={false}>
 				<div className='flex h-full flex-col'>
-					<div className='flex items-center justify-between gap-3 p-3'>
-						<button type='button' onClick={onClose} className='rounded-full' aria-label={t('categories.drawer.close')}>
+					<div className='flex items-center justify-between gap-3 p-3 border-b border-divider'>
+						<h1 className='font-medium text-lg'>{computedTitle}</h1>
+						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('categories.drawer.close')}>
 							<X />
-						</button>
-						<button
-							type='submit'
-							form={formId}
-							className='rounded-md px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
-							disabled={isSubmitDisabled}
-						>
-							{t('common.save')}
 						</button>
 					</div>
 
-					<div className='flex-1 overflow-y-auto pb-10'>
+					<div className='flex-1 overflow-y-auto py-3'>
 						<CategoryForm
 							formId={formId}
-							title={computedTitle}
 							name={name}
 							onNameChange={setName}
 							color={color}
@@ -141,6 +133,8 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 							onDelete={isEditMode ? handleDelete : undefined}
 							disableDelete={isBusy}
 							onSubmit={handleSubmit}
+							submitLabel={t('common.save')}
+							submitDisabled={isSubmitDisabled}
 						/>
 					</div>
 				</div>
