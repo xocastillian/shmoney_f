@@ -1,7 +1,8 @@
 import { z } from 'zod'
-import { WalletType } from '@/types/entities/wallet'
+import { WalletStatus, WalletType } from '@/types/entities/wallet'
 
 export const WalletTypeSchema = z.enum(WalletType)
+export const WalletStatusSchema = z.enum(WalletStatus)
 export const CategoryTransactionTypeSchema = z.enum(['EXPENSE', 'INCOME'])
 
 export const AuthResponseSchema = z.object({
@@ -26,6 +27,7 @@ export const WalletResponseSchema = z.object({
 	currencyCode: z.string(),
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	type: WalletTypeSchema,
+	status: WalletStatusSchema,
 	balance: z.coerce.number(),
 	createdAt: z.coerce.date().nullable().optional(),
 	updatedAt: z.coerce.date().nullable().optional(),
@@ -74,6 +76,10 @@ export const WalletUpdateRequestSchema = z.object({
 export const WalletBalanceResponseSchema = z.object({
 	currencyCode: z.string(),
 	totalBalance: z.coerce.number(),
+})
+
+export const WalletStatusUpdateRequestSchema = z.object({
+	status: WalletStatusSchema,
 })
 
 export const WalletTransactionRequestSchema = z.object({

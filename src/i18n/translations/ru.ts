@@ -23,6 +23,7 @@ export const ru: TranslationDictionary = {
 	'common.general': 'Общее',
 	'common.actions': 'Действия',
 	'common.iconPicker': 'Выберите иконку',
+	'common.archive': 'В архив',
 	'transactions.drawer.noWallets': 'Нет доступных кошельков',
 	'transactions.drawer.selectWallet': 'Выберите кошелёк',
 	'transactions.drawer.selectRecipient': 'Выберите получателя',

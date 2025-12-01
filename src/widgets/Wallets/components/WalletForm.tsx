@@ -21,8 +21,8 @@ interface WalletFormProps {
 	onBalanceChange: (value: string) => void
 	error: string | null
 	formId: string
-	onDelete?: () => void
-	disableDelete?: boolean
+	onArchive?: () => void
+	disableArchive?: boolean
 	submitLabel?: string
 	submitDisabled?: boolean
 }
@@ -42,8 +42,8 @@ export function WalletForm({
 	onBalanceChange,
 	error,
 	formId,
-	onDelete,
-	disableDelete = false,
+	onArchive,
+	disableArchive = false,
 	submitLabel = 'Готово',
 	submitDisabled = false,
 }: WalletFormProps) {
@@ -164,7 +164,9 @@ export function WalletForm({
 						onKeyDown={handleColorPickerKeyDown}
 					>
 						<Palette className='mr-3 text-label transition-colors' style={colorStyle} />
-						<span className={cn('transition-colors', selectedColor ? 'text-text' : 'text-label')} style={colorStyle}>{t('wallets.form.color')}</span>
+						<span className={cn('transition-colors', selectedColor ? 'text-text' : 'text-label')} style={colorStyle}>
+							{t('wallets.form.color')}
+						</span>
 					</div>
 				</div>
 
@@ -177,11 +179,11 @@ export function WalletForm({
 					</button>
 				</div>
 
-				{onDelete && (
+				{onArchive && (
 					<div className='border-b border-divider bg-background-muted'>
-						<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onDelete} disabled={disableDelete}>
+						<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onArchive} disabled={disableArchive}>
 							<Trash className='mr-3 text-danger' />
-							<span className='text-danger'>{t('wallets.form.delete')}</span>
+							<span className='text-danger'>{t('common.archive')}</span>
 						</button>
 					</div>
 				)}

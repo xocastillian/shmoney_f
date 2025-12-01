@@ -26,8 +26,8 @@ interface WalletFormDrawerProps {
 	submitDisabled?: boolean
 	title: string
 	submitLabel?: string
-	onDelete?: () => void
-	disableDelete?: boolean
+	onArchive?: () => void
+	disableArchive?: boolean
 	submitting?: boolean
 }
 
@@ -50,8 +50,8 @@ export function WalletFormDrawer({
 	submitDisabled = false,
 	title,
 	submitLabel = 'Готово',
-	onDelete,
-	disableDelete = false,
+	onArchive,
+	disableArchive = false,
 	submitting = false,
 }: WalletFormDrawerProps) {
 	const formId = useId()
@@ -88,8 +88,8 @@ export function WalletFormDrawer({
 						onBalanceChange={onBalanceChange}
 						error={error}
 						formId={formId}
-						onDelete={onDelete}
-						disableDelete={disableDelete}
+						onArchive={onArchive}
+						disableArchive={disableArchive}
 						submitLabel={submitLabel}
 						submitDisabled={submitDisabled}
 					/>

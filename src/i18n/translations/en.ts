@@ -20,6 +20,7 @@ export const en = {
 	'common.close': 'Close',
 	'common.general': 'General',
 	'common.actions': 'Actions',
+	'common.archive': 'To archive',
 	'common.iconPicker': 'Pick an icon',
 	'transactions.drawer.noWallets': 'No wallets available',
 	'transactions.drawer.selectWallet': 'Select wallet',

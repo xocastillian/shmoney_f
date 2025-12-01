@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import {
 	createWallet as apiCreateWallet,
-	deleteWallet as apiDeleteWallet,
 	listWallets,
 	listWalletBalances,
 	updateWallet as apiUpdateWallet,
+	updateWalletStatus as apiUpdateWalletStatus,
 } from '@api/client'
-import type { WalletBalanceResponse, WalletCreateRequest, WalletResponse, WalletUpdateRequest } from '@api/types'
+import type { WalletBalanceResponse, WalletCreateRequest, WalletResponse, WalletStatusUpdateRequest, WalletUpdateRequest } from '@api/types'
 import { useWalletsStore } from '@/store/walletsStore'
 import type { Wallet, WalletBalanceSummary } from '@/types/entities/wallet'
 
@@ -18,6 +18,7 @@ function mapWallet(response: WalletResponse): Wallet {
 		balance: response.balance,
 		color: response.color,
 		type: response.type,
+		status: response.status,
 	}
 }
 
@@ -35,7 +36,7 @@ export function useWallets() {
 	const balancesLoading = useWalletsStore(state => state.balancesLoading)
 	const setWallets = useWalletsStore(state => state.setWallets)
 	const addWallet = useWalletsStore(state => state.addWallet)
-	const removeWallet = useWalletsStore(state => state.removeWallet)
+	const updateWalletStatusInStore = useWalletsStore(state => state.updateWalletStatus)
 	const setLoading = useWalletsStore(state => state.setLoading)
 	const setBalances = useWalletsStore(state => state.setBalances)
 	const setBalancesLoading = useWalletsStore(state => state.setBalancesLoading)
@@ -103,24 +104,6 @@ export function useWallets() {
 		[addWallet]
 	)
 
-	const deleteWallet = useCallback(
-		async (walletId: number) => {
-			setActionLoading(true)
-			try {
-				await apiDeleteWallet(walletId)
-				removeWallet(walletId)
-				setError(null)
-			} catch (err) {
-				const message = err instanceof Error ? err.message : 'Не удалось удалить кошелёк'
-				setError(message)
-				throw err
-			} finally {
-				setActionLoading(false)
-			}
-		},
-		[removeWallet]
-	)
-
 	const isBusy = useMemo(() => loading || actionLoading, [loading, actionLoading])
 
 	const updateWallet = useCallback(
@@ -143,6 +126,26 @@ export function useWallets() {
 		[addWallet]
 	)
 
+	const updateWalletStatus = useCallback(
+		async (walletId: number, payload: WalletStatusUpdateRequest) => {
+			setActionLoading(true)
+			try {
+				const updated = await apiUpdateWalletStatus(walletId, payload)
+				const mapped = mapWallet(updated)
+				updateWalletStatusInStore(walletId, mapped.status)
+				setError(null)
+				return mapped
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось обновить статус кошелька'
+				setError(message)
+				throw err
+			} finally {
+				setActionLoading(false)
+			}
+		},
+		[updateWalletStatusInStore]
+	)
+
 	return {
 		wallets,
 		loading,
@@ -156,6 +159,6 @@ export function useWallets() {
 		clearWallets,
 		createWallet,
 		updateWallet,
-		deleteWallet,
+		updateWalletStatus,
 	}
 }

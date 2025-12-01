@@ -10,6 +10,7 @@ export const endpoints = {
 	wallets: {
 		base: '/api/wallets',
 		byId: (id: number | string) => `/api/wallets/${id}`,
+		status: (id: number | string) => `/api/wallets/${id}/status`,
 		balances: '/api/wallets/balances',
 	},
 	walletTransactions: {
