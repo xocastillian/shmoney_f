@@ -47,7 +47,9 @@ function App() {
 	} = useTransactions()
 	const { categories, fetchCategories: fetchCategoriesData } = useCategories()
 	const authLoading = useAuthStore(state => state.loading)
-	const { fetchSettings, language } = useSettings()
+	const authStatus = useAuthStore(state => state.status)
+	const isAuthenticated = authStatus === 'authenticated'
+	const { fetchSettings, language, clear: clearSettings } = useSettings()
 	const { t, setLocale } = useTranslation()
 	const [amount, setAmount] = useState('')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
@@ -71,8 +73,13 @@ function App() {
 	}, [])
 
 	useEffect(() => {
+		if (!isAuthenticated) {
+			clearSettings()
+			return
+		}
+
 		void fetchSettings().catch(() => undefined)
-	}, [fetchSettings])
+	}, [clearSettings, fetchSettings, isAuthenticated])
 
 	useEffect(() => {
 		if (language) {
@@ -107,18 +114,19 @@ function App() {
 	}, [])
 
 	useEffect(() => {
-		if (!transactionDrawerOpen) return
+		if (!transactionDrawerOpen || !isAuthenticated) return
 
 		if (wallets.length === 0) {
 			void fetchWallets().catch(() => undefined)
 		}
-	}, [transactionDrawerOpen, wallets.length, fetchWallets])
+	}, [transactionDrawerOpen, wallets.length, fetchWallets, isAuthenticated])
 
 	useEffect(() => {
+		if (!isAuthenticated) return
 		if (categories.length === 0) {
 			void fetchCategoriesData().catch(() => undefined)
 		}
-	}, [categories.length, fetchCategoriesData])
+	}, [categories.length, fetchCategoriesData, isAuthenticated])
 
 	useEffect(() => {
 		if (!transactionDrawerOpen) return
