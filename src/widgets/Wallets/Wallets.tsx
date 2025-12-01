@@ -35,6 +35,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const [selectedType, setSelectedType] = useState<WalletType>(defaultWalletType)
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
+	const [editingWalletStatus, setEditingWalletStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 
 	const isEditing = editingWalletId !== null
 
@@ -49,6 +50,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setSelectedType(defaultWalletType)
 		setCurrencyPickerOpen(false)
 		setEditingWalletId(null)
+		setEditingWalletStatus(WalletStatus.ACTIVE)
 	}
 
 	useEffect(() => {
@@ -148,6 +150,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setBalance(sanitizeDecimalInput(String(wallet.balance)))
 		setSelectedColor(wallet.color || colorOptions[0])
 		setSelectedType(wallet.type || defaultWalletType)
+		setEditingWalletStatus(wallet.status || WalletStatus.ACTIVE)
 		setFormError(null)
 		setColorPickerOpen(false)
 		setCurrencyPickerOpen(false)
@@ -232,6 +235,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				submitLabel={isEditing ? t('wallets.form.save') : t('wallets.form.ready')}
 				onArchive={isEditing ? handleArchive : undefined}
 				disableArchive={actionLoading}
+				walletStatus={isEditing ? editingWalletStatus : undefined}
 			/>
 
 			<ColorPickerDrawer

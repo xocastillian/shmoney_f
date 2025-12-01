@@ -1,4 +1,4 @@
-import { Calculator, Check, CircleDollarSign, Info, Palette, Trash } from 'lucide-react'
+import { BanknoteX, Calculator, Check, CircleDollarSign, Info, Palette } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
 import { WalletType } from '@/types/entities/wallet'
@@ -25,6 +25,7 @@ interface WalletFormProps {
 	disableArchive?: boolean
 	submitLabel?: string
 	submitDisabled?: boolean
+	isArchived?: boolean
 }
 
 export function WalletForm({
@@ -46,6 +47,7 @@ export function WalletForm({
 	disableArchive = false,
 	submitLabel = 'Готово',
 	submitDisabled = false,
+	isArchived = false,
 }: WalletFormProps) {
 	const { t } = useTranslation()
 
@@ -89,6 +91,9 @@ export function WalletForm({
 	const currencyLabel = selectedCurrency ? t(selectedCurrency.label) : currencyCode
 	const currencyIcon = currencyIconMap[currencyCode]
 	const formattedBalance = formatDecimalForDisplay(balance)
+	const archiveButtonLabel = t(isArchived ? 'common.unarchive' : 'common.archive')
+	const archiveButtonColor = isArchived ? 'text-accent' : 'text-danger'
+	const archiveIconColor = isArchived ? 'text-accent' : 'text-danger'
 
 	const handleBalanceChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizeDecimalInput(event.target.value)
@@ -182,8 +187,8 @@ export function WalletForm({
 				{onArchive && (
 					<div className='border-b border-divider bg-background-muted'>
 						<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onArchive} disabled={disableArchive}>
-							<Trash className='mr-3 text-danger' />
-							<span className='text-danger'>{t('common.archive')}</span>
+							<BanknoteX className={`mr-3 ${archiveIconColor}`} />
+							<span className={archiveButtonColor}>{archiveButtonLabel}</span>
 						</button>
 					</div>
 				)}

@@ -3,8 +3,9 @@ import { typeIcons } from '@/widgets/Wallets/types'
 import type { WalletType } from '@/types/entities/wallet'
 import { useTranslation } from '@/i18n'
 import Drawer from '@/components/Drawer/Drawer'
+import Loader from '@/components/ui/Loader/Loader'
 
-interface TransactionWalletPickerDrawerProps {
+interface WalletsDrawerProps {
 	open: boolean
 	onClose: () => void
 	title: string
@@ -15,9 +16,11 @@ interface TransactionWalletPickerDrawerProps {
 	showAllOption?: boolean
 	allOptionLabel?: string
 	onSelectAll?: () => void
+	loading?: boolean
+	showCheckIcon?: boolean
 }
 
-export const TransactionWalletPickerDrawer = ({
+export const WalletsDrawer = ({
 	open,
 	onClose,
 	title,
@@ -28,13 +31,15 @@ export const TransactionWalletPickerDrawer = ({
 	showAllOption = false,
 	allOptionLabel,
 	onSelectAll,
-}: TransactionWalletPickerDrawerProps) => {
+	loading = false,
+	showCheckIcon = false,
+}: WalletsDrawerProps) => {
 	const { t } = useTranslation()
 
 	return (
 		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary' swipeable={false}>
 			<div className='flex h-full flex-col'>
-				<div className='flex justify-between items-center p-3'>
+				<div className='flex items-center justify-between p-3'>
 					<h2 className='text-lg font-medium'>{title}</h2>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
 						<X />
@@ -42,7 +47,11 @@ export const TransactionWalletPickerDrawer = ({
 				</div>
 
 				<div className='flex flex-1 flex-col overflow-y-auto'>
-					{wallets.length === 0 ? (
+					{loading ? (
+						<div className='flex flex-1 items-center justify-center px-3'>
+							<Loader />
+						</div>
+					) : wallets.length === 0 ? (
 						<div className='flex flex-1 items-center justify-center px-3 text-sm text-label'>
 							{emptyStateLabel ?? t('transactions.filters.walletPicker.empty')}
 						</div>
@@ -80,7 +89,7 @@ export const TransactionWalletPickerDrawer = ({
 										<div className='flex h-16 items-center px-3'>
 											<Icon className={iconClassName} style={iconStyle} />
 											<span className='text-text'>{wallet.name}</span>
-											{isSelected && <Check className='ml-auto text-accent' size={16} />}
+											{isSelected && showCheckIcon && <Check className='ml-auto text-accent' size={16} />}
 										</div>
 									</button>
 								)
@@ -93,4 +102,4 @@ export const TransactionWalletPickerDrawer = ({
 	)
 }
 
-export default TransactionWalletPickerDrawer
+export default WalletsDrawer

@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import { ClockFading, FolderHeart, ListFilter, RotateCcw, Wallet as WalletIcon, X } from 'lucide-react'
 import type { TransactionsFilterState, TransactionFilterType, TransactionPeriodFilter } from './filters'
 import TransactionTypePickerDrawer from './TransactionTypePickerDrawer'
-import TransactionWalletPickerDrawer from '@/widgets/Transactions/components/TransactionWalletPickerDrawer'
+import WalletsDrawer from '@/widgets/Wallets/components/WalletsDrawer'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
@@ -253,7 +253,7 @@ const TransactionsFilterDrawer = ({
 				onSelect={type => onFiltersChange({ type })}
 			/>
 
-			<TransactionWalletPickerDrawer
+			<WalletsDrawer
 				open={isWalletPickerOpen}
 				onClose={() => setWalletPickerOpen(false)}
 				title={t('transactions.filters.walletPicker.title')}
@@ -270,6 +270,7 @@ const TransactionsFilterDrawer = ({
 					onFiltersChange({ walletId: null })
 					setWalletPickerOpen(false)
 				}}
+				showCheckIcon
 			/>
 
 			<CategoriesDrawer
