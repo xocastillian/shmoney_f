@@ -1,16 +1,14 @@
-import { CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart, CalendarClock } from 'lucide-react'
-// import { CalendarClock } from 'lucide-react'
+import { CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart, CalendarClock, Check } from 'lucide-react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
-// import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import TransactionTypeTabs, { type TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 import { useTranslation } from '@/i18n'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
+import { cn } from '@/lib/utils'
 
 interface TransactionFormProps {
 	formId: string
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
-	title: string
 	mode?: 'create' | 'edit'
 	onDelete?: () => void
 	deleteDisabled?: boolean
@@ -39,12 +37,13 @@ interface TransactionFormProps {
 	dateTime: string
 	onDateTimeChange: (value: string) => void
 	maxDate?: Date
+	submitLabel?: string
+	submitDisabled?: boolean
 }
 
 export const TransactionForm = ({
 	formId,
 	onSubmit,
-	title,
 	mode = 'create',
 	onDelete,
 	deleteDisabled = false,
@@ -73,6 +72,8 @@ export const TransactionForm = ({
 	dateTime,
 	onDateTimeChange,
 	maxDate,
+	submitLabel,
+	submitDisabled = false,
 }: TransactionFormProps) => {
 	const { t, locale } = useTranslation()
 	const formattedAmount = formatDecimalForDisplay(amount)
@@ -80,6 +81,7 @@ export const TransactionForm = ({
 	const isEditingTransfer = isEditMode && transactionType === 'TRANSFER'
 	const shouldRenderTransactionTypeTabs = !isEditingTransfer
 	const transactionTypeOptions = isEditMode && !isEditingTransfer ? (['EXPENSE', 'INCOME'] as TransactionTypeTabValue[]) : undefined
+	const resolvedSubmitLabel = submitLabel ?? (isEditMode ? t('transactions.drawer.save') : t('transactions.drawer.create'))
 
 	const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizeDecimalInput(event.target.value)
@@ -91,11 +93,14 @@ export const TransactionForm = ({
 	return (
 		<form id={formId} onSubmit={onSubmit} className='flex flex-1 flex-col gap-4'>
 			<div>
-				<h1 className='mb-3 px-3 text-sm'>{title}</h1>
-
 				{shouldRenderTransactionTypeTabs && (
-					<TransactionTypeTabs value={transactionType} onChange={onTransactionTypeChange} options={transactionTypeOptions} className='mb-3' />
+					<>
+						<h1 className='mb-3 px-3 text-sm'>{t('transactions.filters.type.title')}</h1>
+						<TransactionTypeTabs value={transactionType} onChange={onTransactionTypeChange} options={transactionTypeOptions} className='mb-3' />
+					</>
 				)}
+
+				<h1 className='mb-3 px-3 text-sm'>{t('common.general')}</h1>
 
 				<div className='bg-background-muted'>
 					<div className='border-b border-divider'>
@@ -186,6 +191,16 @@ export const TransactionForm = ({
 						/>
 					</div>
 				</div>
+
+				<h2 className='m-3 text-sm'>{t('common.actions')}</h2>
+
+				<div className='border-b border-divider bg-background-muted'>
+					<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
+						<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
+						<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{resolvedSubmitLabel}</span>
+					</button>
+				</div>
+
 				{mode === 'edit' && onDelete && (
 					<div className='border-b border-divider'>
 						<button

@@ -138,18 +138,11 @@ export const TransactionDrawer = ({
 		<>
 			<Drawer open={open} onClose={onClose} className='bg-background-secondary rounded-t-lg' swipeable={false}>
 				<div className='flex h-full flex-col'>
-					<div className='flex items-center justify-between gap-3 p-3'>
+					<div className='flex items-center justify-between gap-3 p-3 flex-none sticky top-0 z-20 bg-background-secondary border-b border-divider'>
+						<h1 className='font-medium text-lg'>{formTitle}</h1>
+
 						<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('transactions.drawer.close')}>
 							<X />
-						</button>
-						<button
-							type='submit'
-							form={formId}
-							className='rounded-md px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
-							disabled={submitDisabled}
-							aria-busy={submitting}
-						>
-							{submitButtonLabel}
 						</button>
 					</div>
 
@@ -159,11 +152,10 @@ export const TransactionDrawer = ({
 						</div>
 					)}
 
-					<div className='pb-10'>
+					<div className='overflow-auto flex-1 px-0 py-3'>
 						<TransactionForm
 							formId={formId}
 							onSubmit={onSubmit}
-							title={formTitle}
 							mode={mode}
 							onDelete={onDelete}
 							deleteDisabled={submitting}
@@ -192,6 +184,8 @@ export const TransactionDrawer = ({
 							dateTime={dateTime}
 							onDateTimeChange={onDateTimeChange}
 							maxDate={maxTransactionDate}
+							submitLabel={submitButtonLabel}
+							submitDisabled={submitDisabled}
 						/>
 					</div>
 				</div>

@@ -51,7 +51,8 @@ const CategoriesDrawer = ({
 	return (
 		<Drawer open={open} onClose={onClose} className={`h-[100vh] rounded-t-lg bg-background-secondary ${className}`} swipeable={false}>
 			<div className='flex h-full flex-col'>
-				<div className='flex justify-end p-3'>
+				<div className='flex justify-between p-3 items-center'>
+					<h1 className='text-lg font-medium'>{t('categories.drawer.title')}</h1>
 					<button type='button' onClick={onClose} className='p-2' aria-label='Закрыть'>
 						<CloseIcon />
 					</button>
@@ -60,7 +61,6 @@ const CategoriesDrawer = ({
 				<div className='flex-1 overflow-y-auto pb-10'>
 					{hasCategories && (
 						<>
-							<h2 className='mb-3 px-3 text-sm font-medium text-label'>{t('categories.drawer.title')}</h2>
 							<div className='overflow-hidden bg-background-muted'>
 								{selectable && allOptionLabel && (
 									<button

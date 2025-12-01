@@ -34,15 +34,14 @@ export const TransactionWalletPickerDrawer = ({
 	return (
 		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary' swipeable={false}>
 			<div className='flex h-full flex-col'>
-				<div className='flex justify-end p-3'>
+				<div className='flex justify-between items-center p-3'>
+					<h2 className='text-lg font-medium'>{title}</h2>
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('common.close')}>
 						<X />
 					</button>
 				</div>
 
 				<div className='flex flex-1 flex-col overflow-y-auto'>
-					<h2 className='mb-4 px-3 text-sm font-medium text-label'>{title}</h2>
-
 					{wallets.length === 0 ? (
 						<div className='flex flex-1 items-center justify-center px-3 text-sm text-label'>
 							{emptyStateLabel ?? t('transactions.filters.walletPicker.empty')}
