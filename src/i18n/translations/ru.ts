@@ -16,6 +16,8 @@ export const ru: TranslationDictionary = {
 	'categories.drawer.editTitle': 'Редактирование категории',
 	'categories.drawer.close': 'Закрыть',
 	'categories.drawer.add': 'Добавить категорию',
+	'categories.drawer.active': 'Активные категории',
+	'categories.drawer.archived': 'Архивные категории',
 	'categories.form.namePlaceholder': 'Название категории',
 	'categories.form.color': 'Цвет',
 	'categories.form.icon': 'Иконка',

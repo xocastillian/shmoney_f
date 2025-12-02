@@ -39,7 +39,7 @@ const CategoryForm = ({
 	const resolvedSubmitLabel = submitLabel ?? t('common.save')
 	const statusActionLabel = statusActionType === 'unarchive' ? t('common.unarchive') : t('common.archive')
 	const StatusIconComponent = statusActionType === 'unarchive' ? RotateCcw : Archive
-	const statusActionColor = statusActionType === 'unarchive' ? 'text-access' : 'text-danger'
+	const statusActionColor = statusActionType === 'unarchive' ? 'text-accent' : 'text-danger'
 
 	return (
 		<form id={formId} className='flex h-full flex-col' onSubmit={onSubmit}>

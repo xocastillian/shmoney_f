@@ -14,6 +14,8 @@ export const en = {
 	'categories.drawer.editTitle': 'Edit category',
 	'categories.drawer.close': 'Close',
 	'categories.drawer.add': 'Add category',
+	'categories.drawer.active': 'Active categories',
+	'categories.drawer.archived': 'Archived categories',
 	'categories.form.namePlaceholder': 'Category name',
 	'categories.form.color': 'Color',
 	'categories.form.icon': 'Icon',
