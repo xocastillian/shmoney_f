@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useCategories } from '@/hooks/useCategories'
 import type { Category } from '@/types/entities/category'
+import { CategoryStatus } from '@/types/entities/category'
 import { useTranslation } from '@/i18n'
 import Drawer from '@/components/Drawer/Drawer'
 
@@ -46,7 +47,14 @@ const CategoriesDrawer = ({
 			.catch(() => setInitialized(true))
 	}, [fetchCategories, initialized, loading, open])
 
-	const hasCategories = categories.length > 0
+	const visibleCategories = useMemo(() => {
+		if (!selectable) {
+			return categories
+		}
+		return categories.filter(category => category.status === CategoryStatus.ACTIVE)
+	}, [categories, selectable])
+
+	const hasCategories = visibleCategories.length > 0
 
 	return (
 		<Drawer open={open} onClose={onClose} className={`h-[100vh] rounded-t-lg bg-background-secondary ${className}`} swipeable={false}>
@@ -75,10 +83,12 @@ const CategoriesDrawer = ({
 										</div>
 									</button>
 								)}
-								{categories.map(category => {
+								{visibleCategories.map(category => {
 									const IconComponent = category.icon ? lucideIconMap[category.icon] : undefined
 									const initials = category.name.slice(0, 2).toUpperCase()
 									const isSelected = selectable && selectedCategoryId === category.id
+									const showArchiveIcon = !selectable && category.status === CategoryStatus.ARCHIVED
+									const showSelectionIcon = selectable && isSelected
 
 									return (
 										<button
@@ -98,7 +108,12 @@ const CategoriesDrawer = ({
 													)}
 												</div>
 												<span className='text-text'>{category.name}</span>
-												{isSelected && <LucideIcons.Check className='ml-auto text-accent' size={16} />}
+												{(showArchiveIcon || showSelectionIcon) && (
+													<div className='ml-auto flex items-center gap-2'>
+														{showArchiveIcon && <LucideIcons.Archive className='text-label' size={16} />}
+														{showSelectionIcon && <LucideIcons.Check className='text-accent' size={16} />}
+													</div>
+												)}
 											</div>
 										</button>
 									)

@@ -1,9 +1,11 @@
 import { z } from 'zod'
 import { WalletStatus, WalletType } from '@/types/entities/wallet'
+import { CategoryStatus } from '@/types/entities/category'
 
 export const WalletTypeSchema = z.enum(WalletType)
 export const WalletStatusSchema = z.enum(WalletStatus)
 export const CategoryTransactionTypeSchema = z.enum(['EXPENSE', 'INCOME'])
+export const CategoryStatusSchema = z.enum(CategoryStatus)
 
 export const AuthResponseSchema = z.object({
 	accessToken: z.string().min(1),
@@ -120,8 +122,6 @@ export const CategoryTransactionResponseSchema = z.object({
 	walletName: z.string(),
 	categoryId: z.number().int(),
 	categoryName: z.string(),
-	subcategoryId: z.number().int().nullable(),
-	subcategoryName: z.string().nullable(),
 	type: CategoryTransactionTypeSchema,
 	amount: z.coerce.number(),
 	currencyCode: z.string(),
@@ -134,7 +134,6 @@ export const CategoryTransactionResponseSchema = z.object({
 export const CategoryTransactionCreateRequestSchema = z.object({
 	walletId: z.number().int().positive(),
 	categoryId: z.number().int().positive(),
-	subcategoryId: z.number().int().positive().optional(),
 	type: CategoryTransactionTypeSchema,
 	amount: z.number().positive(),
 	occurredAt: z.coerce.date(),
@@ -144,7 +143,6 @@ export const CategoryTransactionCreateRequestSchema = z.object({
 export const CategoryTransactionUpdateRequestSchema = z.object({
 	walletId: z.number().int().positive().optional(),
 	categoryId: z.number().int().positive().optional(),
-	subcategoryId: z.number().int().positive().nullable().optional(),
 	type: CategoryTransactionTypeSchema.optional(),
 	amount: z.number().positive().optional(),
 	occurredAt: z.coerce.date().optional(),
@@ -167,7 +165,6 @@ export const TransactionFeedItemSchema = z.object({
 	walletId: z.number().int().nullable(),
 	counterpartyWalletId: z.number().int().nullable(),
 	categoryId: z.number().int().nullable(),
-	subcategoryId: z.number().int().nullable(),
 	amount: z.coerce.number(),
 	currencyCode: z.string(),
 	description: z.string().nullable().optional(),
@@ -215,45 +212,20 @@ export const SettingsUpdateRequestSchema = z.object({
 	language: z.string(),
 })
 
-export const SubcategoryResponseSchema = z.object({
-	id: z.number().int(),
-	name: z.string(),
-	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-	icon: z.string(),
-	createdAt: z.coerce.date().nullable().optional(),
-	updatedAt: z.coerce.date().nullable().optional(),
-})
-
 export const CategoryResponseSchema = z.object({
 	id: z.number().int(),
 	name: z.string(),
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	icon: z.string(),
+	status: CategoryStatusSchema,
 	createdAt: z.coerce.date().nullable().optional(),
 	updatedAt: z.coerce.date().nullable().optional(),
-	subcategories: z.array(SubcategoryResponseSchema),
-})
-
-export const SubcategoryCreateRequestSchema = z.object({
-	name: z.string().min(1).max(100),
-	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-	icon: z.string().min(1).max(100),
-})
-
-export const SubcategoryUpdateRequestSchema = z.object({
-	name: z.string().max(100).optional(),
-	color: z
-		.string()
-		.regex(/^#[0-9A-Fa-f]{6}$/)
-		.optional(),
-	icon: z.string().max(100).optional(),
 })
 
 export const CategoryCreateRequestSchema = z.object({
 	name: z.string().min(1).max(100),
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	icon: z.string().min(1).max(100),
-	subcategories: z.array(SubcategoryCreateRequestSchema).optional(),
 })
 
 export const CategoryUpdateRequestSchema = z.object({
@@ -263,4 +235,8 @@ export const CategoryUpdateRequestSchema = z.object({
 		.regex(/^#[0-9A-Fa-f]{6}$/)
 		.optional(),
 	icon: z.string().max(100).optional(),
+})
+
+export const CategoryStatusUpdateRequestSchema = z.object({
+	status: CategoryStatusSchema,
 })

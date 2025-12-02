@@ -1,20 +1,18 @@
 export type CategoryEntryType = 'EXPENSE' | 'INCOME'
 
-export interface Subcategory {
-	id: number
-	name: string
-	color: string
-	icon: string
-	createdAt: Date | null
-	updatedAt: Date | null
-}
+export const CategoryStatus = {
+	ACTIVE: 'ACTIVE',
+	ARCHIVED: 'ARCHIVED',
+} as const
+
+export type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus]
 
 export interface Category {
 	id: number
 	name: string
 	color: string
 	icon: string
-	subcategories: Subcategory[]
+	status: CategoryStatus
 	createdAt: Date | null
 	updatedAt: Date | null
 }
