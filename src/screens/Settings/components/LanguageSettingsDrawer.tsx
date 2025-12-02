@@ -31,7 +31,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 				</div>
 
 				<div className='flex flex-1 flex-col pb-10'>
-					<div className='bg-background-muted'>
+					<div className='bg-background-muted border-t border-divider'>
 						{languages.map(language => {
 							const isSelected = language === selectedLanguage
 							return (
@@ -40,7 +40,7 @@ export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLangu
 									type='button'
 									onClick={() => onSelect(language)}
 									aria-pressed={isSelected}
-									className='w-full border-b border-divider text-left last:border-b-0 focus:outline-none focus-visible:bg-background-muted'
+									className='w-full border-b border-divider text-left'
 									disabled={loading}
 								>
 									<div className='flex h-16 items-center px-3'>
