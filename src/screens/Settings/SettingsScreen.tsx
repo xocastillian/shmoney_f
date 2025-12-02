@@ -282,11 +282,11 @@ const SettingsScreen = () => {
 			<WalletsDrawer
 				open={isArchivedWalletsDrawerOpen}
 				onClose={closeArchivedWalletsDrawer}
-				title={t('settings.archivedWallets')}
+				title={t('settings.wallets')}
 				wallets={wallets}
 				selectedWalletId={editingWalletId}
 				onSelect={handleWalletClick}
-				emptyStateLabel={t('settings.archivedWallets.empty')}
+				emptyStateLabel={t('settings.wallets.empty')}
 				loading={walletsLoading}
 				showAllOption={false}
 				showAddButton

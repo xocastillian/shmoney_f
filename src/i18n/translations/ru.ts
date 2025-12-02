@@ -6,6 +6,7 @@ export const ru: TranslationDictionary = {
 	'bottomNav.budgets': 'Бюджеты',
 	'bottomNav.settings': 'Настройки',
 	'settings.wallets': 'Кошельки',
+	'settings.wallets.empty': 'Нет кошельков',
 	'settings.title': 'Настройки',
 	'settings.categories': 'Категории',
 	'settings.language': 'Язык',

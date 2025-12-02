@@ -6,6 +6,7 @@ export const en = {
 	'settings.title': 'Settings',
 	'settings.categories': 'Categories',
 	'settings.wallets': 'Wallets',
+	'settings.wallets.empty': 'You have no wallets yet',
 	'settings.archivedWallets': 'Archived wallets',
 	'settings.archivedWallets.empty': 'You have no archived wallets yet',
 	'settings.language': 'Language',
