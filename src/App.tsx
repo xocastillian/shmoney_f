@@ -7,6 +7,7 @@ import BudgetsScreen from '@/screens/Budgets/BudgetsScreen'
 import SettingsScreen from '@/screens/Settings/SettingsScreen'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
+import { useBudgets } from '@/hooks/useBudgets'
 import useTransactions from '@/hooks/useTransactions'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
@@ -46,6 +47,7 @@ function App() {
 	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const formId = useId()
 	const { wallets, fetchWallets, fetchWalletBalances, createWallet } = useWallets()
+	const { fetchBudgets } = useBudgets()
 	const {
 		createWalletTransaction,
 		createCategoryTransaction,
@@ -503,6 +505,7 @@ function App() {
 				void fetchWallets().catch(() => undefined)
 				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
+				void fetchBudgets().catch(() => undefined)
 				handleDrawerClose()
 			} catch (err) {
 				const message = err instanceof Error ? err.message : 'Не удалось сохранить транзакцию'
@@ -529,6 +532,7 @@ function App() {
 			fetchWallets,
 			handleDrawerClose,
 			fetchWalletBalances,
+			fetchBudgets,
 		]
 	)
 

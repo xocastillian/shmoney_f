@@ -40,4 +40,9 @@ export const endpoints = {
 	settings: {
 		base: '/api/settings',
 	},
+	budgets: {
+		base: '/api/budgets',
+		byId: (id: number | string) => `/api/budgets/${id}`,
+		close: (id: number | string) => `/api/budgets/${id}/close`,
+	},
 } as const

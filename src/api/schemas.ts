@@ -1,11 +1,15 @@
 import { z } from 'zod'
 import { WalletStatus, WalletType } from '@/types/entities/wallet'
 import { CategoryStatus } from '@/types/entities/category'
+import { BudgetPeriodType, BudgetStatus, BudgetType } from '@/types/entities/budget'
 
 export const WalletTypeSchema = z.enum(WalletType)
 export const WalletStatusSchema = z.enum(WalletStatus)
 export const CategoryTransactionTypeSchema = z.enum(['EXPENSE', 'INCOME'])
 export const CategoryStatusSchema = z.enum(CategoryStatus)
+export const BudgetPeriodTypeSchema = z.enum(BudgetPeriodType)
+export const BudgetTypeSchema = z.enum(BudgetType)
+export const BudgetStatusSchema = z.enum(BudgetStatus)
 
 export const AuthResponseSchema = z.object({
 	accessToken: z.string().min(1),
@@ -239,4 +243,44 @@ export const CategoryUpdateRequestSchema = z.object({
 
 export const CategoryStatusUpdateRequestSchema = z.object({
 	status: CategoryStatusSchema,
+})
+
+export const BudgetResponseSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	periodType: BudgetPeriodTypeSchema,
+	periodStart: z.coerce.date(),
+	periodEnd: z.coerce.date(),
+	budgetType: BudgetTypeSchema,
+	currencyCode: z.string(),
+	amountLimit: z.coerce.number(),
+	spentAmount: z.coerce.number(),
+	percentSpent: z.coerce.number(),
+	status: BudgetStatusSchema,
+	categoryIds: z.array(z.number().int()),
+	closedAt: z.coerce.date().nullable().optional(),
+	createdAt: z.coerce.date().nullable().optional(),
+	updatedAt: z.coerce.date().nullable().optional(),
+})
+
+export const BudgetCreateRequestSchema = z.object({
+	name: z.string().min(1).max(100),
+	periodType: BudgetPeriodTypeSchema,
+	periodStart: z.coerce.date().optional(),
+	periodEnd: z.coerce.date().optional(),
+	budgetType: BudgetTypeSchema,
+	categoryIds: z.array(z.number().int().positive()).nonempty(),
+	currencyCode: z.string().min(3).max(10),
+	amountLimit: z.coerce.number().positive(),
+})
+
+export const BudgetUpdateRequestSchema = z.object({
+	name: z.string().max(100).optional(),
+	periodType: BudgetPeriodTypeSchema.optional(),
+	periodStart: z.coerce.date().optional(),
+	periodEnd: z.coerce.date().optional(),
+	budgetType: BudgetTypeSchema.optional(),
+	categoryIds: z.array(z.number().int().positive()).nonempty().optional(),
+	currencyCode: z.string().min(3).max(10).optional(),
+	amountLimit: z.coerce.number().positive().optional(),
 })

@@ -17,7 +17,6 @@ import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
-import { SettingsIcon } from 'lucide-react'
 
 const defaultWalletType = WalletType.CASH
 
@@ -251,10 +250,6 @@ const SettingsScreen = () => {
 		<>
 			<div className='p-3 flex items-center justify-between'>
 				<h1 className='text-lg font-medium'>{t('settings.title')}</h1>
-
-				<div className='p-2'>
-					<SettingsIcon className='h-6 w-6' />
-				</div>
 			</div>
 
 			<div className='border-t border-divider'>
@@ -287,11 +282,11 @@ const SettingsScreen = () => {
 			<WalletsDrawer
 				open={isArchivedWalletsDrawerOpen}
 				onClose={closeArchivedWalletsDrawer}
-				title={t('settings.archivedWallets')}
+				title={t('settings.wallets')}
 				wallets={wallets}
 				selectedWalletId={editingWalletId}
 				onSelect={handleWalletClick}
-				emptyStateLabel={t('settings.archivedWallets.empty')}
+				emptyStateLabel={t('settings.wallets.empty')}
 				loading={walletsLoading}
 				showAllOption={false}
 				showAddButton
