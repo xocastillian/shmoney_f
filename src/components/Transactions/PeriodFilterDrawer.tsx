@@ -33,7 +33,7 @@ const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange, from, to, o
 
 				<div className='flex flex-1 flex-col pb-10'>
 					<div className='bg-background-muted'>
-						<div className='flex flex-col'>
+						<div className='flex flex-col border-t border-divider'>
 							{quickPeriodOptions.map(option => {
 								const isSelected = period === option.value
 								return (
@@ -44,7 +44,7 @@ const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange, from, to, o
 											onPeriodChange(isSelected ? '' : option.value)
 											onClose()
 										}}
-										className='flex h-16 w-full items-center border-b border-divider px-3 text-left focus:outline-none focus-visible:bg-background-muted'
+										className='flex h-16 w-full items-center border-b border-divider px-3 text-left'
 										aria-pressed={isSelected}
 									>
 										<span className={isSelected ? 'text-text' : 'text-label'}>{t(option.labelKey)}</span>

@@ -44,7 +44,7 @@ export default function TransactionTypePickerDrawer({ open, onClose, selectedTyp
 										onSelect(option.value)
 										onClose()
 									}}
-									className='w-full border-b border-divider text-left last:border-b-0 focus:outline-none focus-visible:bg-background-muted'
+									className='w-full border-b border-t border-divider text-left'
 								>
 									<div className='flex h-16 items-center px-3'>
 										<span className='text-text'>{t(option.labelKey)}</span>

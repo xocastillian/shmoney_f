@@ -115,7 +115,7 @@ export const TransactionForm = ({
 				<h1 className='mb-3 px-3 text-sm'>{t('common.general')}</h1>
 
 				<div className='bg-background-muted'>
-					<div className='border-b border-divider'>
+					<div className='border-b border-t border-divider'>
 						<div className='flex h-16 items-center px-3'>
 							{fromWalletCurrencyIcon ? (
 								<img src={fromWalletCurrencyIcon} alt='' className='mr-3 h-6 w-6' />
@@ -206,7 +206,7 @@ export const TransactionForm = ({
 
 				<h2 className='m-3 text-sm'>{t('common.actions')}</h2>
 
-				<div className='border-b border-divider bg-background-muted'>
+				<div className='border-b border-t border-divider bg-background-muted'>
 					<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
 						<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
 						<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{resolvedSubmitLabel}</span>

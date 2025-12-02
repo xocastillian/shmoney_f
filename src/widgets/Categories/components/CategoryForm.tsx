@@ -45,8 +45,9 @@ const CategoryForm = ({
 		<form id={formId} className='flex h-full flex-col' onSubmit={onSubmit}>
 			<div>
 				<h2 className='mb-3 px-3 text-sm font-medium text-label'>{t('common.general')}</h2>
+
 				<div className='overflow-hidden bg-background-muted'>
-					<div className='border-b border-divider'>
+					<div className='border-b border-t border-divider'>
 						<div className='flex h-16 items-center px-3'>
 							<Info className='mr-3 text-label' />
 							<input
@@ -77,9 +78,10 @@ const CategoryForm = ({
 					</div>
 				</div>
 			</div>
+
 			<h2 className='m-3 text-sm font-medium text-label'>{t('common.actions')}</h2>
 
-			<div className='border-b border-divider bg-background-muted'>
+			<div className='border-b border-t border-divider bg-background-muted'>
 				<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
 					<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
 					<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{resolvedSubmitLabel}</span>

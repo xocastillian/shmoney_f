@@ -118,7 +118,7 @@ const TransactionsFilterDrawer = ({
 					</div>
 
 					<div className='flex flex-1 flex-col pb-10'>
-						<div className='relative border-b border-divider bg-background-muted'>
+						<div className='relative border-b border-t border-divider bg-background-muted'>
 							<button
 								type='button'
 								className='flex h-16 w-full items-center px-3 pr-10 text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60'

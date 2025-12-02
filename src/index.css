@@ -87,10 +87,9 @@ body,
 
 .adm-picker-header {
 	padding: 12px !important;
-	border: none !important;
 	background-color: var(--background-secondary) !important;
 }
 
 .adm-picker-header-button {
-	padding: 0 !important;
+	padding: 8px !important;
 }

@@ -18,6 +18,7 @@ interface CategoriesDrawerProps {
 	allOptionLabel?: string
 	onSelectAll?: () => void
 	selectedCategoryId?: number | null
+	showArchived?: boolean
 }
 
 const CloseIcon = LucideIcons.X
@@ -34,6 +35,7 @@ const CategoriesDrawer = ({
 	allOptionLabel,
 	onSelectAll,
 	selectedCategoryId = null,
+	showArchived = true,
 }: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
@@ -48,7 +50,10 @@ const CategoriesDrawer = ({
 	}, [fetchCategories, initialized, loading, open])
 
 	const activeCategories = useMemo(() => categories.filter(category => category.status === CategoryStatus.ACTIVE), [categories])
-	const archivedCategories = useMemo(() => categories.filter(category => category.status === CategoryStatus.ARCHIVED), [categories])
+	const archivedCategories = useMemo(
+		() => (showArchived ? categories.filter(category => category.status === CategoryStatus.ARCHIVED) : []),
+		[categories, showArchived]
+	)
 	const hasActiveCategories = activeCategories.length > 0
 	const hasArchivedCategories = archivedCategories.length > 0
 	const showAllButton = selectable && allOptionLabel
@@ -98,12 +103,13 @@ const CategoriesDrawer = ({
 				<div className='flex-1 overflow-y-auto pb-3'>
 					<div className='overflow-hidden'>
 						{showAllButton && (
-							<div className='bg-background-muted'>
+							<div className=''>
 								<h2 className='mb-3 px-3 pt-3 text-sm font-medium text-label'>{t('common.general')}</h2>
+
 								<button
 									type='button'
 									onClick={() => onSelectAll?.()}
-									className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
+									className='w-full bg-background-muted border-b border-t border-divider text-left'
 								>
 									<div className='flex h-16 items-center px-3'>
 										<LucideIcons.FolderHeart className='mr-3 text-label' />
@@ -132,7 +138,8 @@ const CategoriesDrawer = ({
 					{showAddButton && (
 						<div>
 							<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
-							<div className='border-b border-divider bg-background-muted'>
+
+							<div className='border-b border-t border-divider bg-background-muted'>
 								<button type='button' onClick={() => onAdd?.()} className='flex h-16 items-center px-3 w-full'>
 									<LucideIcons.Plus className='mr-3 text-access' />
 									<span className='text-access'>{t('categories.drawer.add')}</span>

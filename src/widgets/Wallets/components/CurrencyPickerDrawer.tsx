@@ -27,7 +27,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 				</div>
 
 				<div className='flex flex-col pb-10'>
-					<div className='bg-background-muted'>
+					<div className='bg-background-muted border-t border-divider'>
 						{options.map(option => {
 							const isSelected = option.value === selectedCode
 							const iconSrc = currencyIconMap[option.value]
@@ -37,7 +37,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 									type='button'
 									onClick={() => onSelect(option.value)}
 									aria-pressed={isSelected}
-									className='w-full border-b border-divider text-left last:border-b-0 focus:outline-none focus-visible:bg-background-muted'
+									className='w-full border-b border-divider text-left'
 								>
 									<div className='flex h-16 items-center px-3'>
 										{iconSrc && <img src={iconSrc} alt='' className='mr-3 h-6 w-6' />}

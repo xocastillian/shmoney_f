@@ -1,5 +1,5 @@
 import type { Setting } from '@/types/entities/setting'
-import { BanknoteX, FolderHeart, Languages } from 'lucide-react'
+import { FolderHeart, Languages, Wallet } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { useMemo } from 'react'
 
@@ -20,9 +20,9 @@ export const useSettingsList = ({ onCategoriesPress, onLanguagePress, onArchived
 				icon: FolderHeart,
 			},
 			{
-				title: t('settings.archivedWallets'),
+				title: t('settings.wallets'),
 				onClick: onArchivedWalletsPress,
-				icon: BanknoteX,
+				icon: Wallet,
 			},
 			{
 				title: t('settings.language'),

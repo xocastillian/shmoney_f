@@ -77,8 +77,6 @@ const SettingsScreen = () => {
 		void fetchWallets().catch(() => undefined)
 	}, [isArchivedWalletsDrawerOpen, wallets.length, fetchWallets])
 
-	const archivedWallets = useMemo(() => wallets.filter(wallet => wallet.status === WalletStatus.ARCHIVED), [wallets])
-
 	const walletFormSubmitDisabled = useMemo(() => {
 		const trimmedName = walletFormName.trim()
 		const trimmedCurrency = walletFormCurrencyCode.trim()
@@ -210,9 +208,7 @@ const SettingsScreen = () => {
 			setWalletFormStatus(nextStatus)
 			setWalletFormError(null)
 			refreshWalletBalances()
-			if (nextStatus === WalletStatus.ACTIVE) {
-				closeWalletForm()
-			}
+			closeWalletForm()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('wallets.errors.saveFailed')
 			setWalletFormError(message)
@@ -261,7 +257,7 @@ const SettingsScreen = () => {
 				</div>
 			</div>
 
-			<div>
+			<div className='border-t border-divider'>
 				{settings.map(setting => (
 					<SettingsItem key={setting.title} setting={setting} />
 				))}
@@ -292,7 +288,7 @@ const SettingsScreen = () => {
 				open={isArchivedWalletsDrawerOpen}
 				onClose={closeArchivedWalletsDrawer}
 				title={t('settings.archivedWallets')}
-				wallets={archivedWallets}
+				wallets={wallets}
 				selectedWalletId={editingWalletId}
 				onSelect={handleWalletClick}
 				emptyStateLabel={t('settings.archivedWallets.empty')}

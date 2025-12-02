@@ -1,4 +1,4 @@
-import { BanknoteX, Calculator, Check, CircleDollarSign, Info, Palette } from 'lucide-react'
+import { Archive, Calculator, Check, CircleDollarSign, Info, Palette, RotateCcw } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
 import { WalletType } from '@/types/entities/wallet'
@@ -91,9 +91,10 @@ export function WalletForm({
 	const currencyLabel = selectedCurrency ? t(selectedCurrency.label) : currencyCode
 	const currencyIcon = currencyIconMap[currencyCode]
 	const formattedBalance = formatDecimalForDisplay(balance)
-	const archiveButtonLabel = t(isArchived ? 'common.unarchive' : 'common.archive')
-	const archiveButtonColor = isArchived ? 'text-accent' : 'text-danger'
-	const archiveIconColor = isArchived ? 'text-accent' : 'text-danger'
+	const statusActionType = isArchived ? 'unarchive' : 'archive'
+	const statusActionLabel = statusActionType === 'unarchive' ? t('common.unarchive') : t('common.archive')
+	const StatusIconComponent = statusActionType === 'unarchive' ? RotateCcw : Archive
+	const statusActionColor = statusActionType === 'unarchive' ? 'text-accent' : 'text-danger'
 
 	const handleBalanceChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const sanitized = sanitizeDecimalInput(event.target.value)
@@ -106,7 +107,7 @@ export function WalletForm({
 		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
 				<h1 className='text-sm px-3 mb-3'>{t('common.general')}</h1>
-				<div className='border-b border-divider bg-background-muted'>
+				<div className='border-b border-t border-divider bg-background-muted'>
 					<div className='flex items-center px-3 h-16'>
 						<Info className='mr-3 text-label' />
 						<input
@@ -177,7 +178,7 @@ export function WalletForm({
 
 				<h2 className='text-sm m-3'>{t('common.actions')}</h2>
 
-				<div className='border-b border-divider bg-background-muted'>
+				<div className='border-b border-t border-divider bg-background-muted'>
 					<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
 						<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
 						<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{submitLabel}</span>
@@ -187,8 +188,8 @@ export function WalletForm({
 				{onArchive && (
 					<div className='border-b border-divider bg-background-muted'>
 						<button className='flex h-16 cursor-pointer items-center px-3 w-full' type='button' onClick={onArchive} disabled={disableArchive}>
-							<BanknoteX className={`mr-3 ${archiveIconColor}`} />
-							<span className={archiveButtonColor}>{archiveButtonLabel}</span>
+							<StatusIconComponent className={`mr-3 ${statusActionColor}`} />
+							<span className={statusActionColor}>{statusActionLabel}</span>
 						</button>
 					</div>
 				)}

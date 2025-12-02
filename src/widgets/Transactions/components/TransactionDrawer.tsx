@@ -205,6 +205,7 @@ export const TransactionDrawer = ({
 				}}
 				showCheckIcon
 				showAddButton={Boolean(onAddWallet)}
+				showArchived={false}
 				onAdd={() => {
 					setFromPickerOpen(false)
 					onAddWallet?.()
@@ -224,6 +225,7 @@ export const TransactionDrawer = ({
 				showCheckIcon
 				emptyStateLabel={t('transactions.drawer.noTransferWallets')}
 				showAddButton={Boolean(onAddWallet)}
+				showArchived={false}
 				onAdd={() => {
 					setToPickerOpen(false)
 					onAddWallet?.()
@@ -235,6 +237,7 @@ export const TransactionDrawer = ({
 				onClose={() => setCategoryPickerOpen(false)}
 				selectable
 				selectedCategoryId={selectedCategory?.id ?? null}
+				showArchived={false}
 				onSelect={category => {
 					onSelectCategory(category)
 					setCategoryPickerOpen(false)
