@@ -8,6 +8,7 @@ export interface WalletPickerOption {
 	name: string
 	color?: string | null
 	type?: WalletType | null
+	status?: Wallet['status']
 }
 
 const defaultIconClassName = 'mr-3 h-6 w-6'
@@ -27,6 +28,7 @@ export const toWalletPickerOption = (wallet: Wallet): WalletPickerOption => ({
 	name: wallet.name,
 	color: wallet.color,
 	type: wallet.type,
+	status: wallet.status,
 })
 
 export const mapWalletsToPickerOptions = (wallets: readonly Wallet[]): WalletPickerOption[] => wallets.map(toWalletPickerOption)

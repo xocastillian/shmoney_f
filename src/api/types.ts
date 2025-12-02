@@ -19,9 +19,7 @@ import {
 	CategoryResponseSchema,
 	CategoryCreateRequestSchema,
 	CategoryUpdateRequestSchema,
-	SubcategoryResponseSchema,
-	SubcategoryCreateRequestSchema,
-	SubcategoryUpdateRequestSchema,
+	CategoryStatusUpdateRequestSchema,
 	CategoryTransactionTypeSchema,
 	CategoryTransactionResponseSchema,
 	CategoryTransactionCreateRequestSchema,
@@ -56,9 +54,7 @@ export type CurrencyConversionResponse = z.infer<typeof CurrencyConversionRespon
 export type CategoryResponse = z.infer<typeof CategoryResponseSchema>
 export type CategoryCreateRequest = z.infer<typeof CategoryCreateRequestSchema>
 export type CategoryUpdateRequest = z.infer<typeof CategoryUpdateRequestSchema>
-export type SubcategoryResponse = z.infer<typeof SubcategoryResponseSchema>
-export type SubcategoryCreateRequest = z.infer<typeof SubcategoryCreateRequestSchema>
-export type SubcategoryUpdateRequest = z.infer<typeof SubcategoryUpdateRequestSchema>
+export type CategoryStatusUpdateRequest = z.infer<typeof CategoryStatusUpdateRequestSchema>
 export type CategoryTransactionType = z.infer<typeof CategoryTransactionTypeSchema>
 export type CategoryTransactionResponse = z.infer<typeof CategoryTransactionResponseSchema>
 export type CategoryTransactionCreateRequest = z.infer<typeof CategoryTransactionCreateRequestSchema>

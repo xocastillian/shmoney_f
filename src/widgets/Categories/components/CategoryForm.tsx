@@ -1,4 +1,4 @@
-import { Check, Info, Palette, Shapes, Trash } from 'lucide-react'
+import { Archive, Check, Info, Palette, RotateCcw, Shapes } from 'lucide-react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { categoryIconMap } from '../icons'
 import { useTranslation } from '@/i18n'
@@ -12,8 +12,9 @@ interface CategoryFormProps {
 	onOpenColorPicker: () => void
 	icon: string
 	onOpenIconPicker: () => void
-	onDelete?: () => void
-	disableDelete?: boolean
+	onToggleStatus?: () => void
+	disableStatusAction?: boolean
+	statusActionType?: 'archive' | 'unarchive'
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 	submitLabel?: string
 	submitDisabled?: boolean
@@ -27,21 +28,26 @@ const CategoryForm = ({
 	onOpenColorPicker,
 	icon,
 	onOpenIconPicker,
-	onDelete,
-	disableDelete,
+	onToggleStatus,
+	disableStatusAction,
+	statusActionType,
 	onSubmit,
 	submitLabel,
 	submitDisabled = false,
 }: CategoryFormProps) => {
 	const { t } = useTranslation()
 	const resolvedSubmitLabel = submitLabel ?? t('common.save')
+	const statusActionLabel = statusActionType === 'unarchive' ? t('common.unarchive') : t('common.archive')
+	const StatusIconComponent = statusActionType === 'unarchive' ? RotateCcw : Archive
+	const statusActionColor = statusActionType === 'unarchive' ? 'text-accent' : 'text-danger'
 
 	return (
 		<form id={formId} className='flex h-full flex-col' onSubmit={onSubmit}>
 			<div>
 				<h2 className='mb-3 px-3 text-sm font-medium text-label'>{t('common.general')}</h2>
+
 				<div className='overflow-hidden bg-background-muted'>
-					<div className='border-b border-divider'>
+					<div className='border-b border-t border-divider'>
 						<div className='flex h-16 items-center px-3'>
 							<Info className='mr-3 text-label' />
 							<input
@@ -72,25 +78,26 @@ const CategoryForm = ({
 					</div>
 				</div>
 			</div>
+
 			<h2 className='m-3 text-sm font-medium text-label'>{t('common.actions')}</h2>
 
-			<div className='border-b border-divider bg-background-muted'>
+			<div className='border-b border-t border-divider bg-background-muted'>
 				<button type='submit' className='flex h-16 w-full items-center px-3 text-access disabled:text-label' disabled={submitDisabled}>
 					<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
 					<span className={cn('transition-colors', submitDisabled ? 'text-label' : 'text-access')}>{resolvedSubmitLabel}</span>
 				</button>
 			</div>
 
-			{onDelete && (
-				<div className='border-b border-divider  bg-background-muted'>
+			{onToggleStatus && statusActionType && (
+				<div className='border-b border-divider bg-background-muted'>
 					<button
 						type='button'
-						onClick={onDelete}
-						className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
-						disabled={disableDelete}
+						onClick={onToggleStatus}
+						className={cn('flex h-16 w-full items-center px-3 text-left', disableStatusAction && 'opacity-60')}
+						disabled={disableStatusAction}
 					>
-						<Trash className='mr-3 text-danger' />
-						<span className='text-danger'>{t('categories.form.delete')}</span>
+						<StatusIconComponent className={cn('mr-3', statusActionColor)} />
+						<span className={statusActionColor}>{statusActionLabel}</span>
 					</button>
 				</div>
 			)}

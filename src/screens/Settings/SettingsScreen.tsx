@@ -17,6 +17,7 @@ import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
+import { SettingsIcon } from 'lucide-react'
 
 const defaultWalletType = WalletType.CASH
 
@@ -40,7 +41,16 @@ const SettingsScreen = () => {
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
 	const { supportedLanguages, language, loading: settingsLoading, error: settingsError, changeLanguage } = useSettings()
-	const { wallets, loading: walletsLoading, fetchWallets, fetchWalletBalances, updateWalletStatus, updateWallet, actionLoading } = useWallets()
+	const {
+		wallets,
+		loading: walletsLoading,
+		fetchWallets,
+		fetchWalletBalances,
+		updateWalletStatus,
+		updateWallet,
+		createWallet,
+		actionLoading,
+	} = useWallets()
 	const { t } = useTranslation()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
@@ -66,8 +76,6 @@ const SettingsScreen = () => {
 		}
 		void fetchWallets().catch(() => undefined)
 	}, [isArchivedWalletsDrawerOpen, wallets.length, fetchWallets])
-
-	const archivedWallets = useMemo(() => wallets.filter(wallet => wallet.status === WalletStatus.ARCHIVED), [wallets])
 
 	const walletFormSubmitDisabled = useMemo(() => {
 		const trimmedName = walletFormName.trim()
@@ -96,6 +104,19 @@ const SettingsScreen = () => {
 		[wallets]
 	)
 
+	const handleAddWallet = useCallback(() => {
+		setEditingWalletId(null)
+		setWalletFormName('')
+		setWalletFormCurrencyCode(currencyOptions[0].value)
+		setWalletFormBalance('')
+		setWalletFormColor(colorOptions[0])
+		setWalletFormType(defaultWalletType)
+		setWalletFormStatus(WalletStatus.ACTIVE)
+		setWalletFormError(null)
+		setWalletFormOpen(true)
+		setArchivedWalletsDrawerOpen(false)
+	}, [])
+
 	const closeWalletForm = useCallback(() => {
 		setWalletFormOpen(false)
 		setEditingWalletId(null)
@@ -113,7 +134,6 @@ const SettingsScreen = () => {
 	const handleWalletFormSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
 			event.preventDefault()
-			if (!editingWalletId) return
 			const trimmedName = walletFormName.trim()
 			const trimmedCurrency = walletFormCurrencyCode.trim().toUpperCase()
 			const sanitizedBalance = sanitizeDecimalInput(walletFormBalance)
@@ -140,13 +160,23 @@ const SettingsScreen = () => {
 			}
 
 			try {
-				await updateWallet(editingWalletId, {
-					name: trimmedName,
-					currencyCode: trimmedCurrency,
-					balance: parsedBalance,
-					color: walletFormColor,
-					type: walletFormType,
-				})
+				if (editingWalletId) {
+					await updateWallet(editingWalletId, {
+						name: trimmedName,
+						currencyCode: trimmedCurrency,
+						balance: parsedBalance,
+						color: walletFormColor,
+						type: walletFormType,
+					})
+				} else {
+					await createWallet({
+						name: trimmedName,
+						currencyCode: trimmedCurrency,
+						balance: parsedBalance,
+						color: walletFormColor,
+						type: walletFormType,
+					})
+				}
 				setWalletFormError(null)
 				refreshWalletBalances()
 				closeWalletForm()
@@ -157,6 +187,7 @@ const SettingsScreen = () => {
 		},
 		[
 			closeWalletForm,
+			createWallet,
 			editingWalletId,
 			refreshWalletBalances,
 			t,
@@ -177,9 +208,7 @@ const SettingsScreen = () => {
 			setWalletFormStatus(nextStatus)
 			setWalletFormError(null)
 			refreshWalletBalances()
-			if (nextStatus === WalletStatus.ACTIVE) {
-				closeWalletForm()
-			}
+			closeWalletForm()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('wallets.errors.saveFailed')
 			setWalletFormError(message)
@@ -220,9 +249,15 @@ const SettingsScreen = () => {
 
 	return (
 		<>
-			<div className='p-3 text-lg font-medium'>{t('settings.title')}</div>
+			<div className='p-3 flex items-center justify-between'>
+				<h1 className='text-lg font-medium'>{t('settings.title')}</h1>
 
-			<div>
+				<div className='p-2'>
+					<SettingsIcon className='h-6 w-6' />
+				</div>
+			</div>
+
+			<div className='border-t border-divider'>
 				{settings.map(setting => (
 					<SettingsItem key={setting.title} setting={setting} />
 				))}
@@ -253,12 +288,14 @@ const SettingsScreen = () => {
 				open={isArchivedWalletsDrawerOpen}
 				onClose={closeArchivedWalletsDrawer}
 				title={t('settings.archivedWallets')}
-				wallets={archivedWallets}
+				wallets={wallets}
 				selectedWalletId={editingWalletId}
 				onSelect={handleWalletClick}
 				emptyStateLabel={t('settings.archivedWallets.empty')}
 				loading={walletsLoading}
 				showAllOption={false}
+				showAddButton
+				onAdd={handleAddWallet}
 			/>
 
 			<WalletFormDrawer

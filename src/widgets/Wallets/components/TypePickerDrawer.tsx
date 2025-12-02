@@ -25,7 +25,7 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 				</div>
 
 				<div className='flex flex-col pb-10'>
-					<div className='bg-background-muted'>
+					<div className='bg-background-muted border-t border-divider'>
 						{walletTypeOrder.map(type => {
 							const isSelected = type === selectedType
 							const Icon = typeIcons[type]
@@ -35,7 +35,7 @@ export function TypePickerDrawer({ open, onClose, selectedType, onSelect }: Type
 									type='button'
 									onClick={() => onSelect(type)}
 									aria-pressed={isSelected}
-									className='w-full border-b border-divider text-left last:border-b-0 focus:outline-none focus-visible:bg-background-muted'
+									className='w-full border-b border-divider text-left'
 								>
 									<div className='flex h-16 items-center px-3'>
 										<Icon className='mr-3 text-label' />

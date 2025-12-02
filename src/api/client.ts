@@ -18,9 +18,7 @@ import {
 	CategoryResponseSchema,
 	CategoryCreateRequestSchema,
 	CategoryUpdateRequestSchema,
-	SubcategoryResponseSchema,
-	SubcategoryCreateRequestSchema,
-	SubcategoryUpdateRequestSchema,
+	CategoryStatusUpdateRequestSchema,
 	CategoryTransactionResponseSchema,
 	CategoryTransactionCreateRequestSchema,
 	CategoryTransactionUpdateRequestSchema,
@@ -46,9 +44,7 @@ import type {
 	CategoryResponse,
 	CategoryCreateRequest,
 	CategoryUpdateRequest,
-	SubcategoryResponse,
-	SubcategoryCreateRequest,
-	SubcategoryUpdateRequest,
+	CategoryStatusUpdateRequest,
 	CategoryTransactionResponse,
 	CategoryTransactionCreateRequest,
 	CategoryTransactionUpdateRequest,
@@ -166,8 +162,10 @@ export async function updateCategory(id: number, payload: CategoryUpdateRequest)
 	return CategoryResponseSchema.parse(data)
 }
 
-export async function deleteCategory(id: number): Promise<void> {
-	await del<void>(endpoints.categories.byId(id))
+export async function updateCategoryStatus(id: number, payload: CategoryStatusUpdateRequest): Promise<CategoryResponse> {
+	const body = CategoryStatusUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.categories.status(id), body)
+	return CategoryResponseSchema.parse(data)
 }
 
 export async function listCategoryTransactions(params?: {
@@ -175,7 +173,6 @@ export async function listCategoryTransactions(params?: {
 	size?: number
 	walletId?: number
 	categoryId?: number
-	subcategoryId?: number
 	type?: string
 	from?: Date | string
 	to?: Date | string
@@ -185,7 +182,6 @@ export async function listCategoryTransactions(params?: {
 	if (typeof params?.size === 'number') query.set('size', String(params.size))
 	if (typeof params?.walletId === 'number') query.set('walletId', String(params.walletId))
 	if (typeof params?.categoryId === 'number') query.set('categoryId', String(params.categoryId))
-	if (typeof params?.subcategoryId === 'number') query.set('subcategoryId', String(params.subcategoryId))
 	if (params?.type) query.set('type', params.type)
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
@@ -233,7 +229,6 @@ export async function getTransactionFeed(params?: {
 	type?: string
 	walletId?: number
 	categoryId?: number
-	subcategoryId?: number
 	from?: Date | string
 	to?: Date | string
 	period?: string
@@ -244,7 +239,6 @@ export async function getTransactionFeed(params?: {
 	if (params?.type) query.set('type', params.type)
 	if (typeof params?.walletId === 'number') query.set('walletId', String(params.walletId))
 	if (typeof params?.categoryId === 'number') query.set('categoryId', String(params.categoryId))
-	if (typeof params?.subcategoryId === 'number') query.set('subcategoryId', String(params.subcategoryId))
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
 	if (params?.period) query.set('period', params.period)
@@ -252,27 +246,6 @@ export async function getTransactionFeed(params?: {
 	const url = queryString ? `${endpoints.transactionsFeed.base}?${queryString}` : endpoints.transactionsFeed.base
 	const data = await get<unknown>(url)
 	return TransactionFeedResponseSchema.parse(data)
-}
-
-export async function listSubcategories(categoryId: number): Promise<SubcategoryResponse[]> {
-	const data = await get<unknown>(endpoints.categories.subcategories(categoryId))
-	return SubcategoryResponseSchema.array().parse(data)
-}
-
-export async function createSubcategory(categoryId: number, payload: SubcategoryCreateRequest): Promise<SubcategoryResponse> {
-	const body = SubcategoryCreateRequestSchema.parse(payload)
-	const data = await post<unknown>(endpoints.categories.subcategories(categoryId), body)
-	return SubcategoryResponseSchema.parse(data)
-}
-
-export async function updateSubcategory(categoryId: number, subcategoryId: number, payload: SubcategoryUpdateRequest): Promise<SubcategoryResponse> {
-	const body = SubcategoryUpdateRequestSchema.parse(payload)
-	const data = await patch<unknown>(endpoints.categories.subcategoryById(categoryId, subcategoryId), body)
-	return SubcategoryResponseSchema.parse(data)
-}
-
-export async function deleteSubcategory(categoryId: number, subcategoryId: number): Promise<void> {
-	await del<void>(endpoints.categories.subcategoryById(categoryId, subcategoryId))
 }
 
 export const createTransaction = createWalletTransaction

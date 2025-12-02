@@ -2,6 +2,7 @@ import { useEffect, useId, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
 import Loader from '@/components/ui/Loader/Loader'
 import type { Category } from '@/types/entities/category'
+import { CategoryStatus } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
 import IconPickerDrawer from './IconPickerDrawer'
@@ -34,11 +35,12 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
 	const [internalSubmitting, setSubmitting] = useState(false)
 	const formId = useId()
-	const { createCategory, updateCategory, deleteCategory } = useCategories()
+	const { createCategory, updateCategory, updateCategoryStatus } = useCategories()
 	const { t } = useTranslation()
 	const computedTitle = title ?? (initialCategory ? t('categories.drawer.editTitle') : t('categories.drawer.newTitle'))
 	const isEditMode = Boolean(initialCategory)
 	const isBusy = internalSubmitting || submitting
+	const currentStatus = initialCategory?.status ?? CategoryStatus.ACTIVE
 
 	useEffect(() => {
 		if (!open) {
@@ -91,12 +93,13 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 		setIconPickerOpen(false)
 	}
 
-	const handleDelete = async () => {
+	const handleToggleStatus = async () => {
 		if (!initialCategory || isBusy) return
+		const nextStatus = currentStatus === CategoryStatus.ARCHIVED ? CategoryStatus.ACTIVE : CategoryStatus.ARCHIVED
 
 		try {
 			setSubmitting(true)
-			await deleteCategory(initialCategory.id)
+			await updateCategoryStatus(initialCategory.id, { status: nextStatus })
 			onSubmit?.({
 				name: initialCategory.name,
 				color: initialCategory.color,
@@ -104,11 +107,13 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 			})
 			onClose()
 		} catch {
-			// ошибки уже обработаны в useCategories
+			// ошибки уже обработаны внутри useCategories
 		} finally {
 			setSubmitting(false)
 		}
 	}
+
+	const statusActionType = currentStatus === CategoryStatus.ARCHIVED ? 'unarchive' : 'archive'
 
 	return (
 		<>
@@ -130,8 +135,9 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 							onOpenColorPicker={() => setColorPickerOpen(true)}
 							icon={icon}
 							onOpenIconPicker={() => setIconPickerOpen(true)}
-							onDelete={isEditMode ? handleDelete : undefined}
-							disableDelete={isBusy}
+							onToggleStatus={isEditMode ? handleToggleStatus : undefined}
+							disableStatusAction={isBusy}
+							statusActionType={statusActionType}
 							onSubmit={handleSubmit}
 							submitLabel={t('common.save')}
 							submitDisabled={isSubmitDisabled}

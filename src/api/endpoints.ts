@@ -24,8 +24,7 @@ export const endpoints = {
 	categories: {
 		base: '/api/categories',
 		byId: (id: number | string) => `/api/categories/${id}`,
-		subcategories: (categoryId: number | string) => `/api/categories/${categoryId}/subcategories`,
-		subcategoryById: (categoryId: number | string, subcategoryId: number | string) => `/api/categories/${categoryId}/subcategories/${subcategoryId}`,
+		status: (id: number | string) => `/api/categories/${id}/status`,
 	},
 	transactionsFeed: {
 		base: '/api/transactions',
