@@ -40,7 +40,7 @@ const SettingsScreen = () => {
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
 	const { supportedLanguages, language, loading: settingsLoading, error: settingsError, changeLanguage } = useSettings()
-	const { wallets, loading: walletsLoading, fetchWallets, updateWalletStatus, updateWallet, actionLoading } = useWallets()
+	const { wallets, loading: walletsLoading, fetchWallets, fetchWalletBalances, updateWalletStatus, updateWallet, actionLoading } = useWallets()
 	const { t } = useTranslation()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
@@ -55,6 +55,10 @@ const SettingsScreen = () => {
 		onLanguagePress: openLanguageDrawer,
 		onArchivedWalletsPress: openArchivedWalletsDrawer,
 	})
+
+	const refreshWalletBalances = useCallback(() => {
+		void fetchWalletBalances().catch(() => undefined)
+	}, [fetchWalletBalances])
 
 	useEffect(() => {
 		if (!isArchivedWalletsDrawerOpen || wallets.length > 0) {
@@ -144,13 +148,25 @@ const SettingsScreen = () => {
 					type: walletFormType,
 				})
 				setWalletFormError(null)
+				refreshWalletBalances()
 				closeWalletForm()
 			} catch (err) {
 				const message = err instanceof Error ? err.message : t('wallets.errors.saveFailed')
 				setWalletFormError(message)
 			}
 		},
-		[closeWalletForm, editingWalletId, t, updateWallet, walletFormBalance, walletFormColor, walletFormCurrencyCode, walletFormName, walletFormType]
+		[
+			closeWalletForm,
+			editingWalletId,
+			refreshWalletBalances,
+			t,
+			updateWallet,
+			walletFormBalance,
+			walletFormColor,
+			walletFormCurrencyCode,
+			walletFormName,
+			walletFormType,
+		]
 	)
 
 	const handleWalletArchiveToggle = useCallback(async () => {
@@ -160,6 +176,7 @@ const SettingsScreen = () => {
 			await updateWalletStatus(editingWalletId, { status: nextStatus })
 			setWalletFormStatus(nextStatus)
 			setWalletFormError(null)
+			refreshWalletBalances()
 			if (nextStatus === WalletStatus.ACTIVE) {
 				closeWalletForm()
 			}
@@ -167,7 +184,7 @@ const SettingsScreen = () => {
 			const message = err instanceof Error ? err.message : t('wallets.errors.saveFailed')
 			setWalletFormError(message)
 		}
-	}, [closeWalletForm, editingWalletId, t, updateWalletStatus, walletFormStatus])
+	}, [closeWalletForm, editingWalletId, refreshWalletBalances, t, updateWalletStatus, walletFormStatus])
 
 	const handleSelectCategory = useCallback((category: Category) => {
 		setEditingCategory(category)
