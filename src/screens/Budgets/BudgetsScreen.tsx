@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
 import { useTranslation } from '@/i18n'
 import { BudgetPeriodType, BudgetStatus } from '@/types/entities/budget'
 import { BudgetCard } from '@/components/Budget/Budget'
+import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
+import { Plus } from 'lucide-react'
 
 const PERIOD_SECTIONS: Array<{ type: BudgetPeriodType; labelKey: string }> = [
 	{ type: BudgetPeriodType.CUSTOM, labelKey: 'budgets.period.custom' },
@@ -23,6 +25,7 @@ const BudgetsScreen = () => {
 	const { budgets, loading, fetchBudgets, clearBudgets } = useBudgets()
 	const { t, locale } = useTranslation()
 	const resolvedLocale = localeMap[locale] ?? localeMap.ru
+	const [drawerOpen, setDrawerOpen] = useState(false)
 
 	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
 	const dateWithYearFormatter = useMemo(
@@ -73,8 +76,6 @@ const BudgetsScreen = () => {
 		})).filter(section => section.items.length > 0)
 	}, [activeBudgets])
 
-	const showEmptyState = !loading && sections.length === 0
-
 	return (
 		<div className='flex flex-col h-screen'>
 			<header className='sticky top-0 z-20 flex items-center justify-between p-3 bg-background'>
@@ -84,8 +85,6 @@ const BudgetsScreen = () => {
 			<div className='overflow-auto pb-28'>
 				{loading && budgets.length === 0 ? (
 					<BudgetsSkeleton />
-				) : showEmptyState ? (
-					<p className='text-sm text-label p-3'>{t('budgets.empty')}</p>
 				) : (
 					<div className=''>
 						{sections.map(section => (
@@ -100,7 +99,19 @@ const BudgetsScreen = () => {
 						))}
 					</div>
 				)}
+
+				<div>
+					<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
+					<div className='border-b border-t border-divider bg-background-muted'>
+						<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={() => setDrawerOpen(true)}>
+							<Plus className='mr-3' />
+							{t('budgets.drawer.add')}
+						</button>
+					</div>
+				</div>
 			</div>
+
+			<BudgetDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 		</div>
 	)
 }

@@ -16,9 +16,12 @@ interface CategoriesDrawerProps {
 	className?: string
 	selectable?: boolean
 	allOptionLabel?: string
-	onSelectAll?: () => void
+	onSelectAll?: (categories?: Category[]) => void
 	selectedCategoryId?: number | null
 	showArchived?: boolean
+	multiSelect?: boolean
+	selectedCategoryIds?: number[]
+	onToggleCategory?: (category: Category) => void
 }
 
 const CloseIcon = LucideIcons.X
@@ -36,6 +39,9 @@ const CategoriesDrawer = ({
 	onSelectAll,
 	selectedCategoryId = null,
 	showArchived = true,
+	multiSelect = false,
+	selectedCategoryIds = [],
+	onToggleCategory,
 }: CategoriesDrawerProps) => {
 	const { categories, loading, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
@@ -54,21 +60,33 @@ const CategoriesDrawer = ({
 		() => (showArchived ? categories.filter(category => category.status === CategoryStatus.ARCHIVED) : []),
 		[categories, showArchived]
 	)
+	const visibleCategories = useMemo(() => [...activeCategories, ...archivedCategories], [activeCategories, archivedCategories])
 	const hasActiveCategories = activeCategories.length > 0
 	const hasArchivedCategories = archivedCategories.length > 0
-	const showAllButton = selectable && allOptionLabel
+	const showAllButton = (selectable || multiSelect) && Boolean(allOptionLabel)
+	const allSelected = multiSelect
+		? visibleCategories.length > 0 && visibleCategories.every(category => selectedCategoryIds.includes(category.id))
+		: selectable && selectedCategoryId == null
 
 	const renderCategoryRow = (category: Category) => {
 		const IconComponent = category.icon ? lucideIconMap[category.icon] : undefined
 		const initials = category.name.slice(0, 2).toUpperCase()
-		const isSelected = selectable && selectedCategoryId === category.id
-		const showSelectionIcon = selectable && isSelected
+		const isSelected = multiSelect ? selectedCategoryIds.includes(category.id) : selectable && selectedCategoryId === category.id
+		const showSelectionIcon = multiSelect ? isSelected : selectable && isSelected
+
+		const handleClick = () => {
+			if (multiSelect && onToggleCategory) {
+				onToggleCategory(category)
+				return
+			}
+			onSelect?.(category)
+		}
 
 		return (
 			<button
 				key={category.id}
 				type='button'
-				onClick={() => onSelect?.(category)}
+				onClick={handleClick}
 				className='w-full border-b border-divider text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
 			>
 				<div className='flex h-16 items-center px-3'>
@@ -108,13 +126,19 @@ const CategoriesDrawer = ({
 
 								<button
 									type='button'
-									onClick={() => onSelectAll?.()}
+									onClick={() => {
+										if (multiSelect) {
+											onSelectAll?.(visibleCategories)
+										} else {
+											onSelectAll?.()
+										}
+									}}
 									className='w-full bg-background-muted border-b border-t border-divider text-left'
 								>
 									<div className='flex h-16 items-center px-3'>
 										<LucideIcons.FolderHeart className='mr-3 text-label' />
 										<span className='text-text'>{allOptionLabel}</span>
-										{selectable && selectedCategoryId == null && <LucideIcons.Check className='ml-auto text-accent' size={16} />}
+										{allSelected && <LucideIcons.Check className='ml-auto text-accent' size={16} />}
 									</div>
 								</button>
 							</div>
