@@ -120,6 +120,19 @@ export const en = {
 	'transactions.filters.resetButton': 'Reset filters',
 	'transactions.drawer.filters': 'Filters',
 	'transactions.placeholder': 'No transactions yet',
+	'budgets.title': 'Budgets',
+	'budgets.loading': 'Loading budgets...',
+	'budgets.empty': 'You have no budgets yet',
+	'budgets.period.month': 'Monthly budgets',
+	'budgets.period.week': 'Weekly budgets',
+	'budgets.period.year': 'Yearly budgets',
+	'budgets.period.custom': 'Custom budgets',
+	'budgets.status.active': 'Active',
+	'budgets.status.closed': 'Closed',
+	'budgets.card.period': 'Period',
+	'budgets.card.spent': 'Spent',
+	'budgets.card.limit': 'Limit',
+	'budgets.card.remaining': 'Left',
 } as const
 
 export type TranslationDictionary = Record<keyof typeof en, string>
