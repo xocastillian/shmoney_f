@@ -1,4 +1,4 @@
-import { Check, Wallet as WalletIcon, X } from 'lucide-react'
+import { Check, Plus, Wallet as WalletIcon, X } from 'lucide-react'
 import { typeIcons } from '@/widgets/Wallets/types'
 import type { WalletType } from '@/types/entities/wallet'
 import { useTranslation } from '@/i18n'
@@ -18,6 +18,8 @@ interface WalletsDrawerProps {
 	onSelectAll?: () => void
 	loading?: boolean
 	showCheckIcon?: boolean
+	showAddButton?: boolean
+	onAdd?: () => void
 }
 
 export const WalletsDrawer = ({
@@ -33,6 +35,8 @@ export const WalletsDrawer = ({
 	onSelectAll,
 	loading = false,
 	showCheckIcon = false,
+	showAddButton = false,
+	onAdd,
 }: WalletsDrawerProps) => {
 	const { t } = useTranslation()
 
@@ -84,7 +88,7 @@ export const WalletsDrawer = ({
 										type='button'
 										onClick={() => onSelect(wallet.id)}
 										aria-pressed={isSelected}
-										className='w-full border-b border-divider text-left last:border-b-0 focus:outline-none focus-visible:bg-background-muted'
+										className='w-full border-b border-divider text-left'
 									>
 										<div className='flex h-16 items-center px-3'>
 											<Icon className={iconClassName} style={iconStyle} />
@@ -94,6 +98,15 @@ export const WalletsDrawer = ({
 									</button>
 								)
 							})}
+						</div>
+					)}
+
+					{showAddButton && (
+						<div className='border-b border-divider bg-background-muted'>
+							<button type='button' onClick={() => onAdd?.()} className='flex h-16 w-full items-center px-3'>
+								<Plus className='mr-3 text-access' />
+								<span className='text-access'>{t('wallets.drawer.add')}</span>
+							</button>
 						</div>
 					)}
 				</div>

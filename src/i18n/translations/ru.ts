@@ -75,6 +75,7 @@ export const ru: TranslationDictionary = {
 	'wallets.form.typeTitle': 'Тип кошелька',
 	'wallets.form.currencyTitle': 'Валюта',
 	'wallets.form.colorPickerTitle': 'Выбор цвета',
+	'wallets.drawer.add': 'Добавить кошелёк',
 	'wallets.currency.usd': 'Доллар США',
 	'wallets.currency.kzt': 'Тенге',
 	'wallets.currency.eur': 'Евро',

@@ -43,6 +43,7 @@ interface TransactionDrawerProps {
 	error: string | null
 	mode?: 'create' | 'edit'
 	onDelete?: () => void
+	onAddWallet?: () => void
 }
 
 export const TransactionDrawer = ({
@@ -71,6 +72,7 @@ export const TransactionDrawer = ({
 	error,
 	mode = 'create',
 	onDelete,
+	onAddWallet,
 }: TransactionDrawerProps) => {
 	const [fromPickerOpen, setFromPickerOpen] = useState(false)
 	const [toPickerOpen, setToPickerOpen] = useState(false)
@@ -202,6 +204,11 @@ export const TransactionDrawer = ({
 					setFromPickerOpen(false)
 				}}
 				showCheckIcon
+				showAddButton={Boolean(onAddWallet)}
+				onAdd={() => {
+					setFromPickerOpen(false)
+					onAddWallet?.()
+				}}
 			/>
 
 			<WalletsDrawer
@@ -216,6 +223,11 @@ export const TransactionDrawer = ({
 				}}
 				showCheckIcon
 				emptyStateLabel={t('transactions.drawer.noTransferWallets')}
+				showAddButton={Boolean(onAddWallet)}
+				onAdd={() => {
+					setToPickerOpen(false)
+					onAddWallet?.()
+				}}
 			/>
 
 			<CategoriesDrawer

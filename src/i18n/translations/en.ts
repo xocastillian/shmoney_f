@@ -73,6 +73,7 @@ export const en = {
 	'wallets.form.typeTitle': 'Wallet type',
 	'wallets.form.currencyTitle': 'Currency',
 	'wallets.form.colorPickerTitle': 'Pick a color',
+	'wallets.drawer.add': 'Add wallet',
 	'wallets.currency.usd': 'US Dollar',
 	'wallets.currency.kzt': 'Tenge',
 	'wallets.currency.eur': 'Euro',

@@ -11,7 +11,9 @@ import useTransactions from '@/hooks/useTransactions'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
+import { WalletStatus, WalletType } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import { CategoryStatus } from '@/types/entities/category'
 import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
 import type { TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
@@ -21,6 +23,12 @@ import { useSettings } from '@/hooks/useSettings'
 import Loader from './components/ui/Loader/Loader'
 import { useTranslation, type Locale } from './i18n'
 import { BottomNav, type BottomNavTab } from './components/ui/BottomNav/BottomNav'
+import WalletFormDrawer from '@/widgets/Wallets/components/WalletFormDrawer'
+import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
+import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
+import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
+import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
+import { sanitizeDecimalInput } from '@/utils/number'
 
 type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
 type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
@@ -29,11 +37,15 @@ const isCategoryTransactionType = (value: TransactionTypeTabValue): value is Cat
 
 const getCurrentDateTimeString = () => formatDateTimeLocal(new Date())
 
+const defaultWalletType = WalletType.CASH
+const defaultCurrencyCode = currencyOptions[0]?.value ?? 'USD'
+const defaultWalletColor = colorOptions[0]
+
 function App() {
 	const [activeTab, setActiveTab] = useState<TabKey>('home')
 	const [transactionDrawerOpen, setTransactionDrawerOpen] = useState(false)
 	const formId = useId()
-	const { wallets, fetchWallets, fetchWalletBalances } = useWallets()
+	const { wallets, fetchWallets, fetchWalletBalances, createWallet } = useWallets()
 	const {
 		createWalletTransaction,
 		createCategoryTransaction,
@@ -59,6 +71,17 @@ function App() {
 	const [formError, setFormError] = useState<string | null>(null)
 	const [transactionType, setTransactionType] = useState<TransactionTypeTabValue>('EXPENSE')
 	const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+	const [isWalletFormOpen, setWalletFormOpen] = useState(false)
+	const [walletFormName, setWalletFormName] = useState('')
+	const [walletFormCurrencyCode, setWalletFormCurrencyCode] = useState(defaultCurrencyCode)
+	const [walletFormBalance, setWalletFormBalance] = useState('')
+	const [walletFormColor, setWalletFormColor] = useState(defaultWalletColor)
+	const [walletFormType, setWalletFormType] = useState<WalletType>(defaultWalletType)
+	const [walletFormError, setWalletFormError] = useState<string | null>(null)
+	const [walletFormSubmitting, setWalletFormSubmitting] = useState(false)
+	const [colorPickerOpen, setColorPickerOpen] = useState(false)
+	const [typePickerOpen, setTypePickerOpen] = useState(false)
+	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const [transactionSubmitting, setTransactionSubmitting] = useState(false)
 	const [transactionError, setTransactionError] = useState<string | null>(null)
 	const [editingTransaction, setEditingTransaction] = useState<{ kind: 'TRANSFER' | 'CATEGORY'; id: number } | null>(null)
@@ -87,6 +110,14 @@ function App() {
 		}
 	}, [language, setLocale])
 
+	useEffect(() => {
+		if (!isWalletFormOpen) {
+			setColorPickerOpen(false)
+			setCurrencyPickerOpen(false)
+			setTypePickerOpen(false)
+		}
+	}, [isWalletFormOpen])
+
 	const tabs = useMemo<BottomNavTab[]>(
 		() => [
 			{ key: 'home', label: t('bottomNav.home'), icon: HomeIcon },
@@ -99,6 +130,20 @@ function App() {
 	)
 
 	const clearTransactionError = useCallback(() => setTransactionError(null), [])
+
+	const handleOpenWalletForm = useCallback(() => {
+		setWalletFormName('')
+		setWalletFormCurrencyCode(defaultCurrencyCode)
+		setWalletFormBalance('')
+		setWalletFormColor(defaultWalletColor)
+		setWalletFormType(defaultWalletType)
+		setWalletFormError(null)
+		setWalletFormOpen(true)
+	}, [])
+
+	const handleCloseWalletForm = useCallback(() => {
+		setWalletFormOpen(false)
+	}, [])
 
 	const resetForm = useCallback(() => {
 		setAmount('0')
@@ -146,6 +191,15 @@ function App() {
 
 	const availableFromWallets = useMemo(() => mapWalletsToPickerOptions(wallets), [wallets])
 	const availableToWallets = useMemo(() => mapWalletsToPickerOptions(wallets.filter(wallet => wallet.id !== fromWalletId)), [wallets, fromWalletId])
+	const walletFormSubmitDisabled = useMemo(() => {
+		const trimmedName = walletFormName.trim()
+		const trimmedCurrency = walletFormCurrencyCode.trim()
+		const sanitizedBalance = sanitizeDecimalInput(walletFormBalance)
+		const parsedBalance = sanitizedBalance.length > 0 ? Number.parseFloat(sanitizedBalance) : NaN
+		const balanceValid = sanitizedBalance.length > 0 && !Number.isNaN(parsedBalance) && parsedBalance >= 0
+
+		return walletFormSubmitting || trimmedName.length === 0 || trimmedCurrency.length === 0 || !balanceValid
+	}, [walletFormBalance, walletFormCurrencyCode, walletFormName, walletFormSubmitting])
 	const isEditMode = Boolean(editingTransaction)
 
 	const amountValid = useMemo(() => {
@@ -242,6 +296,66 @@ function App() {
 		[clearTransactionError]
 	)
 
+	const handleWalletFormSubmit = useCallback(
+		async (event: FormEvent<HTMLFormElement>) => {
+			event.preventDefault()
+			const trimmedName = walletFormName.trim()
+			const trimmedCurrency = walletFormCurrencyCode.trim().toUpperCase()
+			const sanitizedBalance = sanitizeDecimalInput(walletFormBalance)
+			const parsedBalance = sanitizedBalance.length > 0 ? Number.parseFloat(sanitizedBalance) : NaN
+
+			if (trimmedName.length === 0) {
+				setWalletFormError(t('wallets.form.errors.nameRequired'))
+				return
+			}
+
+			if (trimmedCurrency.length === 0) {
+				setWalletFormError(t('wallets.form.errors.currencyRequired'))
+				return
+			}
+
+			if (Number.isNaN(parsedBalance)) {
+				setWalletFormError(t('wallets.form.errors.balanceInvalid'))
+				return
+			}
+
+			if (parsedBalance < 0) {
+				setWalletFormError(t('wallets.form.errors.balanceNegative'))
+				return
+			}
+
+			setWalletFormSubmitting(true)
+			try {
+				await createWallet({
+					name: trimmedName,
+					currencyCode: trimmedCurrency,
+					balance: parsedBalance,
+					color: walletFormColor,
+					type: walletFormType,
+				})
+				setWalletFormError(null)
+				handleCloseWalletForm()
+				void fetchWalletBalances().catch(() => undefined)
+			} catch (error) {
+				const message = error instanceof Error ? error.message : t('wallets.errors.createFailed')
+				setWalletFormError(message)
+			} finally {
+				setWalletFormSubmitting(false)
+			}
+		},
+		[
+			createWallet,
+			fetchWalletBalances,
+			handleCloseWalletForm,
+			t,
+			walletFormBalance,
+			walletFormColor,
+			walletFormCurrencyCode,
+			walletFormName,
+			walletFormType,
+		]
+	)
+
 	const handleTransactionSelect = useCallback(
 		async (item: TransactionFeedItem) => {
 			setFormError(null)
@@ -268,7 +382,7 @@ function App() {
 						name: detail.categoryName,
 						color: '#9CA3AF',
 						icon: '',
-						subcategories: [],
+						status: CategoryStatus.ACTIVE,
 						createdAt: null,
 						updatedAt: null,
 					}
@@ -476,6 +590,71 @@ function App() {
 					error={combinedError}
 					mode={isEditMode ? 'edit' : 'create'}
 					onDelete={isEditMode ? handleDeleteTransaction : undefined}
+					onAddWallet={handleOpenWalletForm}
+				/>
+
+				<WalletFormDrawer
+					open={isWalletFormOpen}
+					onClose={handleCloseWalletForm}
+					onSubmit={handleWalletFormSubmit}
+					name={walletFormName}
+					onNameChange={value => {
+						setWalletFormName(value)
+						setWalletFormError(null)
+					}}
+					currencyCode={walletFormCurrencyCode}
+					currencyOptions={currencyOptions}
+					onOpenCurrencyPicker={() => setCurrencyPickerOpen(true)}
+					onOpenTypePicker={() => setTypePickerOpen(true)}
+					selectedType={walletFormType}
+					onOpenColorPicker={() => setColorPickerOpen(true)}
+					selectedColor={walletFormColor}
+					balance={walletFormBalance}
+					onBalanceChange={value => {
+						setWalletFormBalance(value)
+						setWalletFormError(null)
+					}}
+					error={walletFormError}
+					submitDisabled={walletFormSubmitDisabled}
+					title={t('wallets.form.createTitle')}
+					submitLabel={t('wallets.form.save')}
+					submitting={walletFormSubmitting}
+					walletStatus={WalletStatus.ACTIVE}
+				/>
+
+				<ColorPickerDrawer
+					open={colorPickerOpen}
+					onClose={() => setColorPickerOpen(false)}
+					colors={colorOptions}
+					onSelect={color => {
+						setWalletFormColor(color)
+						setColorPickerOpen(false)
+						setWalletFormError(null)
+					}}
+					selectedColor={walletFormColor}
+				/>
+
+				<CurrencyPickerDrawer
+					open={currencyPickerOpen}
+					onClose={() => setCurrencyPickerOpen(false)}
+					options={currencyOptions}
+					selectedCode={walletFormCurrencyCode}
+					onSelect={code => {
+						setWalletFormCurrencyCode(code)
+						setCurrencyPickerOpen(false)
+						setWalletFormError(null)
+					}}
+				/>
+
+				<TypePickerDrawer
+					open={typePickerOpen}
+					onClose={() => setTypePickerOpen(false)}
+					selectedType={walletFormType}
+					onSelect={type => {
+						setWalletFormType(type)
+						setTypePickerOpen(false)
+						setWalletFormError(null)
+					}}
 				/>
 			</div>
 

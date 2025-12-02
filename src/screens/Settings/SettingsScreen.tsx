@@ -40,7 +40,16 @@ const SettingsScreen = () => {
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
 	const { supportedLanguages, language, loading: settingsLoading, error: settingsError, changeLanguage } = useSettings()
-	const { wallets, loading: walletsLoading, fetchWallets, fetchWalletBalances, updateWalletStatus, updateWallet, actionLoading } = useWallets()
+	const {
+		wallets,
+		loading: walletsLoading,
+		fetchWallets,
+		fetchWalletBalances,
+		updateWalletStatus,
+		updateWallet,
+		createWallet,
+		actionLoading,
+	} = useWallets()
 	const { t } = useTranslation()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
@@ -96,6 +105,19 @@ const SettingsScreen = () => {
 		[wallets]
 	)
 
+	const handleAddWallet = useCallback(() => {
+		setEditingWalletId(null)
+		setWalletFormName('')
+		setWalletFormCurrencyCode(currencyOptions[0].value)
+		setWalletFormBalance('')
+		setWalletFormColor(colorOptions[0])
+		setWalletFormType(defaultWalletType)
+		setWalletFormStatus(WalletStatus.ACTIVE)
+		setWalletFormError(null)
+		setWalletFormOpen(true)
+		setArchivedWalletsDrawerOpen(false)
+	}, [])
+
 	const closeWalletForm = useCallback(() => {
 		setWalletFormOpen(false)
 		setEditingWalletId(null)
@@ -113,7 +135,6 @@ const SettingsScreen = () => {
 	const handleWalletFormSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
 			event.preventDefault()
-			if (!editingWalletId) return
 			const trimmedName = walletFormName.trim()
 			const trimmedCurrency = walletFormCurrencyCode.trim().toUpperCase()
 			const sanitizedBalance = sanitizeDecimalInput(walletFormBalance)
@@ -140,13 +161,23 @@ const SettingsScreen = () => {
 			}
 
 			try {
-				await updateWallet(editingWalletId, {
-					name: trimmedName,
-					currencyCode: trimmedCurrency,
-					balance: parsedBalance,
-					color: walletFormColor,
-					type: walletFormType,
-				})
+				if (editingWalletId) {
+					await updateWallet(editingWalletId, {
+						name: trimmedName,
+						currencyCode: trimmedCurrency,
+						balance: parsedBalance,
+						color: walletFormColor,
+						type: walletFormType,
+					})
+				} else {
+					await createWallet({
+						name: trimmedName,
+						currencyCode: trimmedCurrency,
+						balance: parsedBalance,
+						color: walletFormColor,
+						type: walletFormType,
+					})
+				}
 				setWalletFormError(null)
 				refreshWalletBalances()
 				closeWalletForm()
@@ -157,6 +188,7 @@ const SettingsScreen = () => {
 		},
 		[
 			closeWalletForm,
+			createWallet,
 			editingWalletId,
 			refreshWalletBalances,
 			t,
@@ -259,6 +291,8 @@ const SettingsScreen = () => {
 				emptyStateLabel={t('settings.archivedWallets.empty')}
 				loading={walletsLoading}
 				showAllOption={false}
+				showAddButton
+				onAdd={handleAddWallet}
 			/>
 
 			<WalletFormDrawer
