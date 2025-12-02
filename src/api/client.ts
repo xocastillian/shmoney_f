@@ -26,6 +26,9 @@ import {
 	TransactionFeedResponseSchema,
 	SettingsResponseSchema,
 	SettingsUpdateRequestSchema,
+	BudgetResponseSchema,
+	BudgetCreateRequestSchema,
+	BudgetUpdateRequestSchema,
 } from './schemas'
 import type {
 	AuthResponse,
@@ -52,6 +55,9 @@ import type {
 	TransactionFeedResponse,
 	SettingsResponse,
 	SettingsUpdateRequest,
+	BudgetResponse,
+	BudgetCreateRequest,
+	BudgetUpdateRequest,
 } from './types'
 
 export async function telegramLogin(params: { initData: string }): Promise<AuthResponse> {
@@ -221,6 +227,39 @@ export async function updateCategoryTransaction(id: number, payload: CategoryTra
 
 export async function deleteCategoryTransaction(id: number): Promise<void> {
 	await del<void>(endpoints.categoryTransactions.byId(id))
+}
+
+export async function listBudgets(params?: { status?: string; from?: Date | string; to?: Date | string }): Promise<BudgetResponse[]> {
+	const query = new URLSearchParams()
+	if (params?.status) query.set('status', params.status)
+	if (params?.from) query.set('from', new Date(params.from).toISOString())
+	if (params?.to) query.set('to', new Date(params.to).toISOString())
+	const queryString = query.toString()
+	const url = queryString ? `${endpoints.budgets.base}?${queryString}` : endpoints.budgets.base
+	const data = await get<unknown>(url)
+	return BudgetResponseSchema.array().parse(data)
+}
+
+export async function getBudget(id: number): Promise<BudgetResponse> {
+	const data = await get<unknown>(endpoints.budgets.byId(id))
+	return BudgetResponseSchema.parse(data)
+}
+
+export async function createBudget(payload: BudgetCreateRequest): Promise<BudgetResponse> {
+	const body = BudgetCreateRequestSchema.parse(payload)
+	const data = await post<unknown>(endpoints.budgets.base, body)
+	return BudgetResponseSchema.parse(data)
+}
+
+export async function updateBudget(id: number, payload: BudgetUpdateRequest): Promise<BudgetResponse> {
+	const body = BudgetUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.budgets.byId(id), body)
+	return BudgetResponseSchema.parse(data)
+}
+
+export async function closeBudget(id: number): Promise<BudgetResponse> {
+	const data = await post<unknown>(endpoints.budgets.close(id), {})
+	return BudgetResponseSchema.parse(data)
 }
 
 export async function getTransactionFeed(params?: {
