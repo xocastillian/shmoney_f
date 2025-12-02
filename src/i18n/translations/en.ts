@@ -142,6 +142,7 @@ export const en = {
 	'budgets.form.categories': 'Categories',
 	'budgets.form.categories.empty': 'No categories yet',
 	'budgets.form.categories.all': 'All categories',
+	'budgets.form.closeBudget': 'Close budget',
 	'budgets.form.periodType': 'Period',
 	'budgets.form.budgetType': 'One-time',
 	'budgets.form.period.start': 'Start date',
@@ -151,6 +152,7 @@ export const en = {
 	'budgets.form.errors.amount': 'Enter a limit amount',
 	'budgets.form.errors.categories': 'Pick at least one category',
 	'budgets.form.errors.period': 'Specify period dates',
+	'budgets.form.errors.close': "Couldn't close budget",
 } as const
 
 export type TranslationDictionary = Record<keyof typeof en, string>

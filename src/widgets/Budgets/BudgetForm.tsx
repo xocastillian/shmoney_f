@@ -1,5 +1,5 @@
 import { type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
-import { Calculator, CalendarRange, Check, DollarSign, FolderHeart, Info, ListChecks } from 'lucide-react'
+import { Calculator, CalendarRange, Check, DollarSign, FolderHeart, Info, ListChecks, X } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { cn } from '@/lib/utils'
 import { MobileDateTimePickerField } from '@/components/DateTimePicker/MobileDateTimePickerField'
@@ -34,6 +34,9 @@ interface BudgetFormProps {
 	submitDisabled?: boolean
 	locale?: string
 	error?: string | null
+	mode?: 'create' | 'edit'
+	onCloseBudget?: () => void
+	closeBudgetDisabled?: boolean
 }
 
 const BudgetForm = ({
@@ -61,14 +64,15 @@ const BudgetForm = ({
 	submitDisabled = false,
 	locale,
 	error,
+	mode = 'create',
+	onCloseBudget,
+	closeBudgetDisabled = false,
 }: BudgetFormProps) => {
 	const { t } = useTranslation()
 	const formattedBalance = formatDecimalForDisplay(amount)
 	const isCustomPeriod = periodType === BudgetPeriodTypeEnum.CUSTOM
 	const isOneTime = budgetType === BudgetTypeEnum.ONE_TIME
-	const selectedCategoryNames = selectedCategoryIds
-		.map(id => categories.find(category => category.id === id)?.name)
-		.filter((name): name is string => Boolean(name))
+	const selectedCategoryNames = selectedCategoryIds.map(id => categories.find(category => category.id === id)?.name ?? String(id))
 	const categoriesLabel =
 		selectedCategoryNames.length === 0
 			? t('budgets.form.categories.empty')
@@ -184,6 +188,20 @@ const BudgetForm = ({
 					<span>{t('budgets.form.submit')}</span>
 				</button>
 			</div>
+
+			{mode === 'edit' && onCloseBudget && (
+				<div className='border-b border-divider bg-background-muted'>
+					<button
+						type='button'
+						onClick={onCloseBudget}
+						className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
+						disabled={closeBudgetDisabled}
+					>
+						<X className={cn('mr-3', closeBudgetDisabled ? 'text-label' : 'text-danger')} />
+						<span className={closeBudgetDisabled ? 'text-label' : 'text-danger'}>{t('budgets.form.closeBudget')}</span>
+					</button>
+				</div>
+			)}
 		</form>
 	)
 }

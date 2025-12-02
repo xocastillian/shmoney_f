@@ -3,6 +3,7 @@ import { useBudgets } from '@/hooks/useBudgets'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
 import { useTranslation } from '@/i18n'
 import { BudgetPeriodType, BudgetStatus } from '@/types/entities/budget'
+import type { Budget } from '@/types/entities/budget'
 import { BudgetCard } from '@/components/Budget/Budget'
 import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
 import { Plus } from 'lucide-react'
@@ -26,6 +27,7 @@ const BudgetsScreen = () => {
 	const { t, locale } = useTranslation()
 	const resolvedLocale = localeMap[locale] ?? localeMap.ru
 	const [drawerOpen, setDrawerOpen] = useState(false)
+	const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
 
 	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
 	const dateWithYearFormatter = useMemo(
@@ -76,6 +78,16 @@ const BudgetsScreen = () => {
 		})).filter(section => section.items.length > 0)
 	}, [activeBudgets])
 
+	const handleOpenCreate = () => {
+		setEditingBudget(null)
+		setDrawerOpen(true)
+	}
+
+	const handleBudgetCardClick = (budget: Budget) => {
+		setEditingBudget(budget)
+		setDrawerOpen(true)
+	}
+
 	return (
 		<div className='flex flex-col h-screen'>
 			<header className='sticky top-0 z-20 flex items-center justify-between p-3 bg-background'>
@@ -92,7 +104,14 @@ const BudgetsScreen = () => {
 								<h2 className='p-3 text-sm'>{t(section.labelKey)}</h2>
 								<div className='border-t border-divider'>
 									{section.items.map(budget => (
-										<BudgetCard key={budget.id} budget={budget} formatCurrency={formatCurrency} formatRange={formatRange} t={t} />
+										<BudgetCard
+											key={budget.id}
+											budget={budget}
+											formatCurrency={formatCurrency}
+											formatRange={formatRange}
+											t={t}
+											onClick={() => handleBudgetCardClick(budget)}
+										/>
 									))}
 								</div>
 							</section>
@@ -103,7 +122,7 @@ const BudgetsScreen = () => {
 				<div>
 					<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
 					<div className='border-b border-t border-divider bg-background-muted'>
-						<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={() => setDrawerOpen(true)}>
+						<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
 							<Plus className='mr-3' />
 							{t('budgets.drawer.add')}
 						</button>
@@ -111,7 +130,14 @@ const BudgetsScreen = () => {
 				</div>
 			</div>
 
-			<BudgetDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+			<BudgetDrawer
+				open={drawerOpen}
+				budget={editingBudget}
+				onClose={() => {
+					setDrawerOpen(false)
+					setEditingBudget(null)
+				}}
+			/>
 		</div>
 	)
 }

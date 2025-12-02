@@ -144,6 +144,7 @@ export const ru: TranslationDictionary = {
 	'budgets.form.categories': 'Категории',
 	'budgets.form.categories.empty': 'Нет категорий',
 	'budgets.form.categories.all': 'Все категории',
+	'budgets.form.closeBudget': 'Закрыть бюджет',
 	'budgets.form.periodType': 'Период',
 	'budgets.form.budgetType': 'Одноразовый',
 	'budgets.form.period.start': 'Дата начала',
@@ -153,4 +154,5 @@ export const ru: TranslationDictionary = {
 	'budgets.form.errors.amount': 'Введите сумму лимита',
 	'budgets.form.errors.categories': 'Выберите категории',
 	'budgets.form.errors.period': 'Укажите даты периода',
+	'budgets.form.errors.close': 'Не удалось закрыть бюджет',
 }

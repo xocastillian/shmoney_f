@@ -108,6 +108,7 @@ export function useBudgets() {
 				const mapped = mapBudget(closed)
 				upsertBudget(mapped)
 				setError(null)
+				void fetchBudgets().catch(() => undefined)
 				return mapped
 			} catch (err) {
 				const message = err instanceof Error ? err.message : 'Не удалось закрыть бюджет'
@@ -117,7 +118,7 @@ export function useBudgets() {
 				setActionLoading(false)
 			}
 		},
-		[upsertBudget]
+		[fetchBudgets, upsertBudget]
 	)
 
 	const clearBudgets = useCallback(() => {
