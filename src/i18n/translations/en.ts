@@ -131,6 +131,8 @@ export const en = {
 	'budgets.period.custom': 'Custom period',
 	'budgets.status.active': 'Active',
 	'budgets.status.closed': 'Closed',
+	'budgets.tabs.active': 'Active',
+	'budgets.tabs.closed': 'Closed',
 	'budgets.card.period': 'Period',
 	'budgets.card.spent': 'Spent',
 	'budgets.card.limit': 'Limit',

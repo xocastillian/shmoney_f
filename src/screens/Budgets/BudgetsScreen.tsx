@@ -7,6 +7,7 @@ import type { Budget } from '@/types/entities/budget'
 import { BudgetCard } from '@/components/Budget/Budget'
 import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
 import BudgetMonthSwitcher from '@/widgets/Budgets/components/BudgetMonthSwitcher'
+import BudgetStatusTabs from '@/screens/Budgets/components/BudgetStatusTabs'
 import { Plus } from 'lucide-react'
 
 const PERIOD_SECTIONS: Array<{ type: BudgetPeriodType; labelKey: string }> = [
@@ -34,6 +35,7 @@ const BudgetsScreen = () => {
 	const [drawerOpen, setDrawerOpen] = useState(false)
 	const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
 	const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()))
+	const [statusFilter, setStatusFilter] = useState<BudgetStatus>(BudgetStatus.ACTIVE)
 
 	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
 	const dateWithYearFormatter = useMemo(
@@ -79,18 +81,18 @@ const BudgetsScreen = () => {
 		const params = {
 			from: from.toISOString(),
 			to: to.toISOString(),
-			...(isCurrentMonth ? { status: BudgetStatus.ACTIVE } : {}),
+			...(isCurrentMonth ? { status: statusFilter } : {}),
 		}
 
 		void fetchBudgets(params).catch(() => undefined)
-	}, [authenticated, clearBudgets, fetchBudgets, isCurrentMonth, selectedMonth])
+	}, [authenticated, clearBudgets, fetchBudgets, isCurrentMonth, selectedMonth, statusFilter])
 
 	const visibleBudgets = useMemo(() => {
 		if (isCurrentMonth) {
-			return budgets.filter(budget => budget.status === BudgetStatus.ACTIVE)
+			return budgets.filter(budget => budget.status === statusFilter)
 		}
 		return budgets
-	}, [budgets, isCurrentMonth])
+	}, [budgets, isCurrentMonth, statusFilter])
 
 	const sections = useMemo(() => {
 		return PERIOD_SECTIONS.map(section => ({
@@ -110,7 +112,7 @@ const BudgetsScreen = () => {
 		setDrawerOpen(true)
 	}
 
-	const listOverlayClass = isCurrentMonth ? '' : 'pointer-events-none opacity-60'
+	const listOverlayClass = isCurrentMonth ? '' : 'opacity-60'
 
 	return (
 		<>
@@ -119,6 +121,11 @@ const BudgetsScreen = () => {
 					<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
 				</div>
 				<BudgetMonthSwitcher currentMonth={selectedMonth} locale={resolvedLocale} onChange={setSelectedMonth} />
+				{isCurrentMonth && (
+					<div className='pt-3'>
+						<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} />
+					</div>
+				)}
 			</header>
 
 			<div className={`overflow-auto pb-28 transition-opacity ${listOverlayClass}`}>
@@ -137,7 +144,7 @@ const BudgetsScreen = () => {
 											formatCurrency={formatCurrency}
 											formatRange={formatRange}
 											t={t}
-											onClick={() => handleBudgetCardClick(budget)}
+											onClick={isCurrentMonth ? () => handleBudgetCardClick(budget) : undefined}
 										/>
 									))}
 								</div>

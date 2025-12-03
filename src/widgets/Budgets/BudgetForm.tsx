@@ -8,6 +8,7 @@ import { BudgetPeriodType as BudgetPeriodTypeEnum, BudgetType as BudgetTypeEnum 
 import type { BudgetPeriodType, BudgetType } from '@/types/entities/budget'
 import type { Category } from '@/types/entities/category'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
+import { formatDateTimeLocal } from '@/utils/date'
 
 interface BudgetFormProps {
 	formId: string
@@ -158,7 +159,7 @@ const BudgetForm = ({
 									precision='day'
 									locale={locale}
 									clearable
-									onClear={() => onPeriodStartChange('')}
+									onClear={() => onPeriodStartChange(formatDateTimeLocal(new Date()))}
 								/>
 							</div>
 							<div className='w-1/2'>
@@ -169,7 +170,7 @@ const BudgetForm = ({
 									precision='day'
 									locale={locale}
 									clearable
-									onClear={() => onPeriodEndChange('')}
+									onClear={() => onPeriodEndChange(formatDateTimeLocal(new Date()))}
 								/>
 							</div>
 						</div>
