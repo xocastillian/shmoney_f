@@ -24,7 +24,7 @@ import { useSettings } from '@/hooks/useSettings'
 import Loader from './components/ui/Loader/Loader'
 import { useTranslation, type Locale } from './i18n'
 import { BottomNav, type BottomNavTab } from './components/ui/BottomNav/BottomNav'
-import WalletFormDrawer from '@/widgets/Wallets/components/WalletFormDrawer'
+import WalletDrawer from '@/widgets/Wallets/components/WalletDrawer'
 import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
@@ -599,7 +599,7 @@ function App() {
 					onAddWallet={handleOpenWalletForm}
 				/>
 
-				<WalletFormDrawer
+				<WalletDrawer
 					open={isWalletFormOpen}
 					onClose={handleCloseWalletForm}
 					onSubmit={handleWalletFormSubmit}
