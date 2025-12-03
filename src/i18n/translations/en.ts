@@ -148,6 +148,8 @@ export const en = {
 	'budgets.form.categories.empty': 'No categories yet',
 	'budgets.form.categories.all': 'All categories',
 	'budgets.form.closeBudget': 'Close budget',
+	'budgets.form.openBudget': 'Reopen budget',
+	'budgets.form.deleteBudget': 'Delete budget',
 	'budgets.form.periodType': 'Period',
 	'budgets.form.budgetType': 'One-time',
 	'budgets.form.period.start': 'Start date',
@@ -158,6 +160,8 @@ export const en = {
 	'budgets.form.errors.categories': 'Pick at least one category',
 	'budgets.form.errors.period': 'Specify period dates',
 	'budgets.form.errors.close': "Couldn't close budget",
+	'budgets.form.errors.open': "Couldn't reopen budget",
+	'budgets.form.errors.delete': "Couldn't delete budget",
 	'budgets.history.viewing': 'You are viewing budget history',
 } as const
 

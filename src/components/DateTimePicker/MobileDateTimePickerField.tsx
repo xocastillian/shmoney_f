@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { cloneElement, isValidElement, useMemo, useState, type ReactNode } from 'react'
 import DatePicker from 'antd-mobile/es/components/date-picker'
 import { Calendar, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -65,8 +65,14 @@ export const MobileDateTimePickerField = ({
 		return formatDateTimeDisplay(dateValue, locale)
 	}, [dateValue, placeholder, locale, precision])
 
-	const displayIcon = icon ?? <Calendar className='text-label' />
-	const displayTextClass = dateValue ? 'text-text' : 'text-label'
+	const displayIcon = useMemo(() => {
+		const sourceIcon = icon ?? <Calendar className='text-label' />
+		if (!isValidElement<{ className?: string }>(sourceIcon)) return sourceIcon
+		return cloneElement(sourceIcon, {
+			className: cn(sourceIcon.props.className, disabled && 'text-disable'),
+		})
+	}, [icon, disabled])
+	const displayTextClass = cn(dateValue ? 'text-text' : 'text-label', disabled && 'text-disable')
 
 	const handleConfirm = (next: Date) => {
 		let normalized: Date
@@ -100,10 +106,7 @@ export const MobileDateTimePickerField = ({
 		<button
 			type='button'
 			onClick={openPicker}
-			className={cn(
-				'flex h-16 w-full items-center gap-3 px-3 text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60',
-				className
-			)}
+			className={cn('flex h-16 w-full items-center gap-3 px-3 text-left disabled:text-disable disabled:cursor-not-allowed', className)}
 			disabled={disabled}
 		>
 			{displayIcon}

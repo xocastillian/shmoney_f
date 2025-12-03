@@ -17,15 +17,7 @@ export const BudgetCard = ({ budget, formatCurrency, onClick }: BudgetCardProps)
 		percentValue > 100 ? 'bg-danger' : percentValue > 75 ? 'bg-orange-500' : percentValue > 50 ? 'bg-yellow-400' : 'bg-accent'
 
 	return (
-		<article
-			className={cn(
-				'bg-background-muted-2 p-3',
-				onClick && 'cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
-			)}
-			role={onClick ? 'button' : undefined}
-			tabIndex={onClick ? 0 : undefined}
-			onClick={onClick}
-		>
+		<article className={cn('bg-background-muted-2 p-3')} role={onClick ? 'button' : undefined} tabIndex={onClick ? 0 : undefined} onClick={onClick}>
 			<div className='mb-3 flex items-center justify-between gap-2'>
 				<div className='flex items-center gap-2'>
 					{budget.budgetType === 'ONE_TIME' && <ClockAlert className='h-5 w-5 text-accent' />}

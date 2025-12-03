@@ -1,5 +1,5 @@
 import { type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
-import { Calculator, CalendarRange, Check, DollarSign, FolderHeart, Info, ListChecks, X } from 'lucide-react'
+import { Calculator, CalendarRange, Check, DollarSign, FolderHeart, Info, ListChecks, RefreshCcw, Trash2, X } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { cn } from '@/lib/utils'
 import { MobileDateTimePickerField } from '@/components/DateTimePicker/MobileDateTimePickerField'
@@ -36,8 +36,13 @@ interface BudgetFormProps {
 	locale?: string
 	error?: string | null
 	mode?: 'create' | 'edit'
+	isClosed?: boolean
 	onCloseBudget?: () => void
 	closeBudgetDisabled?: boolean
+	onDeleteBudget?: () => void
+	deleteBudgetDisabled?: boolean
+	onOpenBudget?: () => void
+	openBudgetDisabled?: boolean
 }
 
 const BudgetForm = ({
@@ -66,22 +71,30 @@ const BudgetForm = ({
 	locale,
 	error,
 	mode = 'create',
+	isClosed = false,
 	onCloseBudget,
 	closeBudgetDisabled = false,
+	onDeleteBudget,
+	deleteBudgetDisabled = false,
+	onOpenBudget,
+	openBudgetDisabled = false,
 }: BudgetFormProps) => {
 	const { t } = useTranslation()
 	const formattedBalance = formatDecimalForDisplay(amount)
 	const isCustomPeriod = periodType === BudgetPeriodTypeEnum.CUSTOM
 	const isOneTime = budgetType === BudgetTypeEnum.ONE_TIME
+	const isReadOnly = mode === 'edit' && isClosed
 	const selectedCategoryNames = selectedCategoryIds.map(id => categories.find(category => category.id === id)?.name ?? String(id))
 	const categoriesLabel =
 		selectedCategoryNames.length === 0
 			? t('budgets.form.categories.empty')
 			: selectedCategoryNames.slice(0, 2).join(', ') + (selectedCategoryNames.length > 2 ? ` +${selectedCategoryNames.length - 2}` : '')
-	const handleCurrencyPickerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+	const handleCurrencyPickerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault()
-			onOpenCurrencyPicker()
+			if (!isReadOnly) {
+				onOpenCurrencyPicker()
+			}
 		}
 	}
 
@@ -92,7 +105,7 @@ const BudgetForm = ({
 			sanitized = `0${sanitized}`
 		}
 		const digitCount = sanitized.replace(/\./g, '').length
-		if (digitCount > 9) return
+		if (digitCount > 9 || isReadOnly) return
 		onAmountChange(sanitized)
 	}
 
@@ -103,57 +116,68 @@ const BudgetForm = ({
 				<div className='overflow-hidden bg-background-muted'>
 					<div className='border-t border-b border-divider'>
 						<div className='flex h-16 items-center px-3'>
-							<Info className='mr-3 text-label' />
+							<Info className={cn('mr-3 text-label', isReadOnly && 'text-disable')} />
 							<input
-								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
+								className={cn('flex-1 bg-transparent text-text placeholder:text-label outline-none disabled:cursor-not-allowed', isReadOnly && 'text-disable placeholder:text-disable')}
 								placeholder={t('budgets.form.namePlaceholder')}
 								value={name}
 								onChange={(event: ChangeEvent<HTMLInputElement>) => onNameChange(event.target.value)}
 								maxLength={100}
+								disabled={isReadOnly}
 							/>
 						</div>
 					</div>
 
 					<div className='border-b border-divider'>
-						<div
-							className='flex h-16 cursor-pointer items-center px-3'
-							role='button'
-							tabIndex={0}
+						<button
+							type='button'
+							className={cn('flex h-16 w-full items-center px-3 text-left disabled:cursor-not-allowed', isReadOnly && 'text-disable')}
 							onClick={onOpenCurrencyPicker}
 							onKeyDown={handleCurrencyPickerKeyDown}
+							disabled={isReadOnly}
 						>
-							{currencyIcon ? <img src={currencyIcon} alt='' className='mr-3 h-6 w-6' /> : <DollarSign className='mr-3 text-label' />}
-							<span className='text-text'>{currencyLabel}</span>
-						</div>
+							{currencyIcon ? <img src={currencyIcon} alt='' className={cn('mr-3 h-6 w-6', isReadOnly && 'text-disable')} /> : <DollarSign className={cn('mr-3 text-label', isReadOnly && 'text-disable')} />}
+							<span className={cn('text-text', isReadOnly && 'text-disable')}>{currencyLabel}</span>
+						</button>
 					</div>
 
 					<div className='border-b border-divider'>
 						<div className='flex h-16 items-center px-3'>
-							<Calculator className='mr-3 text-label' />
+							<Calculator className={cn('mr-3 text-label', isReadOnly && 'text-disable')} />
 							<input
-								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
+								className={cn('flex-1 bg-transparent text-text placeholder:text-label outline-none', isReadOnly && 'text-disable placeholder:text-disable')}
 								type='text'
 								inputMode='decimal'
 								placeholder={t('budgets.form.amount')}
 								value={formattedBalance}
 								onChange={handleAmountChange}
 								autoComplete='off'
+								disabled={isReadOnly}
 							/>
 						</div>
 					</div>
 
 					<div className='border-b border-divider flex items-center justify-between px-3 h-16'>
 						<div className='flex items-center gap-3'>
-							<ListChecks className='text-label' />
-							<span className='text-text'>{t('budgets.form.budgetType')}</span>
+							<ListChecks className={cn('text-label', isReadOnly && 'text-disable')} />
+							<span className={cn('text-text', isReadOnly && 'text-disable')}>{t('budgets.form.budgetType')}</span>
 						</div>
-						<Switch checked={isOneTime} onChange={checked => onBudgetTypeToggle(checked ? BudgetTypeEnum.ONE_TIME : BudgetTypeEnum.RECURRING)} />
+						<Switch
+							checked={isOneTime}
+							onChange={checked => onBudgetTypeToggle(checked ? BudgetTypeEnum.ONE_TIME : BudgetTypeEnum.RECURRING)}
+							disabled={isReadOnly}
+						/>
 					</div>
 
 					<div className='border-b border-divider'>
-						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenPeriodTypePicker}>
-							<CalendarRange className='mr-3 text-label' />
-							<span className='text-text'>{periodTypeLabel}</span>
+						<button
+							type='button'
+							className={cn('flex h-16 w-full items-center px-3 text-left disabled:cursor-not-allowed', isReadOnly && 'text-disable')}
+							onClick={onOpenPeriodTypePicker}
+							disabled={isReadOnly}
+						>
+							<CalendarRange className={cn('mr-3 text-label', isReadOnly && 'text-disable')} />
+							<span className={cn('text-text', isReadOnly && 'text-disable')}>{periodTypeLabel}</span>
 						</button>
 					</div>
 
@@ -168,6 +192,7 @@ const BudgetForm = ({
 									locale={locale}
 									clearable
 									onClear={() => onPeriodStartChange(formatDateTimeLocal(new Date()))}
+									disabled={isReadOnly}
 								/>
 							</div>
 							<div className='w-1/2'>
@@ -179,6 +204,7 @@ const BudgetForm = ({
 									locale={locale}
 									clearable
 									onClear={() => onPeriodEndChange(formatDateTimeLocal(new Date()))}
+									disabled={isReadOnly}
 								/>
 							</div>
 						</div>
@@ -187,9 +213,14 @@ const BudgetForm = ({
 			</div>
 
 			<div className='bg-background-muted border-b border-divider'>
-				<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenCategoriesPicker}>
-					<FolderHeart className='mr-3 text-label' />
-					<span className={cn('text-text', selectedCategoryIds.length === 0 && 'text-label')}>{categoriesLabel}</span>
+				<button
+					type='button'
+					className={cn('flex h-16 w-full items-center px-3 text-left disabled:cursor-not-allowed', isReadOnly && 'text-disable')}
+					onClick={onOpenCategoriesPicker}
+					disabled={isReadOnly}
+				>
+					<FolderHeart className={cn('mr-3 text-label', isReadOnly && 'text-disable')} />
+					<span className={cn('text-text', selectedCategoryIds.length === 0 && 'text-label', isReadOnly && 'text-disable')}>{categoriesLabel}</span>
 				</button>
 			</div>
 
@@ -197,18 +228,34 @@ const BudgetForm = ({
 
 			<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
 
-			<div className='border-t border-b border-divider bg-background-muted'>
-				<button
-					type='submit'
-					className={cn('flex h-16 w-full items-center px-3 text-access disabled:text-label transition-colors')}
-					disabled={submitDisabled}
-				>
-					<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
-					<span>{t('budgets.form.submit')}</span>
-				</button>
-			</div>
+			{!isReadOnly && (
+				<div className='border-t border-b border-divider bg-background-muted'>
+					<button
+						type='submit'
+						className={cn('flex h-16 w-full items-center px-3 text-access disabled:text-label transition-colors')}
+						disabled={submitDisabled}
+					>
+						<Check className={cn('mr-3 transition-colors', submitDisabled ? 'text-label' : 'text-access')} />
+						<span>{t('budgets.form.submit')}</span>
+					</button>
+				</div>
+			)}
 
-			{mode === 'edit' && onCloseBudget && (
+			{mode === 'edit' && isClosed && onOpenBudget && (
+				<div className='border-b border-divider bg-background-muted'>
+					<button
+						type='button'
+						onClick={onOpenBudget}
+						className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
+						disabled={openBudgetDisabled}
+					>
+						<RefreshCcw className={cn('mr-3', openBudgetDisabled ? 'text-label' : 'text-accent')} />
+						<span className={openBudgetDisabled ? 'text-label' : 'text-accent'}>{t('budgets.form.openBudget')}</span>
+					</button>
+				</div>
+			)}
+
+			{mode === 'edit' && !isClosed && onCloseBudget && (
 				<div className='border-b border-divider bg-background-muted'>
 					<button
 						type='button'
@@ -218,6 +265,20 @@ const BudgetForm = ({
 					>
 						<X className={cn('mr-3', closeBudgetDisabled ? 'text-label' : 'text-danger')} />
 						<span className={closeBudgetDisabled ? 'text-label' : 'text-danger'}>{t('budgets.form.closeBudget')}</span>
+					</button>
+				</div>
+			)}
+
+			{mode === 'edit' && onDeleteBudget && (
+				<div className='border-b border-divider bg-background-muted'>
+					<button
+						type='button'
+						onClick={onDeleteBudget}
+						className='flex h-16 w-full items-center px-3 text-left disabled:opacity-60'
+						disabled={deleteBudgetDisabled}
+					>
+						<Trash2 className={cn('mr-3', deleteBudgetDisabled ? 'text-label' : 'text-danger')} />
+						<span className={deleteBudgetDisabled ? 'text-label' : 'text-danger'}>{t('budgets.form.deleteBudget')}</span>
 					</button>
 				</div>
 			)}

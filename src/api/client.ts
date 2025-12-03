@@ -59,6 +59,7 @@ import type {
 	BudgetCreateRequest,
 	BudgetUpdateRequest,
 } from './types'
+import type { BudgetPeriodType } from '@/types/entities/budget'
 
 export async function telegramLogin(params: { initData: string }): Promise<AuthResponse> {
 	const body = TelegramAuthRequestSchema.parse(params)
@@ -229,11 +230,12 @@ export async function deleteCategoryTransaction(id: number): Promise<void> {
 	await del<void>(endpoints.categoryTransactions.byId(id))
 }
 
-export async function listBudgets(params?: { status?: string; from?: Date | string; to?: Date | string }): Promise<BudgetResponse[]> {
+export async function listBudgets(params?: { status?: string; from?: Date | string; to?: Date | string; periodType?: BudgetPeriodType }): Promise<BudgetResponse[]> {
 	const query = new URLSearchParams()
 	if (params?.status) query.set('status', params.status)
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
+	if (params?.periodType) query.set('periodType', params.periodType)
 	const queryString = query.toString()
 	const url = queryString ? `${endpoints.budgets.base}?${queryString}` : endpoints.budgets.base
 	const data = await get<unknown>(url)
@@ -260,6 +262,15 @@ export async function updateBudget(id: number, payload: BudgetUpdateRequest): Pr
 export async function closeBudget(id: number): Promise<BudgetResponse> {
 	const data = await post<unknown>(endpoints.budgets.close(id), {})
 	return BudgetResponseSchema.parse(data)
+}
+
+export async function openBudget(id: number): Promise<BudgetResponse> {
+	const data = await post<unknown>(endpoints.budgets.open(id), {})
+	return BudgetResponseSchema.parse(data)
+}
+
+export async function deleteBudget(id: number): Promise<void> {
+	await del<void>(endpoints.budgets.byId(id))
 }
 
 export async function getTransactionFeed(params?: {

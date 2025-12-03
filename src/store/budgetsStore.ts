@@ -6,6 +6,7 @@ interface BudgetsState {
 	loading: boolean
 	setBudgets: (budgets: Budget[]) => void
 	upsertBudget: (budget: Budget) => void
+	removeBudget: (budgetId: number) => void
 	setLoading: (loading: boolean) => void
 	clear: () => void
 }
@@ -21,6 +22,10 @@ export const useBudgetsStore = create<BudgetsState>(set => ({
 				budgets: exists ? state.budgets.map(b => (b.id === budget.id ? budget : b)) : [...state.budgets, budget],
 			}
 		}),
+	removeBudget: budgetId =>
+		set(state => ({
+			budgets: state.budgets.filter(b => b.id !== budgetId),
+		})),
 	setLoading: loading => set({ loading }),
 	clear: () => set({ budgets: [], loading: false }),
 }))

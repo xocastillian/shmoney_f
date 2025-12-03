@@ -19,6 +19,7 @@ module.exports = {
 				'background-secondary': 'var(--background-secondary)',
 				danger: 'var(--danger)',
 				access: 'var(--access)',
+				disable: 'var(--disable)',
 			},
 		},
 	},
