@@ -7,6 +7,7 @@ import type { Budget } from '@/types/entities/budget'
 import { BudgetCard } from '@/components/Budget/Budget'
 import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
 import BudgetMonthSwitcher from '@/widgets/Budgets/components/BudgetMonthSwitcher'
+import BudgetStatusTabs from '@/screens/Budgets/components/BudgetStatusTabs'
 import { Plus } from 'lucide-react'
 
 const PERIOD_SECTIONS: Array<{ type: BudgetPeriodType; labelKey: string }> = [
@@ -34,6 +35,7 @@ const BudgetsScreen = () => {
 	const [drawerOpen, setDrawerOpen] = useState(false)
 	const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
 	const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()))
+	const [statusFilter, setStatusFilter] = useState<BudgetStatus>(BudgetStatus.ACTIVE)
 
 	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
 	const dateWithYearFormatter = useMemo(
@@ -79,18 +81,18 @@ const BudgetsScreen = () => {
 		const params = {
 			from: from.toISOString(),
 			to: to.toISOString(),
-			...(isCurrentMonth ? { status: BudgetStatus.ACTIVE } : {}),
+			...(isCurrentMonth ? { status: statusFilter } : {}),
 		}
 
 		void fetchBudgets(params).catch(() => undefined)
-	}, [authenticated, clearBudgets, fetchBudgets, isCurrentMonth, selectedMonth])
+	}, [authenticated, clearBudgets, fetchBudgets, isCurrentMonth, selectedMonth, statusFilter])
 
 	const visibleBudgets = useMemo(() => {
 		if (isCurrentMonth) {
-			return budgets.filter(budget => budget.status === BudgetStatus.ACTIVE)
+			return budgets.filter(budget => budget.status === statusFilter)
 		}
 		return budgets
-	}, [budgets, isCurrentMonth])
+	}, [budgets, isCurrentMonth, statusFilter])
 
 	const sections = useMemo(() => {
 		return PERIOD_SECTIONS.map(section => ({
@@ -105,9 +107,12 @@ const BudgetsScreen = () => {
 	}
 
 	const handleBudgetCardClick = (budget: Budget) => {
+		if (!isCurrentMonth) return
 		setEditingBudget(budget)
 		setDrawerOpen(true)
 	}
+
+	const listOverlayClass = isCurrentMonth ? '' : 'opacity-60'
 
 	return (
 		<>
@@ -116,10 +121,15 @@ const BudgetsScreen = () => {
 					<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
 				</div>
 				<BudgetMonthSwitcher currentMonth={selectedMonth} locale={resolvedLocale} onChange={setSelectedMonth} />
+				{isCurrentMonth && (
+					<div className='pt-3'>
+						<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} />
+					</div>
+				)}
 			</header>
 
-			<div className='overflow-auto pb-28'>
-				{loading && budgets.length === 0 ? (
+			<div className={`overflow-auto pb-28 transition-opacity ${listOverlayClass}`}>
+				{loading ? (
 					<BudgetsSkeleton />
 				) : (
 					<div className=''>
@@ -134,7 +144,7 @@ const BudgetsScreen = () => {
 											formatCurrency={formatCurrency}
 											formatRange={formatRange}
 											t={t}
-											onClick={() => handleBudgetCardClick(budget)}
+											onClick={isCurrentMonth ? () => handleBudgetCardClick(budget) : undefined}
 										/>
 									))}
 								</div>
@@ -143,15 +153,17 @@ const BudgetsScreen = () => {
 					</div>
 				)}
 
-				<div>
-					<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
-					<div className='border-b border-t border-divider bg-background-muted'>
-						<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
-							<Plus className='mr-3' />
-							{t('budgets.drawer.add')}
-						</button>
+				{isCurrentMonth && (
+					<div>
+						<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
+						<div className='border-b border-t border-divider bg-background-muted'>
+							<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
+								<Plus className='mr-3' />
+								{t('budgets.drawer.add')}
+							</button>
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 
 			<BudgetDrawer

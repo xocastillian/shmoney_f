@@ -131,6 +131,8 @@ export const en = {
 	'budgets.period.custom': 'Custom period',
 	'budgets.status.active': 'Active',
 	'budgets.status.closed': 'Closed',
+	'budgets.tabs.active': 'Active',
+	'budgets.tabs.closed': 'Closed',
 	'budgets.card.period': 'Period',
 	'budgets.card.spent': 'Spent',
 	'budgets.card.limit': 'Limit',
@@ -155,6 +157,7 @@ export const en = {
 	'budgets.form.errors.categories': 'Pick at least one category',
 	'budgets.form.errors.period': 'Specify period dates',
 	'budgets.form.errors.close': "Couldn't close budget",
+	'budgets.history.viewing': 'You are viewing budget history',
 } as const
 
 export type TranslationDictionary = Record<keyof typeof en, string>

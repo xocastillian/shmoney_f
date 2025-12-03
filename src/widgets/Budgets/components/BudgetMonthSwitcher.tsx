@@ -34,7 +34,7 @@ const BudgetMonthSwitcher = ({ currentMonth, locale, onChange, disableFuture = t
 	}
 
 	return (
-		<div className={cn('flex items-center gap-3 bg-background-muted px-3 py-2', className)}>
+		<div className={cn('flex items-center gap-3 bg-background-muted py-2', className)}>
 			<button
 				type='button'
 				onClick={() => handleChange('prev')}

@@ -10,6 +10,7 @@ import { CategoryStatus } from '@/types/entities/category'
 import type { Category } from '@/types/entities/category'
 import { currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
+import { formatDateTimeLocal } from '@/utils/date'
 import CurrencyPickerDrawer from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import PeriodTypePickerDrawer from './components/PeriodTypePickerDrawer'
 import BudgetForm from './BudgetForm'
@@ -99,8 +100,8 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 			setCurrencyCode(budget.currencyCode)
 			setPeriodType(budget.periodType)
 			setBudgetType(budget.budgetType)
-			setPeriodStart(budget.periodType === PeriodTypeEnum.CUSTOM && budget.periodStart ? budget.periodStart.toISOString().split('T')[0] : '')
-			setPeriodEnd(budget.periodType === PeriodTypeEnum.CUSTOM && budget.periodEnd ? budget.periodEnd.toISOString().split('T')[0] : '')
+			setPeriodStart(budget.periodType === PeriodTypeEnum.CUSTOM && budget.periodStart ? formatDateTimeLocal(budget.periodStart) : '')
+			setPeriodEnd(budget.periodType === PeriodTypeEnum.CUSTOM && budget.periodEnd ? formatDateTimeLocal(budget.periodEnd) : '')
 			setSelectedCategoryIds(budget.categoryIds)
 			setError(null)
 		} else {

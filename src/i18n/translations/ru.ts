@@ -133,6 +133,8 @@ export const ru: TranslationDictionary = {
 	'budgets.period.custom': 'Кастомный период',
 	'budgets.status.active': 'Активен',
 	'budgets.status.closed': 'Закрыт',
+	'budgets.tabs.active': 'Активные',
+	'budgets.tabs.closed': 'Закрытые',
 	'budgets.card.period': 'Период',
 	'budgets.card.spent': 'Потрачено',
 	'budgets.card.limit': 'Лимит',
@@ -157,4 +159,5 @@ export const ru: TranslationDictionary = {
 	'budgets.form.errors.categories': 'Выберите категории',
 	'budgets.form.errors.period': 'Укажите даты периода',
 	'budgets.form.errors.close': 'Не удалось закрыть бюджет',
+	'budgets.history.viewing': 'Вы смотрите историю бюджетов',
 }

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import type { Budget } from '@/types/entities/budget'
+import { ClockAlert } from 'lucide-react'
 
 interface BudgetCardProps {
 	budget: Budget
@@ -26,7 +27,11 @@ export const BudgetCard = ({ budget, formatCurrency, onClick }: BudgetCardProps)
 			onClick={onClick}
 		>
 			<div className='mb-3 flex items-center justify-between gap-2'>
-				<h3 className='text-base font-semibold text-text'>{budget.name}</h3>
+				<div className='flex items-center gap-2'>
+					{budget.budgetType === 'ONE_TIME' && <ClockAlert className='h-5 w-5 text-accent' />}
+					<h3 className='text-base font-semibold text-text'>{budget.name}</h3>
+				</div>
+
 				<span>{Math.round(percentValue)}%</span>
 			</div>
 

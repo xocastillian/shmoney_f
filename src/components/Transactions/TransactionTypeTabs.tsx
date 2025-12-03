@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils'
 import { useTranslation } from '@/i18n'
+import SegmentedTabs from '@/components/ui/SegmentedTabs/SegmentedTabs'
 
 const TRANSACTION_TABS = ['EXPENSE', 'INCOME', 'TRANSFER'] as const
 
@@ -27,24 +27,12 @@ export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className, op
 		return null
 	}
 
-	return (
-		<div className={cn('flex bg-background-muted p-[2px]', className)}>
-			{tabsToRender.map(option => {
-				const isActive = option === value
-				const labelKey = labelKeyMap[option]
-				return (
-					<button
-						key={option}
-						type='button'
-						onClick={() => onChange?.(option)}
-						className={cn('flex-1 rounded-lg px-3 py-2 text-sm', isActive ? 'bg-background text-accent' : 'text-label')}
-					>
-						{t(labelKey)}
-					</button>
-				)
-			})}
-		</div>
-	)
+	const optionsLocal = tabsToRender.map(option => ({
+		value: option,
+		label: t(labelKeyMap[option]),
+	}))
+
+	return <SegmentedTabs value={value} options={optionsLocal} onChange={onChange} className={className} />
 }
 
 export default TransactionTypeTabs
