@@ -72,7 +72,7 @@ export const WalletsDrawer = ({
 	}
 
 	return (
-		<Drawer open={open} onClose={onClose} className='h-[100vh] rounded-t-lg bg-background-secondary' swipeable={false}>
+		<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary' swipeable={false}>
 			<div className='flex h-full flex-col'>
 				<div className='flex items-center justify-between p-3 border-b border-divider'>
 					<h2 className='text-lg font-medium'>{title}</h2>

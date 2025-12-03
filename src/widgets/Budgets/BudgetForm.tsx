@@ -7,7 +7,7 @@ import Switch from '@/components/ui/Switch'
 import { BudgetPeriodType as BudgetPeriodTypeEnum, BudgetType as BudgetTypeEnum } from '@/types/entities/budget'
 import type { BudgetPeriodType, BudgetType } from '@/types/entities/budget'
 import type { Category } from '@/types/entities/category'
-import { formatDecimalForDisplay } from '@/utils/number'
+import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 
 interface BudgetFormProps {
 	formId: string
@@ -84,6 +84,17 @@ const BudgetForm = ({
 		}
 	}
 
+	const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const rawValue = event.target.value.replace(/^[+-]/, '')
+		let sanitized = sanitizeDecimalInput(rawValue)
+		if (sanitized.startsWith('.')) {
+			sanitized = `0${sanitized}`
+		}
+		const digitCount = sanitized.replace(/\./g, '').length
+		if (digitCount > 9) return
+		onAmountChange(sanitized)
+	}
+
 	return (
 		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
@@ -120,9 +131,12 @@ const BudgetForm = ({
 							<Calculator className='mr-3 text-label' />
 							<input
 								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
+								type='text'
+								inputMode='decimal'
 								placeholder={t('budgets.form.amount')}
 								value={formattedBalance}
-								onChange={(event: ChangeEvent<HTMLInputElement>) => onAmountChange(event.target.value)}
+								onChange={handleAmountChange}
+								autoComplete='off'
 							/>
 						</div>
 					</div>

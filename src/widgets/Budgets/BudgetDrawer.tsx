@@ -203,7 +203,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 
 	return (
 		<>
-			<Drawer open={open} onClose={handleDrawerClose} className='h-[100vh] rounded-t-lg bg-background-secondary' swipeable={false}>
+			<Drawer open={open} onClose={handleDrawerClose} className='rounded-t-lg bg-background-secondary' swipeable={false}>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between border-b border-divider p-3'>
 						<h1 className='text-lg font-medium'>{t('budgets.drawer.title')}</h1>

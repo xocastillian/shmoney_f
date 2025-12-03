@@ -109,7 +109,7 @@ const CategoriesDrawer = ({
 	}
 
 	return (
-		<Drawer open={open} onClose={onClose} className={`h-[100vh] rounded-t-lg bg-background-secondary ${className}`} swipeable={false}>
+		<Drawer open={open} onClose={onClose} className={`rounded-t-lg bg-background-secondary ${className}`} swipeable={false}>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-between p-3 items-center border-b border-divider'>
 					<h1 className='text-lg font-medium'>{t('categories.drawer.title')}</h1>
