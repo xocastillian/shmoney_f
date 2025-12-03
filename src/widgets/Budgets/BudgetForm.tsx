@@ -157,6 +157,8 @@ const BudgetForm = ({
 									placeholder={t('budgets.form.period.start')}
 									precision='day'
 									locale={locale}
+									clearable
+									onClear={() => onPeriodStartChange('')}
 								/>
 							</div>
 							<div className='w-1/2'>
@@ -166,6 +168,8 @@ const BudgetForm = ({
 									placeholder={t('budgets.form.period.end')}
 									precision='day'
 									locale={locale}
+									clearable
+									onClear={() => onPeriodEndChange('')}
 								/>
 							</div>
 						</div>

@@ -6,6 +6,7 @@ import { BudgetPeriodType, BudgetStatus } from '@/types/entities/budget'
 import type { Budget } from '@/types/entities/budget'
 import { BudgetCard } from '@/components/Budget/Budget'
 import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
+import BudgetMonthSwitcher from '@/widgets/Budgets/components/BudgetMonthSwitcher'
 import { Plus } from 'lucide-react'
 
 const PERIOD_SECTIONS: Array<{ type: BudgetPeriodType; labelKey: string }> = [
@@ -20,6 +21,10 @@ const localeMap: Record<string, string> = {
 	en: 'en-US',
 }
 
+const startOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1)
+const endOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999)
+const isSameMonth = (left: Date, right: Date) => left.getFullYear() === right.getFullYear() && left.getMonth() === right.getMonth()
+
 const BudgetsScreen = () => {
 	const { status } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
@@ -28,6 +33,7 @@ const BudgetsScreen = () => {
 	const resolvedLocale = localeMap[locale] ?? localeMap.ru
 	const [drawerOpen, setDrawerOpen] = useState(false)
 	const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
+	const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()))
 
 	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
 	const dateWithYearFormatter = useMemo(
@@ -60,23 +66,38 @@ const BudgetsScreen = () => {
 		[dateFormatter, dateWithYearFormatter]
 	)
 
+	const isCurrentMonth = isSameMonth(selectedMonth, new Date())
+
 	useEffect(() => {
 		if (!authenticated) {
 			clearBudgets()
 			return
 		}
 
-		void fetchBudgets().catch(() => undefined)
-	}, [authenticated, fetchBudgets, clearBudgets])
+		const from = startOfMonth(selectedMonth)
+		const to = endOfMonth(selectedMonth)
+		const params = {
+			from: from.toISOString(),
+			to: to.toISOString(),
+			...(isCurrentMonth ? { status: BudgetStatus.ACTIVE } : {}),
+		}
 
-	const activeBudgets = useMemo(() => budgets.filter(budget => budget.status === BudgetStatus.ACTIVE), [budgets])
+		void fetchBudgets(params).catch(() => undefined)
+	}, [authenticated, clearBudgets, fetchBudgets, isCurrentMonth, selectedMonth])
+
+	const visibleBudgets = useMemo(() => {
+		if (isCurrentMonth) {
+			return budgets.filter(budget => budget.status === BudgetStatus.ACTIVE)
+		}
+		return budgets
+	}, [budgets, isCurrentMonth])
 
 	const sections = useMemo(() => {
 		return PERIOD_SECTIONS.map(section => ({
 			...section,
-			items: activeBudgets.filter(budget => budget.periodType === section.type).sort((a, b) => a.periodStart.getTime() - b.periodStart.getTime()),
+			items: visibleBudgets.filter(budget => budget.periodType === section.type).sort((a, b) => a.periodStart.getTime() - b.periodStart.getTime()),
 		})).filter(section => section.items.length > 0)
-	}, [activeBudgets])
+	}, [visibleBudgets])
 
 	const handleOpenCreate = () => {
 		setEditingBudget(null)
@@ -90,8 +111,11 @@ const BudgetsScreen = () => {
 
 	return (
 		<>
-			<header className='sticky top-0 z-20 flex items-center justify-between p-3 bg-background'>
-				<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
+			<header className='sticky top-0 z-20 bg-background'>
+				<div className='flex items-center justify-between p-3'>
+					<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
+				</div>
+				<BudgetMonthSwitcher currentMonth={selectedMonth} locale={resolvedLocale} onChange={setSelectedMonth} />
 			</header>
 
 			<div className='overflow-auto pb-28'>

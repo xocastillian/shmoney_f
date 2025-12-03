@@ -62,6 +62,7 @@ const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange, from, to, o
 							placeholder={t('transactions.filters.period.start')}
 							precision='day'
 							locale={locale}
+							clearable
 						/>
 
 						<MobileDateTimePickerField
@@ -70,6 +71,7 @@ const PeriodFilterDrawer = ({ open, onClose, period, onPeriodChange, from, to, o
 							placeholder={t('transactions.filters.period.end')}
 							precision='day'
 							locale={locale}
+							clearable
 						/>
 					</div>
 				</div>

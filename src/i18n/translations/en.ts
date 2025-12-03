@@ -29,6 +29,7 @@ export const en = {
 	'common.archive': 'To archive',
 	'common.unarchive': 'Restore',
 	'common.iconPicker': 'Pick an icon',
+	'common.reset': 'Reset',
 	'transactions.drawer.noWallets': 'No wallets available',
 	'transactions.drawer.selectWallet': 'Select wallet',
 	'transactions.drawer.selectRecipient': 'Select recipient',

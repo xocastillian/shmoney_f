@@ -31,6 +31,7 @@ export const ru: TranslationDictionary = {
 	'common.iconPicker': 'Выберите иконку',
 	'common.archive': 'В архив',
 	'common.unarchive': 'Разархивировать',
+	'common.reset': 'Сбросить',
 	'transactions.drawer.noWallets': 'Нет доступных кошельков',
 	'transactions.drawer.selectWallet': 'Выберите кошелёк',
 	'transactions.drawer.selectRecipient': 'Выберите получателя',

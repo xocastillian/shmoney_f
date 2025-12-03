@@ -5,6 +5,7 @@ import TransactionTypeTabs, { type TransactionTypeTabValue } from '@/components/
 import { useTranslation } from '@/i18n'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import { cn } from '@/lib/utils'
+import { formatDateTimeLocal } from '@/utils/date'
 
 interface TransactionFormProps {
 	formId: string
@@ -200,6 +201,8 @@ export const TransactionForm = ({
 							placeholder={t('transactions.form.date')}
 							locale={locale}
 							maxDate={maxDate}
+							clearable
+							onClear={() => onDateTimeChange(formatDateTimeLocal(new Date()))}
 						/>
 					</div>
 				</div>
