@@ -135,6 +135,7 @@ export const en = {
 	'budgets.card.limit': 'Limit',
 	'budgets.card.remaining': 'Left',
 	'budgets.drawer.title': 'New budget',
+	'budgets.drawer.editTitle': 'Edit budget',
 	'budgets.drawer.add': 'Add budget',
 	'budgets.form.namePlaceholder': 'Budget name',
 	'budgets.form.amount': 'Limit',

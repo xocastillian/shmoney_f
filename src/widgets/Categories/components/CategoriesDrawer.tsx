@@ -118,7 +118,7 @@ const CategoriesDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto pb-3'>
+				<div className='flex-1 overflow-y-auto pb-10'>
 					<div className='overflow-hidden'>
 						{showAllButton && (
 							<div className=''>

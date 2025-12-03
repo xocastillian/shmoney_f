@@ -137,6 +137,7 @@ export const ru: TranslationDictionary = {
 	'budgets.card.limit': 'Лимит',
 	'budgets.card.remaining': 'Остаток',
 	'budgets.drawer.title': 'Новый бюджет',
+	'budgets.drawer.editTitle': 'Редактирование бюджета',
 	'budgets.drawer.add': 'Добавить бюджет',
 	'budgets.form.namePlaceholder': 'Название бюджета',
 	'budgets.form.amount': 'Лимит',

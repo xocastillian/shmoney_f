@@ -75,7 +75,7 @@ export function WalletDrawer({
 					</div>
 				)}
 
-				<div className='overflow-auto flex-1 px-0 py-3'>
+				<div className='overflow-auto flex-1 px-0 py-3 pb-10'>
 					<WalletForm
 						name={name}
 						onNameChange={onNameChange}

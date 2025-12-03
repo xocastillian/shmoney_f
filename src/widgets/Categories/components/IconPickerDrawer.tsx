@@ -24,7 +24,7 @@ const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerD
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto px-4 py-3'>
+				<div className='flex-1 overflow-y-auto px-4 py-3 pb-10'>
 					<div className='grid grid-cols-4 gap-3'>
 						{categoryIconOptions.map(({ key, Icon }) => {
 							const isActive = selectedIcon === key

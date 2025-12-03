@@ -81,7 +81,7 @@ export const WalletsDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex flex-1 flex-col overflow-y-auto pb-3'>
+				<div className='flex flex-1 flex-col overflow-y-auto pb-10'>
 					{loading ? (
 						<div className='flex flex-1 items-center justify-center px-3'>
 							<Loader />

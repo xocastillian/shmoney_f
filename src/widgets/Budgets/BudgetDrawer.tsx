@@ -44,6 +44,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 	const [categoriesPickerOpen, setCategoriesPickerOpen] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const isEditMode = Boolean(budget)
+	const drawerTitle = isEditMode ? t('budgets.drawer.editTitle') : t('budgets.drawer.title')
 	const handleDrawerClose = useCallback(() => {
 		if (actionLoading) return
 		onClose()
@@ -206,13 +207,13 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 			<Drawer open={open} onClose={handleDrawerClose} className='rounded-t-lg bg-background-secondary' swipeable={false}>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between border-b border-divider p-3'>
-						<h1 className='text-lg font-medium'>{t('budgets.drawer.title')}</h1>
+						<h1 className='text-lg font-medium'>{drawerTitle}</h1>
 						<button type='button' onClick={handleDrawerClose} className='p-2' aria-label='Close'>
 							<X />
 						</button>
 					</div>
 
-					<div className='flex-1 overflow-y-auto pb-3'>
+					<div className='flex-1 overflow-y-auto pb-10'>
 						<BudgetForm
 							formId='budget-form'
 							name={name}

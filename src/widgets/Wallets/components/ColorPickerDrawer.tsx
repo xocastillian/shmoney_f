@@ -25,7 +25,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 					</button>
 				</div>
 
-				<div className='flex flex-col px-4 flex-1 overflow-y-auto pb-3 py-5'>
+				<div className='flex flex-col px-4 flex-1 overflow-y-auto pb-10 py-5'>
 					<div className='grid grid-cols-4 gap-3 gap-y-7 place-items-center'>
 						{colors.map(color => (
 							<button
