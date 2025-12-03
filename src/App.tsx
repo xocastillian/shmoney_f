@@ -416,6 +416,7 @@ function App() {
 			void fetchWallets().catch(() => undefined)
 			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
+			void fetchBudgets().catch(() => undefined)
 			handleDrawerClose()
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Не удалось удалить транзакцию'
@@ -430,6 +431,7 @@ function App() {
 		fetchWalletBalances,
 		fetchWallets,
 		fetchTransactionFeed,
+		fetchBudgets,
 		handleDrawerClose,
 	])
 

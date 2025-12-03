@@ -85,7 +85,7 @@ const BudgetForm = ({
 	}
 
 	return (
-		<form id={formId} onSubmit={onSubmit}>
+		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
 				<h2 className='p-3 text-sm'>{t('common.general')}</h2>
 				<div className='overflow-hidden bg-background-muted'>
@@ -167,7 +167,7 @@ const BudgetForm = ({
 				</div>
 			</div>
 
-			<div className='bg-background-muted'>
+			<div className='bg-background-muted border-b border-divider'>
 				<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenCategoriesPicker}>
 					<FolderHeart className='mr-3 text-label' />
 					<span className={cn('text-text', selectedCategoryIds.length === 0 && 'text-label')}>{categoriesLabel}</span>
@@ -178,7 +178,7 @@ const BudgetForm = ({
 
 			<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
 
-			<div className='mt-auto border-t border-b border-divider bg-background-muted'>
+			<div className='border-t border-b border-divider bg-background-muted'>
 				<button
 					type='submit'
 					className={cn('flex h-16 w-full items-center px-3 text-access disabled:text-label transition-colors')}

@@ -122,7 +122,7 @@ const CategoriesDrawer = ({
 					<div className='overflow-hidden'>
 						{showAllButton && (
 							<div className=''>
-								<h2 className='mb-3 px-3 pt-3 text-sm font-medium text-label'>{t('common.general')}</h2>
+								<h2 className='p-3 text-sm font-medium'>{t('common.general')}</h2>
 
 								<button
 									type='button'

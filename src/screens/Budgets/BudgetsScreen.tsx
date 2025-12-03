@@ -89,7 +89,7 @@ const BudgetsScreen = () => {
 	}
 
 	return (
-		<div className='flex flex-col h-screen'>
+		<>
 			<header className='sticky top-0 z-20 flex items-center justify-between p-3 bg-background'>
 				<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
 			</header>
@@ -138,7 +138,7 @@ const BudgetsScreen = () => {
 					setEditingBudget(null)
 				}}
 			/>
-		</div>
+		</>
 	)
 }
 
