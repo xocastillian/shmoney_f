@@ -30,6 +30,7 @@ export const en = {
 	'common.unarchive': 'Restore',
 	'common.iconPicker': 'Pick an icon',
 	'common.reset': 'Reset',
+	'common.showMore': 'Show more',
 	'transactions.drawer.noWallets': 'No wallets available',
 	'transactions.drawer.selectWallet': 'Select wallet',
 	'transactions.drawer.selectRecipient': 'Select recipient',

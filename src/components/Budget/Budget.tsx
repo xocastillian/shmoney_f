@@ -19,7 +19,7 @@ export const BudgetCard = ({ budget, formatCurrency, onClick }: BudgetCardProps)
 	return (
 		<article
 			className={cn(
-				'border-b border-divider bg-background-muted p-3',
+				'bg-background-muted-2 p-3',
 				onClick && 'cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
 			)}
 			role={onClick ? 'button' : undefined}
@@ -35,7 +35,7 @@ export const BudgetCard = ({ budget, formatCurrency, onClick }: BudgetCardProps)
 				<span>{Math.round(percentValue)}%</span>
 			</div>
 
-			<div className='h-2 rounded-full mb-2 bg-background-muted-2'>
+			<div className='h-2 rounded-full mb-2 bg-background-muted'>
 				<div className={cn('h-full rounded-full transition-all', progressColorClass)} style={{ width: `${clampedPercent}%` }} />
 			</div>
 

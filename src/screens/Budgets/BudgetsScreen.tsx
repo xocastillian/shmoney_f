@@ -9,6 +9,7 @@ import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
 import BudgetMonthSwitcher from '@/widgets/Budgets/components/BudgetMonthSwitcher'
 import BudgetStatusTabs from '@/screens/Budgets/components/BudgetStatusTabs'
 import { Plus } from 'lucide-react'
+import Button from '@/components/ui/Button/Button'
 
 const PERIOD_SECTIONS: Array<{ type: BudgetPeriodType; labelKey: string }> = [
 	{ type: BudgetPeriodType.CUSTOM, labelKey: 'budgets.period.custom' },
@@ -119,11 +120,14 @@ const BudgetsScreen = () => {
 			<header className='sticky top-0 z-20 bg-background'>
 				<div className='flex items-center justify-between p-3'>
 					<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
+					<button className='p-2' onClick={handleOpenCreate}>
+						<Plus className='h-6 w-6' />
+					</button>
 				</div>
 				<BudgetMonthSwitcher currentMonth={selectedMonth} locale={resolvedLocale} onChange={setSelectedMonth} />
 				{isCurrentMonth && (
-					<div className='pt-3'>
-						<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} />
+					<div className='pt-3 px-3'>
+						<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} className='rounded-xl' />
 					</div>
 				)}
 			</header>
@@ -132,11 +136,13 @@ const BudgetsScreen = () => {
 				{loading ? (
 					<BudgetsSkeleton />
 				) : (
-					<div className=''>
+					<div className='mt-3 px-3 overflow-hidden space-y-4'>
 						{sections.map(section => (
-							<section key={section.type}>
-								<h2 className='p-3 text-sm'>{t(section.labelKey)}</h2>
-								<div className='border-t border-divider'>
+							<section key={section.type} className='bg-background-muted rounded-xl py-3'>
+								<div className='mb-3 flex items-center justify-between gap-2 px-3'>
+									<h2 className='text-base border-b border-divider pb-3 w-full'>{t(section.labelKey)}</h2>
+								</div>
+								<div className='space-y-3'>
 									{section.items.map(budget => (
 										<BudgetCard
 											key={budget.id}
@@ -147,21 +153,13 @@ const BudgetsScreen = () => {
 											onClick={isCurrentMonth ? () => handleBudgetCardClick(budget) : undefined}
 										/>
 									))}
+
+									<div className='mt-3 px-3 ml-auto w-fit'>
+										<Button text={t('common.showMore')} onClick={() => {}} />
+									</div>
 								</div>
 							</section>
 						))}
-					</div>
-				)}
-
-				{isCurrentMonth && (
-					<div>
-						<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
-						<div className='border-b border-t border-divider bg-background-muted'>
-							<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
-								<Plus className='mr-3' />
-								{t('budgets.drawer.add')}
-							</button>
-						</div>
 					</div>
 				)}
 			</div>

@@ -143,7 +143,7 @@ export const Carousel = ({ children, className, contentClassName, pageClassName,
 				<div className={cn('flex gap-[10px]', contentClassName)}>{processedPages}</div>
 			</div>
 
-			{dots && <CarouselDots count={pageCount} activeIndex={activeIndex} onSelect={scrollToPage} className={'mt-4'} />}
+			{dots && <CarouselDots count={pageCount} activeIndex={activeIndex} onSelect={scrollToPage} className={'mt-3'} />}
 		</>
 	)
 }
