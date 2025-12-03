@@ -7,7 +7,7 @@ import type { CurrencyOption } from '../types'
 import { WalletStatus, type WalletType } from '@/types/entities/wallet'
 import Drawer from '@/components/Drawer/Drawer'
 
-interface WalletFormDrawerProps {
+interface WalletDrawerProps {
 	open: boolean
 	onClose: () => void
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
@@ -32,7 +32,7 @@ interface WalletFormDrawerProps {
 	walletStatus?: WalletStatus
 }
 
-export function WalletFormDrawer({
+export function WalletDrawer({
 	open,
 	onClose,
 	onSubmit,
@@ -55,7 +55,7 @@ export function WalletFormDrawer({
 	disableArchive = false,
 	submitting = false,
 	walletStatus,
-}: WalletFormDrawerProps) {
+}: WalletDrawerProps) {
 	const formId = useId()
 	const isArchived = walletStatus === WalletStatus.ARCHIVED
 
@@ -75,7 +75,7 @@ export function WalletFormDrawer({
 					</div>
 				)}
 
-				<div className='overflow-auto flex-1 px-0 py-3'>
+				<div className='overflow-auto flex-1 px-0 py-3 pb-10'>
 					<WalletForm
 						name={name}
 						onNameChange={onNameChange}
@@ -111,4 +111,4 @@ export function WalletFormDrawer({
 	)
 }
 
-export default WalletFormDrawer
+export default WalletDrawer

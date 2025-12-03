@@ -11,7 +11,7 @@ import { useTranslation } from '@/i18n'
 import { useWallets } from '@/hooks/useWallets'
 import { WalletStatus, WalletType } from '@/types/entities/wallet'
 import WalletsDrawer from '@/widgets/Wallets/components/WalletsDrawer'
-import WalletFormDrawer from '@/widgets/Wallets/components/WalletFormDrawer'
+import WalletDrawer from '@/widgets/Wallets/components/WalletDrawer'
 import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
 import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
@@ -293,7 +293,7 @@ const SettingsScreen = () => {
 				onAdd={handleAddWallet}
 			/>
 
-			<WalletFormDrawer
+			<WalletDrawer
 				open={isWalletFormOpen}
 				onClose={closeWalletForm}
 				onSubmit={handleWalletFormSubmit}

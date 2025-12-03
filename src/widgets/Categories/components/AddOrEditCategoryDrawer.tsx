@@ -117,7 +117,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 
 	return (
 		<>
-			<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary h-[100vh]' swipeable={false}>
+			<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary' swipeable={false}>
 				<div className='flex h-full flex-col'>
 					<div className='flex items-center justify-between gap-3 p-3 border-b border-divider'>
 						<h1 className='font-medium text-lg'>{computedTitle}</h1>

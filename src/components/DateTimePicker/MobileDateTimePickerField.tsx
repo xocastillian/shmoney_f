@@ -3,6 +3,7 @@ import DatePicker from 'antd-mobile/es/components/date-picker'
 import { Calendar, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDateDisplay, formatDateTimeDisplay, formatDateTimeLocal } from '@/utils/date'
+import { useTranslation } from '@/i18n'
 
 export interface MobileDateTimePickerFieldProps {
 	value: string
@@ -14,7 +15,18 @@ export interface MobileDateTimePickerFieldProps {
 	locale?: string
 	minDate?: Date
 	maxDate?: Date
-	precision?: 'minute' | 'day'
+	precision?: 'minute' | 'day' | 'month'
+	clearable?: boolean
+	clearLabel?: string
+	onClear?: () => void
+	renderTrigger?: (props: {
+		open: () => void
+		displayText: string
+		displayIcon: ReactNode
+		displayTextClass: string
+		disabled: boolean
+		className?: string
+	}) => ReactNode
 }
 
 export const MobileDateTimePickerField = ({
@@ -28,8 +40,13 @@ export const MobileDateTimePickerField = ({
 	minDate,
 	maxDate,
 	precision = 'minute',
+	clearable = false,
+	onClear,
+	renderTrigger,
 }: MobileDateTimePickerFieldProps) => {
 	const [visible, setVisible] = useState(false)
+	const { t } = useTranslation()
+	const clearText = t('common.reset')
 
 	const dateValue = useMemo(() => {
 		if (!value) return null
@@ -39,37 +56,70 @@ export const MobileDateTimePickerField = ({
 
 	const displayText = useMemo(() => {
 		if (!dateValue) return placeholder
-		return precision === 'day' ? formatDateDisplay(dateValue, locale) : formatDateTimeDisplay(dateValue, locale)
+		if (precision === 'day') {
+			return formatDateDisplay(dateValue, locale)
+		}
+		if (precision === 'month') {
+			return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(dateValue)
+		}
+		return formatDateTimeDisplay(dateValue, locale)
 	}, [dateValue, placeholder, locale, precision])
 
 	const displayIcon = icon ?? <Calendar className='text-label' />
 	const displayTextClass = dateValue ? 'text-text' : 'text-label'
 
 	const handleConfirm = (next: Date) => {
-		const normalized = precision === 'day' ? new Date(next.getFullYear(), next.getMonth(), next.getDate()) : next
+		let normalized: Date
+		if (precision === 'day') {
+			normalized = new Date(next.getFullYear(), next.getMonth(), next.getDate())
+		} else if (precision === 'month') {
+			normalized = new Date(next.getFullYear(), next.getMonth(), 1)
+		} else {
+			normalized = next
+		}
 		onChange(formatDateTimeLocal(normalized))
 	}
 
+	const openPicker = () => {
+		if (disabled) return
+		setVisible(true)
+	}
+
+	const handleClear = () => {
+		setVisible(false)
+		if (onClear) {
+			onClear()
+		} else {
+			onChange('')
+		}
+	}
+
+	const triggerNode = renderTrigger ? (
+		renderTrigger({ open: openPicker, displayText, displayIcon, displayTextClass, disabled, className })
+	) : (
+		<button
+			type='button'
+			onClick={openPicker}
+			className={cn(
+				'flex h-16 w-full items-center gap-3 px-3 text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60',
+				className
+			)}
+			disabled={disabled}
+		>
+			{displayIcon}
+			<span className={displayTextClass}>{displayText}</span>
+		</button>
+	)
+
 	return (
 		<>
-			<button
-				type='button'
-				onClick={() => setVisible(true)}
-				className={cn(
-					'flex h-16 w-full items-center gap-3 px-3 text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60',
-					className
-				)}
-				disabled={disabled}
-			>
-				{displayIcon}
-				<span className={displayTextClass}>{displayText}</span>
-			</button>
+			{triggerNode}
 
 			<DatePicker
 				visible={visible}
 				value={dateValue ?? undefined}
 				onClose={() => setVisible(false)}
-				onCancel={() => setVisible(false)}
+				onCancel={clearable ? handleClear : () => setVisible(false)}
 				onConfirm={next => {
 					setVisible(false)
 					handleConfirm(next)
@@ -78,7 +128,7 @@ export const MobileDateTimePickerField = ({
 				min={minDate}
 				max={maxDate}
 				precision={precision}
-				cancelText={null}
+				cancelText={clearable ? clearText : null}
 				confirmText={<X className='h-6 w-6 text-text' />}
 				style={{ height: '70vh', backgroundColor: 'var(--background-secondary)' }}
 			/>

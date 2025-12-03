@@ -5,7 +5,7 @@ import { AddWalletCard } from '@/components/WalletCard/AddWalletCard'
 import WalletCard from '@/components/WalletCard/WalletCard'
 import type { Wallet } from '@/types/entities/wallet'
 import { useWallets } from '@/hooks/useWallets'
-import { WalletFormDrawer } from './components/WalletFormDrawer'
+import { WalletDrawer } from './components/WalletDrawer'
 import { ColorPickerDrawer } from './components/ColorPickerDrawer'
 import { TypePickerDrawer } from './components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
@@ -207,7 +207,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				</Carousel>
 			)}
 
-			<WalletFormDrawer
+			<WalletDrawer
 				open={open}
 				onClose={() => setOpen(false)}
 				onSubmit={handleSubmit}

@@ -7,7 +7,7 @@ import Switch from '@/components/ui/Switch'
 import { BudgetPeriodType as BudgetPeriodTypeEnum, BudgetType as BudgetTypeEnum } from '@/types/entities/budget'
 import type { BudgetPeriodType, BudgetType } from '@/types/entities/budget'
 import type { Category } from '@/types/entities/category'
-import { formatDecimalForDisplay } from '@/utils/number'
+import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 
 interface BudgetFormProps {
 	formId: string
@@ -84,8 +84,19 @@ const BudgetForm = ({
 		}
 	}
 
+	const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const rawValue = event.target.value.replace(/^[+-]/, '')
+		let sanitized = sanitizeDecimalInput(rawValue)
+		if (sanitized.startsWith('.')) {
+			sanitized = `0${sanitized}`
+		}
+		const digitCount = sanitized.replace(/\./g, '').length
+		if (digitCount > 9) return
+		onAmountChange(sanitized)
+	}
+
 	return (
-		<form id={formId} onSubmit={onSubmit}>
+		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
 				<h2 className='p-3 text-sm'>{t('common.general')}</h2>
 				<div className='overflow-hidden bg-background-muted'>
@@ -120,9 +131,12 @@ const BudgetForm = ({
 							<Calculator className='mr-3 text-label' />
 							<input
 								className='flex-1 bg-transparent text-text placeholder:text-label outline-none'
+								type='text'
+								inputMode='decimal'
 								placeholder={t('budgets.form.amount')}
 								value={formattedBalance}
-								onChange={(event: ChangeEvent<HTMLInputElement>) => onAmountChange(event.target.value)}
+								onChange={handleAmountChange}
+								autoComplete='off'
 							/>
 						</div>
 					</div>
@@ -143,6 +157,8 @@ const BudgetForm = ({
 									placeholder={t('budgets.form.period.start')}
 									precision='day'
 									locale={locale}
+									clearable
+									onClear={() => onPeriodStartChange('')}
 								/>
 							</div>
 							<div className='w-1/2'>
@@ -152,6 +168,8 @@ const BudgetForm = ({
 									placeholder={t('budgets.form.period.end')}
 									precision='day'
 									locale={locale}
+									clearable
+									onClear={() => onPeriodEndChange('')}
 								/>
 							</div>
 						</div>
@@ -167,7 +185,7 @@ const BudgetForm = ({
 				</div>
 			</div>
 
-			<div className='bg-background-muted'>
+			<div className='bg-background-muted border-b border-divider'>
 				<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenCategoriesPicker}>
 					<FolderHeart className='mr-3 text-label' />
 					<span className={cn('text-text', selectedCategoryIds.length === 0 && 'text-label')}>{categoriesLabel}</span>
@@ -178,7 +196,7 @@ const BudgetForm = ({
 
 			<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
 
-			<div className='mt-auto border-t border-b border-divider bg-background-muted'>
+			<div className='border-t border-b border-divider bg-background-muted'>
 				<button
 					type='submit'
 					className={cn('flex h-16 w-full items-center px-3 text-access disabled:text-label transition-colors')}

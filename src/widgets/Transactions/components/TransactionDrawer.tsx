@@ -154,7 +154,7 @@ export const TransactionDrawer = ({
 						</div>
 					)}
 
-					<div className='overflow-auto flex-1 px-0 py-3'>
+					<div className='overflow-auto flex-1 px-0 py-3 pb-10'>
 						<TransactionForm
 							formId={formId}
 							onSubmit={onSubmit}

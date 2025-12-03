@@ -15,6 +15,7 @@ interface LanguageSettingsDrawerProps {
 
 export const LanguageSettingsDrawer = ({ open, onClose, languages, selectedLanguage, loading = false, onSelect }: LanguageSettingsDrawerProps) => {
 	const { t } = useTranslation()
+
 	const handleClose = () => {
 		if (loading) return
 		onClose()

@@ -109,7 +109,7 @@ const CategoriesDrawer = ({
 	}
 
 	return (
-		<Drawer open={open} onClose={onClose} className={`h-[100vh] rounded-t-lg bg-background-secondary ${className}`} swipeable={false}>
+		<Drawer open={open} onClose={onClose} className={`rounded-t-lg bg-background-secondary ${className}`} swipeable={false}>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-between p-3 items-center border-b border-divider'>
 					<h1 className='text-lg font-medium'>{t('categories.drawer.title')}</h1>
@@ -118,11 +118,11 @@ const CategoriesDrawer = ({
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto pb-3'>
+				<div className='flex-1 overflow-y-auto pb-10'>
 					<div className='overflow-hidden'>
 						{showAllButton && (
 							<div className=''>
-								<h2 className='mb-3 px-3 pt-3 text-sm font-medium text-label'>{t('common.general')}</h2>
+								<h2 className='p-3 text-sm font-medium'>{t('common.general')}</h2>
 
 								<button
 									type='button'
