@@ -105,9 +105,12 @@ const BudgetsScreen = () => {
 	}
 
 	const handleBudgetCardClick = (budget: Budget) => {
+		if (!isCurrentMonth) return
 		setEditingBudget(budget)
 		setDrawerOpen(true)
 	}
+
+	const listOverlayClass = isCurrentMonth ? '' : 'pointer-events-none opacity-60'
 
 	return (
 		<>
@@ -118,8 +121,8 @@ const BudgetsScreen = () => {
 				<BudgetMonthSwitcher currentMonth={selectedMonth} locale={resolvedLocale} onChange={setSelectedMonth} />
 			</header>
 
-			<div className='overflow-auto pb-28'>
-				{loading && budgets.length === 0 ? (
+			<div className={`overflow-auto pb-28 transition-opacity ${listOverlayClass}`}>
+				{loading ? (
 					<BudgetsSkeleton />
 				) : (
 					<div className=''>
@@ -143,15 +146,17 @@ const BudgetsScreen = () => {
 					</div>
 				)}
 
-				<div>
-					<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
-					<div className='border-b border-t border-divider bg-background-muted'>
-						<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
-							<Plus className='mr-3' />
-							{t('budgets.drawer.add')}
-						</button>
+				{isCurrentMonth && (
+					<div>
+						<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
+						<div className='border-b border-t border-divider bg-background-muted'>
+							<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
+								<Plus className='mr-3' />
+								{t('budgets.drawer.add')}
+							</button>
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 
 			<BudgetDrawer

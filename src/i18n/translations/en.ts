@@ -155,6 +155,7 @@ export const en = {
 	'budgets.form.errors.categories': 'Pick at least one category',
 	'budgets.form.errors.period': 'Specify period dates',
 	'budgets.form.errors.close': "Couldn't close budget",
+	'budgets.history.viewing': 'You are viewing budget history',
 } as const
 
 export type TranslationDictionary = Record<keyof typeof en, string>

@@ -157,4 +157,5 @@ export const ru: TranslationDictionary = {
 	'budgets.form.errors.categories': 'Выберите категории',
 	'budgets.form.errors.period': 'Укажите даты периода',
 	'budgets.form.errors.close': 'Не удалось закрыть бюджет',
+	'budgets.history.viewing': 'Вы смотрите историю бюджетов',
 }
