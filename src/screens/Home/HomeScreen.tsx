@@ -16,6 +16,7 @@ import useTransactions from '@/hooks/useTransactions'
 import { useTranslation } from '@/i18n'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import { getTransactionFeed } from '@api/client'
 
 interface HomeScreenProps {
 	onTransactionSelect?: (item: TransactionFeedItem) => void
@@ -50,6 +51,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		walletId: null,
 		categoryId: null,
 	})
+	const [drawerItems, setDrawerItems] = useState<TransactionFeedItem[]>([])
 	const [drawerNextPage, setDrawerNextPage] = useState<number | null>(null)
 	const [drawerLoading, setDrawerLoading] = useState(false)
 	const [drawerError, setDrawerError] = useState<string | null>(null)
@@ -87,6 +89,8 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 
 	const handleResetFeedFilters = useCallback(() => {
 		setFeedFilters({ type: '', from: '', to: '', period: '', walletId: null, categoryId: null })
+		setDrawerNextPage(null)
+		setDrawerItems([])
 	}, [])
 
 	const walletById = useMemo(() => {
@@ -148,8 +152,9 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 			}
 
 			try {
-				const response = await fetchTransactionFeed({ ...feedQueryParams, page }, { append })
+				const response = await getTransactionFeed({ ...feedQueryParams, page })
 				setDrawerNextPage(response.next ?? null)
+				setDrawerItems(prev => (append ? [...prev, ...response.results] : response.results))
 				setDrawerError(null)
 			} catch (error) {
 				const message = error instanceof Error ? error.message : 'Не удалось загрузить транзакции'
@@ -163,13 +168,13 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				}
 			}
 		},
-		[feedQueryParams, fetchTransactionFeed]
+		[feedQueryParams]
 	)
 
 	useEffect(() => {
 		if (!isTransactionsDrawerOpen) return
 		void loadDrawerFeed(0, false)
-	}, [isTransactionsDrawerOpen, loadDrawerFeed])
+	}, [isTransactionsDrawerOpen, loadDrawerFeed, feed])
 
 	const handleLoadMoreFeed = useCallback(async () => {
 		if (drawerNextPage == null) return
@@ -203,8 +208,11 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 
 			<TransactionsDrawer
 				open={isTransactionsDrawerOpen}
-				onClose={() => setTransactionsDrawerOpen(false)}
-				items={feed}
+				onClose={() => {
+					setTransactionsDrawerOpen(false)
+					setFiltersDrawerOpen(false)
+				}}
+				items={drawerItems}
 				walletById={walletById}
 				categoryById={categoryById}
 				hasMore={drawerNextPage != null}
