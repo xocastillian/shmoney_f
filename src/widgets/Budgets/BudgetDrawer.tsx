@@ -111,6 +111,11 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 
 	const handleBudgetTypeToggle = (nextType: BudgetType) => {
 		setBudgetType(nextType)
+		if (nextType === BudgetTypeEnum.RECURRING && periodType === PeriodTypeEnum.CUSTOM) {
+			setPeriodType(defaultPeriodType)
+			setPeriodStart('')
+			setPeriodEnd('')
+		}
 	}
 
 	const submitDisabled = useMemo(() => {
@@ -279,6 +284,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 					}
 					setPeriodPickerOpen(false)
 				}}
+				allowCustom={budgetType === BudgetTypeEnum.ONE_TIME}
 			/>
 
 			<CategoriesDrawer

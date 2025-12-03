@@ -142,6 +142,14 @@ const BudgetForm = ({
 						</div>
 					</div>
 
+					<div className='border-b border-divider flex items-center justify-between px-3 h-16'>
+						<div className='flex items-center gap-3'>
+							<ListChecks className='text-label' />
+							<span className='text-text'>{t('budgets.form.budgetType')}</span>
+						</div>
+						<Switch checked={isOneTime} onChange={checked => onBudgetTypeToggle(checked ? BudgetTypeEnum.ONE_TIME : BudgetTypeEnum.RECURRING)} />
+					</div>
+
 					<div className='border-b border-divider'>
 						<button type='button' className='flex h-16 w-full items-center px-3 text-left' onClick={onOpenPeriodTypePicker}>
 							<CalendarRange className='mr-3 text-label' />
@@ -175,14 +183,6 @@ const BudgetForm = ({
 							</div>
 						</div>
 					)}
-
-					<div className='border-b border-divider flex items-center justify-between px-3 h-16'>
-						<div className='flex items-center gap-3'>
-							<ListChecks className='text-label' />
-							<span className='text-text'>{t('budgets.form.budgetType')}</span>
-						</div>
-						<Switch checked={isOneTime} onChange={checked => onBudgetTypeToggle(checked ? BudgetTypeEnum.ONE_TIME : BudgetTypeEnum.RECURRING)} />
-					</div>
 				</div>
 			</div>
 
