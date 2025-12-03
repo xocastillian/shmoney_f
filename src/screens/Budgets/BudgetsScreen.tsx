@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { BudgetCard } from '@/components/BudgetCard/BudgetCard'
+import BudgetStatusTabs from '@/screens/Budgets/components/BudgetStatusTabs'
+import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
 import { useTranslation } from '@/i18n'
 import { BudgetPeriodType, BudgetStatus } from '@/types/entities/budget'
 import type { Budget } from '@/types/entities/budget'
-import { BudgetCard } from '@/components/Budget/Budget'
-import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
-import BudgetMonthSwitcher from '@/widgets/Budgets/components/BudgetMonthSwitcher'
-import BudgetStatusTabs from '@/screens/Budgets/components/BudgetStatusTabs'
 import { Plus } from 'lucide-react'
 
 const PERIOD_SECTIONS: Array<{ type: BudgetPeriodType; labelKey: string }> = [
@@ -22,26 +21,15 @@ const localeMap: Record<string, string> = {
 	en: 'en-US',
 }
 
-const startOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1)
-const endOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999)
-const isSameMonth = (left: Date, right: Date) => left.getFullYear() === right.getFullYear() && left.getMonth() === right.getMonth()
-
 const BudgetsScreen = () => {
 	const { status } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
-	const { budgets, loading, fetchBudgets, clearBudgets } = useBudgets()
+	const { budgets, loading, error, fetchBudgets, clearBudgets } = useBudgets()
 	const { t, locale } = useTranslation()
 	const resolvedLocale = localeMap[locale] ?? localeMap.ru
 	const [drawerOpen, setDrawerOpen] = useState(false)
 	const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
-	const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()))
 	const [statusFilter, setStatusFilter] = useState<BudgetStatus>(BudgetStatus.ACTIVE)
-
-	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
-	const dateWithYearFormatter = useMemo(
-		() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short', year: 'numeric' }),
-		[resolvedLocale]
-	)
 
 	const formatCurrency = useCallback(
 		(value: number, currencyCode: string) => {
@@ -58,6 +46,12 @@ const BudgetsScreen = () => {
 		[resolvedLocale]
 	)
 
+	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short' }), [resolvedLocale])
+	const dateWithYearFormatter = useMemo(
+		() => new Intl.DateTimeFormat(resolvedLocale, { day: '2-digit', month: 'short', year: 'numeric' }),
+		[resolvedLocale]
+	)
+
 	const formatRange = useCallback(
 		(start: Date, end: Date) => {
 			const sameYear = start.getFullYear() === end.getFullYear()
@@ -68,75 +62,67 @@ const BudgetsScreen = () => {
 		[dateFormatter, dateWithYearFormatter]
 	)
 
-	const isCurrentMonth = isSameMonth(selectedMonth, new Date())
+	const loadBudgets = useCallback(async () => {
+		if (!authenticated) return
+		try {
+			await fetchBudgets({ status: statusFilter })
+		} catch {
+			// ошибка уже прокидывается хуком
+		}
+	}, [authenticated, fetchBudgets, statusFilter])
 
 	useEffect(() => {
 		if (!authenticated) {
 			clearBudgets()
 			return
 		}
-
-		const from = startOfMonth(selectedMonth)
-		const to = endOfMonth(selectedMonth)
-		const params = {
-			from: from.toISOString(),
-			to: to.toISOString(),
-			...(isCurrentMonth ? { status: statusFilter } : {}),
-		}
-
-		void fetchBudgets(params).catch(() => undefined)
-	}, [authenticated, clearBudgets, fetchBudgets, isCurrentMonth, selectedMonth, statusFilter])
-
-	const visibleBudgets = useMemo(() => {
-		if (isCurrentMonth) {
-			return budgets.filter(budget => budget.status === statusFilter)
-		}
-		return budgets
-	}, [budgets, isCurrentMonth, statusFilter])
+		void loadBudgets()
+	}, [authenticated, clearBudgets, loadBudgets])
 
 	const sections = useMemo(() => {
 		return PERIOD_SECTIONS.map(section => ({
 			...section,
-			items: visibleBudgets.filter(budget => budget.periodType === section.type).sort((a, b) => a.periodStart.getTime() - b.periodStart.getTime()),
+			items: budgets.filter(budget => budget.periodType === section.type && budget.status === statusFilter),
 		})).filter(section => section.items.length > 0)
-	}, [visibleBudgets])
+	}, [budgets, statusFilter])
 
 	const handleOpenCreate = () => {
 		setEditingBudget(null)
 		setDrawerOpen(true)
 	}
 
-	const handleBudgetCardClick = (budget: Budget) => {
-		if (!isCurrentMonth) return
+	const handleBudgetCardClick = useCallback((budget: Budget) => {
 		setEditingBudget(budget)
 		setDrawerOpen(true)
-	}
-
-	const listOverlayClass = isCurrentMonth ? '' : 'opacity-60'
+	}, [])
 
 	return (
 		<>
 			<header className='sticky top-0 z-20 bg-background'>
 				<div className='flex items-center justify-between p-3'>
 					<h1 className='text-lg font-medium'>{t('budgets.title')}</h1>
+					<button className='p-2' onClick={handleOpenCreate}>
+						<Plus className='h-6 w-6' />
+					</button>
 				</div>
-				<BudgetMonthSwitcher currentMonth={selectedMonth} locale={resolvedLocale} onChange={setSelectedMonth} />
-				{isCurrentMonth && (
-					<div className='pt-3'>
-						<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} />
-					</div>
-				)}
+				<div className='px-3'>
+					<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} className='rounded-xl' />
+				</div>
 			</header>
 
-			<div className={`overflow-auto pb-28 transition-opacity ${listOverlayClass}`}>
+			{error && <div className='px-3 pt-2 text-sm text-danger'>{error}</div>}
+
+			<div className='overflow-auto pb-28'>
 				{loading ? (
 					<BudgetsSkeleton />
 				) : (
-					<div className=''>
+					<div className='mt-3 px-3 overflow-hidden space-y-4'>
 						{sections.map(section => (
-							<section key={section.type}>
-								<h2 className='p-3 text-sm'>{t(section.labelKey)}</h2>
-								<div className='border-t border-divider'>
+							<section key={section.type} className='bg-background-muted rounded-xl py-3'>
+								<div className='mb-3 flex items-center justify-between gap-2 px-3'>
+									<h2 className='text-base border-b border-divider pb-3 w-full'>{t(section.labelKey)}</h2>
+								</div>
+								<div className='space-y-3'>
 									{section.items.map(budget => (
 										<BudgetCard
 											key={budget.id}
@@ -144,7 +130,7 @@ const BudgetsScreen = () => {
 											formatCurrency={formatCurrency}
 											formatRange={formatRange}
 											t={t}
-											onClick={isCurrentMonth ? () => handleBudgetCardClick(budget) : undefined}
+											onClick={() => handleBudgetCardClick(budget)}
 										/>
 									))}
 								</div>
@@ -152,23 +138,12 @@ const BudgetsScreen = () => {
 						))}
 					</div>
 				)}
-
-				{isCurrentMonth && (
-					<div>
-						<h2 className='p-3 text-sm'>{t('common.actions')}</h2>
-						<div className='border-b border-t border-divider bg-background-muted'>
-							<button type='button' className='flex h-16 w-full items-center px-3 text-access' onClick={handleOpenCreate}>
-								<Plus className='mr-3' />
-								{t('budgets.drawer.add')}
-							</button>
-						</div>
-					</div>
-				)}
 			</div>
 
 			<BudgetDrawer
 				open={drawerOpen}
 				budget={editingBudget}
+				onChange={loadBudgets}
 				onClose={() => {
 					setDrawerOpen(false)
 					setEditingBudget(null)

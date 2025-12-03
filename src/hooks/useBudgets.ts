@@ -1,13 +1,21 @@
 import { useCallback, useMemo, useState } from 'react'
-import { listBudgets, createBudget as apiCreateBudget, updateBudget as apiUpdateBudget, closeBudget as apiCloseBudget } from '@api/client'
+import {
+	listBudgets,
+	createBudget as apiCreateBudget,
+	updateBudget as apiUpdateBudget,
+	closeBudget as apiCloseBudget,
+	deleteBudget as apiDeleteBudget,
+	openBudget as apiOpenBudget,
+} from '@api/client'
 import type { BudgetCreateRequest, BudgetResponse, BudgetUpdateRequest } from '@api/types'
 import { useBudgetsStore } from '@/store/budgetsStore'
-import type { Budget, BudgetStatus } from '@/types/entities/budget'
+import type { Budget, BudgetPeriodType, BudgetStatus } from '@/types/entities/budget'
 
 type BudgetListParams = {
 	status?: BudgetStatus
 	from?: Date | string
 	to?: Date | string
+	periodType?: BudgetPeriodType
 }
 
 function mapBudget(response: BudgetResponse): Budget {
@@ -35,6 +43,7 @@ export function useBudgets() {
 	const loading = useBudgetsStore(state => state.loading)
 	const setBudgets = useBudgetsStore(state => state.setBudgets)
 	const upsertBudget = useBudgetsStore(state => state.upsertBudget)
+	const removeBudget = useBudgetsStore(state => state.removeBudget)
 	const setLoading = useBudgetsStore(state => state.setLoading)
 	const clearStore = useBudgetsStore(state => state.clear)
 	const [error, setError] = useState<string | null>(null)
@@ -59,6 +68,11 @@ export function useBudgets() {
 		},
 		[setBudgets, setLoading]
 	)
+
+	const fetchBudgetsRaw = useCallback(async (params?: BudgetListParams) => {
+		const data = await listBudgets(params)
+		return data.map(mapBudget)
+	}, [])
 
 	const createBudget = useCallback(
 		async (payload: BudgetCreateRequest) => {
@@ -121,6 +135,45 @@ export function useBudgets() {
 		[fetchBudgets, upsertBudget]
 	)
 
+	const deleteBudget = useCallback(
+		async (budgetId: number) => {
+			setActionLoading(true)
+			try {
+				await apiDeleteBudget(budgetId)
+				removeBudget(budgetId)
+				setError(null)
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось удалить бюджет'
+				setError(message)
+				throw err
+			} finally {
+				setActionLoading(false)
+			}
+		},
+		[removeBudget]
+	)
+
+	const openBudget = useCallback(
+		async (budgetId: number) => {
+			setActionLoading(true)
+			try {
+				const reopened = await apiOpenBudget(budgetId)
+				const mapped = mapBudget(reopened)
+				upsertBudget(mapped)
+				setError(null)
+				void fetchBudgets().catch(() => undefined)
+				return mapped
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось открыть бюджет'
+				setError(message)
+				throw err
+			} finally {
+				setActionLoading(false)
+			}
+		},
+		[fetchBudgets, upsertBudget]
+	)
+
 	const clearBudgets = useCallback(() => {
 		clearStore()
 		setError(null)
@@ -135,9 +188,12 @@ export function useBudgets() {
 		isBusy,
 		error,
 		fetchBudgets,
+		fetchBudgetsRaw,
 		createBudget,
 		updateBudget,
 		closeBudget,
+		openBudget,
+		deleteBudget,
 		clearBudgets,
 	}
 }

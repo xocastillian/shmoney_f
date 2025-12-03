@@ -5,7 +5,7 @@ import { useTranslation } from '@/i18n'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useCategories } from '@/hooks/useCategories'
 import type { BudgetPeriodType, BudgetType, Budget } from '@/types/entities/budget'
-import { BudgetPeriodType as PeriodTypeEnum, BudgetType as BudgetTypeEnum } from '@/types/entities/budget'
+import { BudgetPeriodType as PeriodTypeEnum, BudgetType as BudgetTypeEnum, BudgetStatus } from '@/types/entities/budget'
 import { CategoryStatus } from '@/types/entities/category'
 import type { Category } from '@/types/entities/category'
 import { currencyOptions } from '@/widgets/Wallets/constants'
@@ -22,14 +22,15 @@ interface BudgetDrawerProps {
 	open: boolean
 	onClose: () => void
 	budget?: Budget | null
+	onChange?: () => void
 }
 
 const defaultPeriodType = PeriodTypeEnum.MONTH
 const defaultBudgetType = BudgetTypeEnum.RECURRING
 
-export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps) => {
+export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetDrawerProps) => {
 	const { t, locale } = useTranslation()
-	const { createBudget, updateBudget, closeBudget, actionLoading } = useBudgets()
+	const { createBudget, updateBudget, closeBudget, openBudget, deleteBudget, actionLoading } = useBudgets()
 	const { categories, fetchCategories } = useCategories()
 	const [initialized, setInitialized] = useState(false)
 	const [name, setName] = useState('')
@@ -111,6 +112,11 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 
 	const handleBudgetTypeToggle = (nextType: BudgetType) => {
 		setBudgetType(nextType)
+		if (nextType === BudgetTypeEnum.RECURRING && periodType === PeriodTypeEnum.CUSTOM) {
+			setPeriodType(defaultPeriodType)
+			setPeriodStart('')
+			setPeriodEnd('')
+		}
 	}
 
 	const submitDisabled = useMemo(() => {
@@ -171,8 +177,9 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 					amountLimit: amountNumber,
 				})
 			}
-			setError(null)
-			onClose()
+				setError(null)
+				onChange?.()
+				onClose()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('wallets.errors.saveFailed')
 			setError(message)
@@ -184,12 +191,39 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 		try {
 			await closeBudget(budget.id)
 			setError(null)
+			onChange?.()
 			onClose()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('budgets.form.errors.close')
 			setError(message)
 		}
-	}, [budget, closeBudget, onClose, t])
+	}, [budget, closeBudget, onClose, onChange, t])
+
+	const handleOpenBudget = useCallback(async () => {
+		if (!budget) return
+		try {
+			await openBudget(budget.id)
+			setError(null)
+			onChange?.()
+			onClose()
+		} catch (err) {
+			const message = err instanceof Error ? err.message : t('budgets.form.errors.open')
+			setError(message)
+		}
+	}, [budget, openBudget, onClose, onChange, t])
+
+	const handleDeleteBudget = useCallback(async () => {
+		if (!budget) return
+		try {
+			await deleteBudget(budget.id)
+			setError(null)
+			onChange?.()
+			onClose()
+		} catch (err) {
+			const message = err instanceof Error ? err.message : t('budgets.form.errors.delete')
+			setError(message)
+		}
+	}, [budget, deleteBudget, onClose, onChange, t])
 
 	const periodTypeLabel = t(
 		{
@@ -201,6 +235,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 	)
 	const currencyOption = currencyOptions.find(option => option.value === currencyCode)
 	const currencyLabel = currencyOption ? t(currencyOption.label) : currencyCode
+	const isBudgetClosed = budget?.status === BudgetStatus.CLOSED
 	const currencyIcon = currencyIconMap[currencyCode] ?? null
 
 	return (
@@ -241,8 +276,13 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 							locale={locale}
 							error={error}
 							mode={isEditMode ? 'edit' : 'create'}
-							onCloseBudget={isEditMode ? handleCloseBudget : undefined}
+							isClosed={isBudgetClosed}
+							onCloseBudget={isEditMode && !isBudgetClosed ? handleCloseBudget : undefined}
 							closeBudgetDisabled={actionLoading}
+							onOpenBudget={isEditMode && isBudgetClosed ? handleOpenBudget : undefined}
+							openBudgetDisabled={actionLoading}
+							onDeleteBudget={isEditMode ? handleDeleteBudget : undefined}
+							deleteBudgetDisabled={actionLoading}
 						/>
 					</div>
 
@@ -279,6 +319,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null }: BudgetDrawerProps
 					}
 					setPeriodPickerOpen(false)
 				}}
+				allowCustom={budgetType === BudgetTypeEnum.ONE_TIME}
 			/>
 
 			<CategoriesDrawer

@@ -17,10 +17,12 @@ interface PeriodTypePickerDrawerProps {
 	onClose: () => void
 	selectedType: BudgetPeriodType
 	onSelect: (type: BudgetPeriodType) => void
+	allowCustom?: boolean
 }
 
-export const PeriodTypePickerDrawer = ({ open, onClose, selectedType, onSelect }: PeriodTypePickerDrawerProps) => {
+export const PeriodTypePickerDrawer = ({ open, onClose, selectedType, onSelect, allowCustom = true }: PeriodTypePickerDrawerProps) => {
 	const { t } = useTranslation()
+	const availablePeriods = allowCustom ? periodOrder : periodOrder.filter(period => period !== BudgetPeriodType.CUSTOM)
 
 	return (
 		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
@@ -33,7 +35,7 @@ export const PeriodTypePickerDrawer = ({ open, onClose, selectedType, onSelect }
 				</div>
 
 				<div className='border-t border-divider bg-background-muted'>
-					{periodOrder.map(period => {
+					{availablePeriods.map(period => {
 						const isSelected = period === selectedType
 						return (
 							<button key={period} type='button' onClick={() => onSelect(period)} className='w-full border-b border-divider text-left'>

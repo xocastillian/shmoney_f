@@ -186,11 +186,11 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 			{walletsError && <div className='text-sm text-danger'>{walletsError}</div>}
 			<Wallets wallets={wallets} loading={walletsLoading} />
 
-			<div className='mt-4'>
+			<div className='mt-3'>
 				<WalletBalancesWidget balances={balances} loading={balancesLoading} error={walletsError} />
 			</div>
 
-			<div className='mt-4'>
+			<div className='mt-3'>
 				<TransactionsWidget
 					items={feed}
 					loading={feedLoading}
@@ -202,7 +202,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				/>
 			</div>
 
-			<div className='mb-3 mt-4'>
+			<div className='mb-3 mt-3'>
 				<ExchangeRates rates={rates} loading={ratesLoading} error={ratesError} />
 			</div>
 
