@@ -28,6 +28,7 @@ import {
 	TransactionFeedItemSchema,
 	TransactionFeedResponseSchema,
 	TransactionFeedTypeSchema,
+	AnalyticsResponseSchema,
 	SettingsResponseSchema,
 	SettingsUpdateRequestSchema,
 	BudgetResponseSchema,
@@ -66,6 +67,7 @@ export type CategoryTransactionPageResponse = z.infer<typeof CategoryTransaction
 export type TransactionFeedItem = z.infer<typeof TransactionFeedItemSchema>
 export type TransactionFeedResponse = z.infer<typeof TransactionFeedResponseSchema>
 export type TransactionFeedType = z.infer<typeof TransactionFeedTypeSchema>
+export type AnalyticsResponse = z.infer<typeof AnalyticsResponseSchema>
 export type SettingsResponse = z.infer<typeof SettingsResponseSchema>
 export type SettingsUpdateRequest = z.infer<typeof SettingsUpdateRequestSchema>
 export type BudgetResponse = z.infer<typeof BudgetResponseSchema>

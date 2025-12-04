@@ -183,6 +183,32 @@ export const TransactionFeedResponseSchema = z.object({
 	results: TransactionFeedItemSchema.array(),
 })
 
+const HexColorSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/)
+
+export const AnalyticsCategorySummarySchema = z.object({
+	categoryId: z.number().int(),
+	categoryName: z.string(),
+	categoryColor: HexColorSchema,
+	amount: z.coerce.number(),
+	percent: z.coerce.number(),
+})
+
+export const AnalyticsPeriodSchema = z.object({
+	from: z.coerce.date(),
+	to: z.coerce.date(),
+})
+
+export const AnalyticsResponseSchema = z.object({
+	period: AnalyticsPeriodSchema,
+	currencyCode: z.string(),
+	totalExpense: z.coerce.number(),
+	totalIncome: z.coerce.number(),
+	cashFlowAmount: z.coerce.number(),
+	cashFlowPercent: z.coerce.number(),
+	categories: AnalyticsCategorySummarySchema.array(),
+	topCategories: AnalyticsCategorySummarySchema.array(),
+})
+
 export const CurrencyResponseSchema = z.object({
 	id: z.number().int(),
 	code: z.string(),

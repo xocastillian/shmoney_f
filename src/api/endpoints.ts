@@ -46,4 +46,7 @@ export const endpoints = {
 		close: (id: number | string) => `/api/budgets/${id}/close`,
 		open: (id: number | string) => `/api/budgets/${id}/open`,
 	},
+	analytics: {
+		base: '/api/analytics',
+	},
 } as const
