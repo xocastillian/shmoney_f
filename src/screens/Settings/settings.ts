@@ -1,19 +1,35 @@
 import type { Setting } from '@/types/entities/setting'
-import { FolderHeart, Languages, Wallet } from 'lucide-react'
+import { CircleDollarSign, FolderHeart, Languages, Wallet } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { useMemo } from 'react'
 
 interface SettingsOptions {
 	onCategoriesPress: () => void
 	onLanguagePress: () => void
+	onCurrencyPress: () => void
 	onArchivedWalletsPress: () => void
+	languageValue?: string
+	currencyValue?: string
 }
 
-export const useSettingsList = ({ onCategoriesPress, onLanguagePress, onArchivedWalletsPress }: SettingsOptions): Setting[] => {
+export const useSettingsList = ({
+	onCategoriesPress,
+	onLanguagePress,
+	onCurrencyPress,
+	onArchivedWalletsPress,
+	languageValue,
+	currencyValue,
+}: SettingsOptions): Setting[] => {
 	const { t } = useTranslation()
 
 	return useMemo(
 		() => [
+			{
+				title: t('settings.mainCurrency'),
+				onClick: onCurrencyPress,
+				icon: CircleDollarSign,
+				value: currencyValue,
+			},
 			{
 				title: t('settings.categories'),
 				onClick: onCategoriesPress,
@@ -28,8 +44,9 @@ export const useSettingsList = ({ onCategoriesPress, onLanguagePress, onArchived
 				title: t('settings.language'),
 				onClick: onLanguagePress,
 				icon: Languages,
+				value: languageValue,
 			},
 		],
-		[onCategoriesPress, onLanguagePress, onArchivedWalletsPress, t]
+		[onArchivedWalletsPress, onCategoriesPress, onCurrencyPress, onLanguagePress, currencyValue, languageValue, t]
 	)
 }

@@ -10,6 +10,7 @@ export const ru: TranslationDictionary = {
 	'settings.title': 'Настройки',
 	'settings.categories': 'Категории',
 	'settings.language': 'Язык',
+	'settings.mainCurrency': 'Основная валюта',
 	'settings.archivedWallets': 'Архивные кошельки',
 	'settings.archivedWallets.empty': 'Нет архивных кошельков',
 	'settings.theme': 'Тема',

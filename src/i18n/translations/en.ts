@@ -10,6 +10,7 @@ export const en = {
 	'settings.archivedWallets': 'Archived wallets',
 	'settings.archivedWallets.empty': 'You have no archived wallets yet',
 	'settings.language': 'Language',
+	'settings.mainCurrency': 'Main currency',
 	'settings.theme': 'Theme',
 	'categories.drawer.title': 'Categories',
 	'categories.drawer.newTitle': 'New category',

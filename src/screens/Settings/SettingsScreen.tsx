@@ -19,17 +19,19 @@ import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
 
 const defaultWalletType = WalletType.CASH
+const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
 
 const SettingsScreen = () => {
 	const [isCategoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false)
 	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
 	const [isLanguageDrawerOpen, setLanguageDrawerOpen] = useState(false)
+	const [isCurrencyDrawerOpen, setCurrencyDrawerOpen] = useState(false)
 	const [isArchivedWalletsDrawerOpen, setArchivedWalletsDrawerOpen] = useState(false)
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 	const [isWalletFormOpen, setWalletFormOpen] = useState(false)
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
 	const [walletFormName, setWalletFormName] = useState('')
-	const [walletFormCurrencyCode, setWalletFormCurrencyCode] = useState(currencyOptions[0].value)
+	const [walletFormCurrencyCode, setWalletFormCurrencyCode] = useState(fallbackCurrencyCode)
 	const [walletFormBalance, setWalletFormBalance] = useState('')
 	const [walletFormColor, setWalletFormColor] = useState(colorOptions[0])
 	const [walletFormType, setWalletFormType] = useState<WalletType>(defaultWalletType)
@@ -37,9 +39,28 @@ const SettingsScreen = () => {
 	const [walletFormStatus, setWalletFormStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
-	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
+	const [walletCurrencyPickerOpen, setWalletCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
-	const { supportedLanguages, language, loading: settingsLoading, error: settingsError, changeLanguage } = useSettings()
+	const {
+		supportedLanguages,
+		supportedCurrencies,
+		mainCurrency,
+		language,
+		loading: settingsLoading,
+		error: settingsError,
+		changeLanguage,
+		changeMainCurrency,
+	} = useSettings()
+	const currencyPickerOptions = useMemo(() => {
+		if (!supportedCurrencies.length) {
+			return currencyOptions
+		}
+		return supportedCurrencies.map(code => {
+			const existing = currencyOptions.find(option => option.value === code)
+			return existing ?? { value: code, label: `wallets.currency.${code.toLowerCase()}` }
+		})
+	}, [supportedCurrencies])
+	const defaultCurrencyCode = useMemo(() => mainCurrency ?? supportedCurrencies[0] ?? fallbackCurrencyCode, [mainCurrency, supportedCurrencies])
 	const {
 		wallets,
 		loading: walletsLoading,
@@ -56,13 +77,25 @@ const SettingsScreen = () => {
 	const closeCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(false), [])
 	const openLanguageDrawer = useCallback(() => setLanguageDrawerOpen(true), [])
 	const closeLanguageDrawer = useCallback(() => setLanguageDrawerOpen(false), [])
+	const openCurrencyDrawer = useCallback(() => setCurrencyDrawerOpen(true), [])
+	const closeCurrencyDrawer = useCallback(() => setCurrencyDrawerOpen(false), [])
 	const openArchivedWalletsDrawer = useCallback(() => setArchivedWalletsDrawerOpen(true), [])
 	const closeArchivedWalletsDrawer = useCallback(() => setArchivedWalletsDrawerOpen(false), [])
+	const currencyLabel = useMemo(() => {
+		const code = mainCurrency ?? defaultCurrencyCode
+		if (!code) return undefined
+		const option = currencyPickerOptions.find(item => item.value === code)
+		return option ? t(option.label) : code
+	}, [currencyPickerOptions, defaultCurrencyCode, mainCurrency, t])
+	const languageLabel = useMemo(() => (language ? language.toUpperCase() : undefined), [language])
 
 	const settings = useSettingsList({
 		onCategoriesPress: openCategoriesDrawer,
 		onLanguagePress: openLanguageDrawer,
+		onCurrencyPress: openCurrencyDrawer,
 		onArchivedWalletsPress: openArchivedWalletsDrawer,
+		currencyValue: currencyLabel,
+		languageValue: languageLabel,
 	})
 
 	const refreshWalletBalances = useCallback(() => {
@@ -106,7 +139,7 @@ const SettingsScreen = () => {
 	const handleAddWallet = useCallback(() => {
 		setEditingWalletId(null)
 		setWalletFormName('')
-		setWalletFormCurrencyCode(currencyOptions[0].value)
+		setWalletFormCurrencyCode(defaultCurrencyCode)
 		setWalletFormBalance('')
 		setWalletFormColor(colorOptions[0])
 		setWalletFormType(defaultWalletType)
@@ -114,7 +147,7 @@ const SettingsScreen = () => {
 		setWalletFormError(null)
 		setWalletFormOpen(true)
 		setArchivedWalletsDrawerOpen(false)
-	}, [])
+	}, [defaultCurrencyCode])
 
 	const closeWalletForm = useCallback(() => {
 		setWalletFormOpen(false)
@@ -125,10 +158,28 @@ const SettingsScreen = () => {
 	useEffect(() => {
 		if (!isWalletFormOpen) {
 			setColorPickerOpen(false)
-			setCurrencyPickerOpen(false)
+			setWalletCurrencyPickerOpen(false)
 			setTypePickerOpen(false)
 		}
 	}, [isWalletFormOpen])
+
+	useEffect(() => {
+		if (!isWalletFormOpen && editingWalletId === null) {
+			setWalletFormCurrencyCode(defaultCurrencyCode)
+		}
+	}, [defaultCurrencyCode, editingWalletId, isWalletFormOpen])
+
+	const handleSelectMainCurrency = useCallback(
+		async (code: string) => {
+			try {
+				await changeMainCurrency(code)
+				setCurrencyDrawerOpen(false)
+			} catch {
+				// errors handled in hook
+			}
+		},
+		[changeMainCurrency]
+	)
 
 	const handleWalletFormSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
@@ -279,6 +330,15 @@ const SettingsScreen = () => {
 				onSelect={handleSelectLanguage}
 			/>
 
+			<CurrencyPickerDrawer
+				open={isCurrencyDrawerOpen}
+				onClose={closeCurrencyDrawer}
+				options={currencyPickerOptions}
+				selectedCode={mainCurrency ?? defaultCurrencyCode}
+				onSelect={handleSelectMainCurrency}
+				loading={settingsLoading}
+			/>
+
 			<WalletsDrawer
 				open={isArchivedWalletsDrawerOpen}
 				onClose={closeArchivedWalletsDrawer}
@@ -303,8 +363,8 @@ const SettingsScreen = () => {
 					setWalletFormError(null)
 				}}
 				currencyCode={walletFormCurrencyCode}
-				currencyOptions={currencyOptions}
-				onOpenCurrencyPicker={() => setCurrencyPickerOpen(true)}
+				currencyOptions={currencyPickerOptions}
+				onOpenCurrencyPicker={() => setWalletCurrencyPickerOpen(true)}
 				onOpenTypePicker={() => setTypePickerOpen(true)}
 				selectedType={walletFormType}
 				onOpenColorPicker={() => setColorPickerOpen(true)}
@@ -337,13 +397,13 @@ const SettingsScreen = () => {
 			/>
 
 			<CurrencyPickerDrawer
-				open={currencyPickerOpen}
-				onClose={() => setCurrencyPickerOpen(false)}
-				options={currencyOptions}
+				open={walletCurrencyPickerOpen}
+				onClose={() => setWalletCurrencyPickerOpen(false)}
+				options={currencyPickerOptions}
 				selectedCode={walletFormCurrencyCode}
 				onSelect={code => {
 					setWalletFormCurrencyCode(code)
-					setCurrencyPickerOpen(false)
+					setWalletCurrencyPickerOpen(false)
 					setWalletFormError(null)
 				}}
 			/>
