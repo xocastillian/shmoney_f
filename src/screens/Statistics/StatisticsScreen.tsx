@@ -4,8 +4,16 @@ import { useAnalytics } from '@/hooks/useAnalytics'
 import { useTranslation } from '@/i18n'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
 import CategoryPieChart, { type CategoryPieChartDatum } from '@/components/ui/CategoryPieChart/CategoryPieChart'
+import TransactionsDrawer from '@/components/Transactions/TransactionsDrawer'
+import { getTransactionFeed } from '@api/client'
+import type { TransactionFeedItem } from '@api/types'
+import { useWallets } from '@/hooks/useWallets'
+import { useCategories } from '@/hooks/useCategories'
+import type { Wallet } from '@/types/entities/wallet'
+import type { Category } from '@/types/entities/category'
 
 interface ChartCategoryDatum extends Record<string, unknown> {
+	categoryId: number
 	name: string
 	value: number
 	color: string
@@ -15,30 +23,60 @@ interface ChartCategoryDatum extends Record<string, unknown> {
 
 type ChartDatumWithFormatted = ChartCategoryDatum & CategoryPieChartDatum
 
+interface StatisticsScreenProps {
+	onTransactionSelect?: (item: TransactionFeedItem) => void
+}
+
 const localeMap: Record<string, string> = {
 	ru: 'ru-RU',
 	en: 'en-US',
 }
 
-const StatisticsScreen = () => {
+const getCurrentMonthRange = () => {
+	const now = new Date()
+	const from = new Date(now.getFullYear(), now.getMonth(), 1)
+	const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+	return { from, to }
+}
+
+const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	const { analytics, loading, error, fetchAnalytics, clear } = useAnalytics()
 	const { locale, t } = useTranslation()
 	const { status } = useTelegramAuth({ auto: true })
+	const { wallets, fetchWallets, clearWallets } = useWallets()
+	const { categories, fetchCategories, clearCategories } = useCategories()
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 
 	useEffect(() => {
 		if (!authenticated) {
 			clear()
+			clearWallets()
+			clearCategories()
 			return
 		}
 
 		if (analytics) return
 		void fetchAnalytics().catch(() => undefined)
-	}, [authenticated, analytics, fetchAnalytics, clear])
+	}, [authenticated, analytics, fetchAnalytics, clear, clearWallets, clearCategories])
+
+	useEffect(() => {
+		if (!authenticated) {
+			return
+		}
+
+		if (!wallets.length) {
+			void fetchWallets().catch(() => undefined)
+		}
+
+		if (!categories.length) {
+			void fetchCategories().catch(() => undefined)
+		}
+	}, [authenticated, wallets.length, categories.length, fetchWallets, fetchCategories])
 
 	const chartData = useMemo<ChartCategoryDatum[]>(
 		() =>
 			analytics?.categories.map(category => ({
+				categoryId: category.categoryId,
 				name: category.categoryName,
 				value: category.amount,
 				color: category.categoryColor,
@@ -63,12 +101,32 @@ const StatisticsScreen = () => {
 		[chartData, currencyFormatter]
 	)
 
+	const walletById = useMemo(() => {
+		const map: Record<number, Wallet> = {}
+		for (const wallet of wallets) {
+			map[wallet.id] = wallet
+		}
+		return map
+	}, [wallets])
+
+	const categoryById = useMemo(() => {
+		const map: Record<number, Category> = {}
+		for (const category of categories) {
+			map[category.id] = category
+		}
+		return map
+	}, [categories])
+
 	const totalAmount = useMemo(() => chartData.reduce((sum, item) => sum + item.value, 0), [chartData])
 	const totalFormatted = currencyFormatter.format(totalAmount)
 
 	const hasData = formattedData.length > 0
 	const [activeSliceIndex, setActiveSliceIndex] = useState<number | null>(null)
 	const activeSlice = typeof activeSliceIndex === 'number' ? formattedData[activeSliceIndex] : null
+	const [isDrawerOpen, setDrawerOpen] = useState(false)
+	const [drawerItems, setDrawerItems] = useState<TransactionFeedItem[]>([])
+	const [drawerLoading, setDrawerLoading] = useState(false)
+	const [drawerError, setDrawerError] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (!hasData) {
@@ -122,6 +180,38 @@ const StatisticsScreen = () => {
 	const showSelectedLabel = showSelectedTemplate
 		.replace('{count}', countFormatter.format(selectedTransactionsCount))
 		.replace('{transactionWord}', getTransactionWord(selectedTransactionsCount))
+	const drawerTitle = activeSlice?.name ?? t('transactions.drawer.all')
+
+	const fetchDrawerTransactions = useCallback(async (categoryId?: number | null) => {
+		setDrawerLoading(true)
+		setDrawerError(null)
+		try {
+			const { from, to } = getCurrentMonthRange()
+			const response = await getTransactionFeed({
+				categoryId: typeof categoryId === 'number' ? categoryId : undefined,
+				from,
+				to,
+			})
+			setDrawerItems(response.results)
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Не удалось загрузить транзакции'
+			setDrawerItems([])
+			setDrawerError(message)
+		} finally {
+			setDrawerLoading(false)
+		}
+	}, [])
+
+	const handleDrawerButtonClick = useCallback(() => {
+		if (!isDrawerOpen) {
+			setDrawerOpen(true)
+		}
+	}, [isDrawerOpen])
+
+	useEffect(() => {
+		if (!isDrawerOpen) return
+		void fetchDrawerTransactions(activeSlice?.categoryId ?? null)
+	}, [isDrawerOpen, activeSlice?.categoryId, fetchDrawerTransactions])
 
 	return (
 		<div className='flex min-h-full items-center justify-center p-3 pb-24'>
@@ -147,10 +237,12 @@ const StatisticsScreen = () => {
 								onActiveSliceChange={handleSliceSelection}
 							/>
 						</div>
-						<div className='px-3 ml-auto w-fit'>
+						<div className='px-3 w-full'>
 							<button
 								type='button'
-								className='rounded-md px-4 py-2 text-sm font-medium bg-accent text-text-dark disabled:bg-background-muted disabled:text-accent disabled:opacity-50 transition-colors duration-300 ease-in-out'
+								onClick={handleDrawerButtonClick}
+								disabled={drawerLoading}
+								className='w-full rounded-md bg-accent px-4 py-2 text-sm font-medium text-text-dark transition-colors duration-300 ease-in-out disabled:bg-background-muted disabled:text-accent disabled:opacity-50'
 							>
 								{activeSlice ? showSelectedLabel : showAllLabel}
 							</button>
@@ -158,6 +250,18 @@ const StatisticsScreen = () => {
 					</div>
 				</div>
 			) : null}
+
+			<TransactionsDrawer
+				open={isDrawerOpen}
+				onClose={() => setDrawerOpen(false)}
+				title={drawerTitle}
+				items={drawerItems}
+				walletById={walletById}
+				categoryById={categoryById}
+				initialLoading={drawerLoading}
+				error={drawerError}
+				onItemClick={onTransactionSelect}
+			/>
 		</div>
 	)
 }

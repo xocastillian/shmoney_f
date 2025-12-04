@@ -8,6 +8,7 @@ export interface CategoryPieChartDatum extends Record<string, unknown> {
 	color: string
 	formattedValue: string
 	transactionCount?: number
+	categoryId?: number
 }
 
 interface CategoryPieChartProps<T extends CategoryPieChartDatum = CategoryPieChartDatum> {

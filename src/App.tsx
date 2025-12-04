@@ -8,6 +8,7 @@ import SettingsScreen from '@/screens/Settings/SettingsScreen'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
 import { useBudgets } from '@/hooks/useBudgets'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import useTransactions from '@/hooks/useTransactions'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
@@ -48,6 +49,7 @@ function App() {
 	const formId = useId()
 	const { wallets, fetchWallets, fetchWalletBalances, createWallet } = useWallets()
 	const { fetchBudgets } = useBudgets()
+	const { fetchAnalytics: refreshAnalytics } = useAnalytics()
 	const {
 		createWalletTransaction,
 		createCategoryTransaction,
@@ -433,6 +435,7 @@ function App() {
 			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
 			void fetchBudgets().catch(() => undefined)
+			void refreshAnalytics().catch(() => undefined)
 			handleDrawerClose()
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Не удалось удалить транзакцию'
@@ -448,6 +451,7 @@ function App() {
 		fetchWallets,
 		fetchTransactionFeed,
 		fetchBudgets,
+		refreshAnalytics,
 		handleDrawerClose,
 	])
 
@@ -524,6 +528,7 @@ function App() {
 				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
 				void fetchBudgets().catch(() => undefined)
+				void refreshAnalytics().catch(() => undefined)
 				handleDrawerClose()
 			} catch (err) {
 				const message = err instanceof Error ? err.message : 'Не удалось сохранить транзакцию'
@@ -551,6 +556,7 @@ function App() {
 			handleDrawerClose,
 			fetchWalletBalances,
 			fetchBudgets,
+			refreshAnalytics,
 		]
 	)
 
@@ -563,7 +569,7 @@ function App() {
 					</section>
 
 					<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
-						<StatisticsScreen />
+						<StatisticsScreen onTransactionSelect={handleTransactionSelect} />
 					</section>
 
 					<section className={cn('min-h-screen', activeTab === 'budgets' ? 'block' : 'hidden')}>
