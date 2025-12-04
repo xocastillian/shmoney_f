@@ -7,4 +7,5 @@ export type Setting = {
 	onClick: () => void
 	icon?: IconComponent
 	disabled?: boolean
+	value?: string
 }

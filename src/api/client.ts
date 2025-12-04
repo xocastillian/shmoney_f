@@ -29,6 +29,7 @@ import {
 	BudgetResponseSchema,
 	BudgetCreateRequestSchema,
 	BudgetUpdateRequestSchema,
+	AnalyticsResponseSchema,
 } from './schemas'
 import type {
 	AuthResponse,
@@ -58,6 +59,7 @@ import type {
 	BudgetResponse,
 	BudgetCreateRequest,
 	BudgetUpdateRequest,
+	AnalyticsResponse,
 } from './types'
 import type { BudgetPeriodType } from '@/types/entities/budget'
 
@@ -230,7 +232,12 @@ export async function deleteCategoryTransaction(id: number): Promise<void> {
 	await del<void>(endpoints.categoryTransactions.byId(id))
 }
 
-export async function listBudgets(params?: { status?: string; from?: Date | string; to?: Date | string; periodType?: BudgetPeriodType }): Promise<BudgetResponse[]> {
+export async function listBudgets(params?: {
+	status?: string
+	from?: Date | string
+	to?: Date | string
+	periodType?: BudgetPeriodType
+}): Promise<BudgetResponse[]> {
 	const query = new URLSearchParams()
 	if (params?.status) query.set('status', params.status)
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
@@ -245,6 +252,25 @@ export async function listBudgets(params?: { status?: string; from?: Date | stri
 export async function getBudget(id: number): Promise<BudgetResponse> {
 	const data = await get<unknown>(endpoints.budgets.byId(id))
 	return BudgetResponseSchema.parse(data)
+}
+
+export async function getAnalytics(params?: { from?: Date | string; to?: Date | string; categoryIds?: number[] }): Promise<AnalyticsResponse> {
+	const query = new URLSearchParams()
+	if (params?.from) {
+		query.set('from', new Date(params.from).toISOString())
+	}
+	if (params?.to) {
+		query.set('to', new Date(params.to).toISOString())
+	}
+	if (params?.categoryIds?.length) {
+		for (const categoryId of params.categoryIds) {
+			query.append('categoryIds', String(categoryId))
+		}
+	}
+	const queryString = query.toString()
+	const url = queryString ? `${endpoints.analytics.base}?${queryString}` : endpoints.analytics.base
+	const data = await get<unknown>(url)
+	return AnalyticsResponseSchema.parse(data)
 }
 
 export async function createBudget(payload: BudgetCreateRequest): Promise<BudgetResponse> {

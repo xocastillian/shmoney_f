@@ -8,6 +8,7 @@ import SettingsScreen from '@/screens/Settings/SettingsScreen'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
 import { useBudgets } from '@/hooks/useBudgets'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import useTransactions from '@/hooks/useTransactions'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
@@ -39,7 +40,7 @@ const isCategoryTransactionType = (value: TransactionTypeTabValue): value is Cat
 const getCurrentDateTimeString = () => formatDateTimeLocal(new Date())
 
 const defaultWalletType = WalletType.CASH
-const defaultCurrencyCode = currencyOptions[0]?.value ?? 'USD'
+const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
 const defaultWalletColor = colorOptions[0]
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
 	const formId = useId()
 	const { wallets, fetchWallets, fetchWalletBalances, createWallet } = useWallets()
 	const { fetchBudgets } = useBudgets()
+	const { fetchAnalytics: refreshAnalytics } = useAnalytics()
 	const {
 		createWalletTransaction,
 		createCategoryTransaction,
@@ -63,7 +65,17 @@ function App() {
 	const authLoading = useAuthStore(state => state.loading)
 	const authStatus = useAuthStore(state => state.status)
 	const isAuthenticated = authStatus === 'authenticated'
-	const { fetchSettings, language, clear: clearSettings } = useSettings()
+	const { fetchSettings, language, clear: clearSettings, supportedCurrencies, mainCurrency } = useSettings()
+	const currencyPickerOptions = useMemo(() => {
+		if (!supportedCurrencies.length) {
+			return currencyOptions
+		}
+		return supportedCurrencies.map(code => {
+			const existing = currencyOptions.find(option => option.value === code)
+			return existing ?? { value: code, label: `wallets.currency.${code.toLowerCase()}` }
+		})
+	}, [supportedCurrencies])
+	const defaultCurrencyCode = useMemo(() => mainCurrency ?? supportedCurrencies[0] ?? fallbackCurrencyCode, [mainCurrency, supportedCurrencies])
 	const { t, setLocale } = useTranslation()
 	const [amount, setAmount] = useState('0')
 	const [fromWalletId, setFromWalletId] = useState<number | null>(null)
@@ -133,6 +145,12 @@ function App() {
 
 	const clearTransactionError = useCallback(() => setTransactionError(null), [])
 
+	useEffect(() => {
+		if (!isWalletFormOpen) {
+			setWalletFormCurrencyCode(defaultCurrencyCode)
+		}
+	}, [defaultCurrencyCode, isWalletFormOpen])
+
 	const handleOpenWalletForm = useCallback(() => {
 		setWalletFormName('')
 		setWalletFormCurrencyCode(defaultCurrencyCode)
@@ -141,7 +159,7 @@ function App() {
 		setWalletFormType(defaultWalletType)
 		setWalletFormError(null)
 		setWalletFormOpen(true)
-	}, [])
+	}, [defaultCurrencyCode])
 
 	const handleCloseWalletForm = useCallback(() => {
 		setWalletFormOpen(false)
@@ -417,6 +435,7 @@ function App() {
 			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
 			void fetchBudgets().catch(() => undefined)
+			void refreshAnalytics().catch(() => undefined)
 			handleDrawerClose()
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Не удалось удалить транзакцию'
@@ -432,6 +451,7 @@ function App() {
 		fetchWallets,
 		fetchTransactionFeed,
 		fetchBudgets,
+		refreshAnalytics,
 		handleDrawerClose,
 	])
 
@@ -508,6 +528,7 @@ function App() {
 				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
 				void fetchBudgets().catch(() => undefined)
+				void refreshAnalytics().catch(() => undefined)
 				handleDrawerClose()
 			} catch (err) {
 				const message = err instanceof Error ? err.message : 'Не удалось сохранить транзакцию'
@@ -535,6 +556,7 @@ function App() {
 			handleDrawerClose,
 			fetchWalletBalances,
 			fetchBudgets,
+			refreshAnalytics,
 		]
 	)
 
@@ -547,7 +569,7 @@ function App() {
 					</section>
 
 					<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
-						<StatisticsScreen />
+						<StatisticsScreen onTransactionSelect={handleTransactionSelect} />
 					</section>
 
 					<section className={cn('min-h-screen', activeTab === 'budgets' ? 'block' : 'hidden')}>
@@ -609,7 +631,7 @@ function App() {
 						setWalletFormError(null)
 					}}
 					currencyCode={walletFormCurrencyCode}
-					currencyOptions={currencyOptions}
+					currencyOptions={currencyPickerOptions}
 					onOpenCurrencyPicker={() => setCurrencyPickerOpen(true)}
 					onOpenTypePicker={() => setTypePickerOpen(true)}
 					selectedType={walletFormType}
@@ -643,7 +665,7 @@ function App() {
 				<CurrencyPickerDrawer
 					open={currencyPickerOpen}
 					onClose={() => setCurrencyPickerOpen(false)}
-					options={currencyOptions}
+					options={currencyPickerOptions}
 					selectedCode={walletFormCurrencyCode}
 					onSelect={code => {
 						setWalletFormCurrencyCode(code)

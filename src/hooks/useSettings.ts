@@ -5,7 +5,9 @@ import { useSettingsStore } from '@/store/settingsStore'
 
 export function useSettings() {
 	const defaultLanguage = useSettingsStore(state => state.defaultLanguage)
+	const mainCurrency = useSettingsStore(state => state.mainCurrency)
 	const supportedLanguages = useSettingsStore(state => state.supportedLanguages)
+	const supportedCurrencies = useSettingsStore(state => state.supportedCurrencies)
 	const language = useSettingsStore(state => state.language)
 	const loading = useSettingsStore(state => state.loading)
 	const error = useSettingsStore(state => state.error)
@@ -64,15 +66,37 @@ export function useSettings() {
 		[setError, setLanguage, setLoading, setSettings]
 	)
 
+	const changeMainCurrency = useCallback(
+		async (nextCurrency: string): Promise<SettingsResponse> => {
+			setLoading(true)
+			try {
+				const response = await updateSettings({ mainCurrency: nextCurrency })
+				setSettings(response)
+				setError(null)
+				return response
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось обновить валюту'
+				setError(message)
+				throw err
+			} finally {
+				setLoading(false)
+			}
+		},
+		[setError, setLoading, setSettings]
+	)
+
 	return {
 		defaultLanguage,
+		mainCurrency,
 		supportedLanguages,
+		supportedCurrencies,
 		language,
 		loading,
 		error,
 		fetchSettings,
 		setLanguage,
 		changeLanguage,
+		changeMainCurrency,
 		clear,
 	}
 }

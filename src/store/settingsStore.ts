@@ -3,7 +3,9 @@ import type { AppSettings } from '@/types/entities/appSettings'
 
 interface SettingsState {
 	defaultLanguage: string | null
+	mainCurrency: string | null
 	supportedLanguages: string[]
+	supportedCurrencies: string[]
 	language: string | null
 	loading: boolean
 	error: string | null
@@ -16,7 +18,9 @@ interface SettingsState {
 
 const initialState: Omit<SettingsState, 'setSettings' | 'setLanguage' | 'setLoading' | 'setError' | 'clear'> = {
 	defaultLanguage: null,
+	mainCurrency: null,
 	supportedLanguages: [],
+	supportedCurrencies: [],
 	language: null,
 	loading: false,
 	error: null,
@@ -27,7 +31,9 @@ export const useSettingsStore = create<SettingsState>(set => ({
 	setSettings: settings =>
 		set({
 			defaultLanguage: settings.defaultLanguage,
+			mainCurrency: settings.mainCurrency,
 			supportedLanguages: settings.supportedLanguages,
+			supportedCurrencies: settings.supportedCurrencies,
 		}),
 	setLanguage: language => set({ language }),
 	setLoading: loading => set({ loading }),

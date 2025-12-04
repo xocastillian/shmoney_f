@@ -51,7 +51,7 @@ export const TransactionsWidget = ({
 
 			<TransactionsList items={items} walletById={walletById} categoryById={categoryById} limit={limit} onItemClick={onItemClick} />
 
-			<div className='mt-3 px-3 ml-auto w-fit'>
+			<div className='mt-3 px-3 w-full'>
 				<Button text={t('transactions.widget.showAll')} onClick={onOpenDrawer} />
 			</div>
 		</section>

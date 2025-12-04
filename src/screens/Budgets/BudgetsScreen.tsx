@@ -86,6 +86,8 @@ const BudgetsScreen = () => {
 		})).filter(section => section.items.length > 0)
 	}, [budgets, statusFilter])
 
+	const isEmpty = !loading && sections.length === 0
+
 	const handleOpenCreate = () => {
 		setEditingBudget(null)
 		setDrawerOpen(true)
@@ -115,6 +117,8 @@ const BudgetsScreen = () => {
 			<div className='overflow-auto pb-28'>
 				{loading ? (
 					<BudgetsSkeleton />
+				) : isEmpty ? (
+					<div className='flex min-h-[50vh] items-center justify-center px-6 text-center text-sm text-label'>{t('budgets.empty')}</div>
 				) : (
 					<div className='mt-3 px-3 overflow-hidden space-y-4'>
 						{sections.map(section => (

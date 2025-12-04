@@ -6,6 +6,7 @@ import dollarIcon from '@/assets/currencyIcons/currency-dollar.svg'
 import euroIcon from '@/assets/currencyIcons/currency-euro.svg'
 import tengeIcon from '@/assets/currencyIcons/currency-tenge.svg'
 import yuanIcon from '@/assets/currencyIcons/currency-yuan.svg'
+import rubleIcon from '@/assets/currencyIcons/currency-ruble.svg'
 
 export interface CurrencyOption {
 	value: string
@@ -26,4 +27,5 @@ export const currencyIconMap: Record<string, string> = {
 	EUR: euroIcon,
 	CNY: yuanIcon,
 	AED: dirhamIcon,
+	RUB: rubleIcon,
 }

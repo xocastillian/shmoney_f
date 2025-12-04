@@ -17,6 +17,7 @@ import BudgetForm from './BudgetForm'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import { currencyIconMap } from '@/widgets/Wallets/types'
 import Loader from '@/components/ui/Loader/Loader'
+import { useSettings } from '@/hooks/useSettings'
 
 interface BudgetDrawerProps {
 	open: boolean
@@ -27,15 +28,27 @@ interface BudgetDrawerProps {
 
 const defaultPeriodType = PeriodTypeEnum.MONTH
 const defaultBudgetType = BudgetTypeEnum.RECURRING
+const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
 
 export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetDrawerProps) => {
 	const { t, locale } = useTranslation()
 	const { createBudget, updateBudget, closeBudget, openBudget, deleteBudget, actionLoading } = useBudgets()
 	const { categories, fetchCategories } = useCategories()
+	const { supportedCurrencies, mainCurrency } = useSettings()
+	const currencyPickerOptions = useMemo(() => {
+		if (!supportedCurrencies.length) {
+			return currencyOptions
+		}
+		return supportedCurrencies.map(code => {
+			const existing = currencyOptions.find(option => option.value === code)
+			return existing ?? { value: code, label: `wallets.currency.${code.toLowerCase()}` }
+		})
+	}, [supportedCurrencies])
+	const defaultCurrencyCode = useMemo(() => mainCurrency ?? supportedCurrencies[0] ?? fallbackCurrencyCode, [mainCurrency, supportedCurrencies])
 	const [initialized, setInitialized] = useState(false)
 	const [name, setName] = useState('')
 	const [amount, setAmount] = useState('')
-	const [currencyCode, setCurrencyCode] = useState(currencyOptions[0].value)
+	const [currencyCode, setCurrencyCode] = useState(defaultCurrencyCode)
 	const [periodType, setPeriodType] = useState<BudgetPeriodType>(defaultPeriodType)
 	const [budgetType, setBudgetType] = useState<BudgetType>(defaultBudgetType)
 	const [periodStart, setPeriodStart] = useState('')
@@ -63,7 +76,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetD
 	const resetState = useCallback(() => {
 		setName('')
 		setAmount('')
-		setCurrencyCode(currencyOptions[0].value)
+		setCurrencyCode(defaultCurrencyCode)
 		setPeriodType(defaultPeriodType)
 		setBudgetType(defaultBudgetType)
 		setPeriodStart('')
@@ -71,13 +84,19 @@ export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetD
 		setSelectedCategoryIds([])
 		setError(null)
 		setCategoriesPickerOpen(false)
-	}, [])
+	}, [defaultCurrencyCode])
 
 	useEffect(() => {
 		if (!open) {
 			resetState()
 		}
 	}, [open, resetState])
+
+	useEffect(() => {
+		if (!open && !budget) {
+			setCurrencyCode(defaultCurrencyCode)
+		}
+	}, [budget, defaultCurrencyCode, open])
 
 	const handleToggleCategory = useCallback((categoryId: number) => {
 		setSelectedCategoryIds(prev => (prev.includes(categoryId) ? prev.filter(id => id !== categoryId) : [...prev, categoryId]))
@@ -177,9 +196,9 @@ export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetD
 					amountLimit: amountNumber,
 				})
 			}
-				setError(null)
-				onChange?.()
-				onClose()
+			setError(null)
+			onChange?.()
+			onClose()
 		} catch (err) {
 			const message = err instanceof Error ? err.message : t('wallets.errors.saveFailed')
 			setError(message)
@@ -233,7 +252,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetD
 			[PeriodTypeEnum.YEAR]: 'budgets.period.year',
 		}[periodType]
 	)
-	const currencyOption = currencyOptions.find(option => option.value === currencyCode)
+	const currencyOption = currencyPickerOptions.find(option => option.value === currencyCode)
 	const currencyLabel = currencyOption ? t(currencyOption.label) : currencyCode
 	const isBudgetClosed = budget?.status === BudgetStatus.CLOSED
 	const currencyIcon = currencyIconMap[currencyCode] ?? null
@@ -299,7 +318,7 @@ export const BudgetDrawer = ({ open, onClose, budget = null, onChange }: BudgetD
 			<CurrencyPickerDrawer
 				open={currencyPickerOpen}
 				onClose={() => setCurrencyPickerOpen(false)}
-				options={currencyOptions}
+				options={currencyPickerOptions}
 				selectedCode={currencyCode}
 				onSelect={code => {
 					setCurrencyCode(code)

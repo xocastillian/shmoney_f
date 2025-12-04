@@ -20,6 +20,7 @@ module.exports = {
 				danger: 'var(--danger)',
 				access: 'var(--access)',
 				disable: 'var(--disable)',
+				'accent-b': 'var(--accent-b)',
 			},
 		},
 	},
