@@ -133,8 +133,8 @@ const StatisticsScreen = () => {
 				<div className='text-center text-sm text-danger'>{error}</div>
 			) : hasData ? (
 				<div className='w-full rounded-xl bg-background-muted py-3'>
-					<div className='mb-3 border-b border-divider pb-3 px-3'>
-						<h2 className='text-base'>{t('statistics.categories.title')}</h2>
+					<div className='mb-3 px-3'>
+						<h2 className='text-base border-b border-divider pb-3 w-full'>{t('statistics.categories.title')}</h2>
 					</div>
 					<div className='flex flex-col items-center gap-3'>
 						<div className='bg-background-muted-2 py-3 w-full'>
