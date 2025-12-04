@@ -37,10 +37,7 @@ const CashFlowWidget = ({
 	if (!hasData) {
 		return (
 			<div className={cn('w-full rounded-xl bg-background-muted py-3 shadow-sm backdrop-blur', className)}>
-				<div className='mb-3 px-3'>
-					<h2 className='text-base border-b border-divider pb-3 w-full'>{title}</h2>
-				</div>
-				<div className='px-3 text-sm text-label'>{emptyLabel}</div>
+				<div className='px-3 text-sm text-label text-center'>{emptyLabel}</div>
 			</div>
 		)
 	}
