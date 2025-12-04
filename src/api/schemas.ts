@@ -209,12 +209,19 @@ export const CurrencyConversionResponseSchema = z.object({
 
 export const SettingsResponseSchema = z.object({
 	defaultLanguage: z.string(),
+	mainCurrency: z.string(),
 	supportedLanguages: z.array(z.string()),
+	supportedCurrencies: z.array(z.string()),
 })
 
-export const SettingsUpdateRequestSchema = z.object({
-	language: z.string(),
-})
+export const SettingsUpdateRequestSchema = z
+	.object({
+		language: z.string().optional(),
+		mainCurrency: z.string().optional(),
+	})
+	.refine(data => typeof data.language === 'string' || typeof data.mainCurrency === 'string', {
+		message: 'Settings update requires language or mainCurrency',
+	})
 
 export const CategoryResponseSchema = z.object({
 	id: z.number().int(),
