@@ -120,7 +120,6 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	const totalAmount = useMemo(() => chartData.reduce((sum, item) => sum + item.value, 0), [chartData])
 	const totalFormatted = currencyFormatter.format(totalAmount)
 
-	const hasData = formattedData.length > 0
 	const [activeSliceIndex, setActiveSliceIndex] = useState<number | null>(null)
 	const activeSlice = typeof activeSliceIndex === 'number' ? formattedData[activeSliceIndex] : null
 	const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -129,7 +128,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	const [drawerError, setDrawerError] = useState<string | null>(null)
 
 	useEffect(() => {
-		if (!hasData) {
+		if (formattedData.length === 0) {
 			setActiveSliceIndex(null)
 			return
 		}
@@ -137,7 +136,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 		if (typeof activeSliceIndex === 'number' && activeSliceIndex >= formattedData.length) {
 			setActiveSliceIndex(null)
 		}
-	}, [hasData, formattedData, activeSliceIndex])
+	}, [formattedData, activeSliceIndex])
 
 	const handleSliceSelection = useCallback((_slice: ChartDatumWithFormatted | null, index: number | null) => {
 		setActiveSliceIndex(typeof index === 'number' ? index : null)
@@ -231,35 +230,23 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 					</div>
 				) : error ? (
 					<div className='text-center text-sm text-danger'>{error}</div>
-				) : hasData ? (
-					<div className='w-full rounded-xl bg-background-muted py-3'>
-						<div className='mb-3 px-3'>
-							<h2 className='text-base border-b border-divider pb-3 w-full'>{t('statistics.categories.title')}</h2>
-						</div>
-						<div className='flex flex-col items-center gap-3'>
-							<div className='bg-background-muted-2 py-3 w-full'>
-								<CategoryPieChartWidget
-									data={formattedData}
-									defaultLabel={defaultLabel}
-									fallbackValue={totalFormatted}
-									className='w-full max-w-md'
-									activeIndex={activeSliceIndex}
-									onActiveSliceChange={handleSliceSelection}
-								/>
-							</div>
-							<div className='px-3 w-full'>
-								<button
-									type='button'
-									onClick={handleDrawerButtonClick}
-									disabled={drawerLoading}
-									className='w-full rounded-md bg-accent px-4 py-2 text-sm font-medium text-text-dark transition-colors duration-300 ease-in-out disabled:bg-background-muted disabled:text-accent disabled:opacity-50'
-								>
-									{activeSlice ? showSelectedLabel : showAllLabel}
-								</button>
-							</div>
-						</div>
-					</div>
-				) : null}
+				) : (
+					<CategoryPieChartWidget
+						data={formattedData}
+						defaultLabel={defaultLabel}
+						fallbackValue={totalFormatted}
+						title={t('statistics.categories.title')}
+						emptyLabel={t('statistics.categories.empty')}
+						containerClassName='shadow-sm backdrop-blur'
+						className='w-full max-w-md'
+						activeIndex={activeSliceIndex}
+						onActiveSliceChange={handleSliceSelection}
+						showActions={formattedData.length > 0}
+						actionLabel={activeSlice ? showSelectedLabel : showAllLabel}
+						actionDisabled={drawerLoading}
+						onActionClick={handleDrawerButtonClick}
+					/>
+				)}
 			</div>
 
 			<TransactionsDrawer
