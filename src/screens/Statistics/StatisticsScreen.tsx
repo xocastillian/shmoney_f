@@ -3,7 +3,7 @@ import Loader from '@/components/ui/Loader/Loader'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { useTranslation } from '@/i18n'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
-import CategoryPieChart, { type CategoryPieChartDatum } from '@/components/ui/CategoryPieChart/CategoryPieChart'
+import CategoryPieChartWidget, { type CategoryPieChartWidgetDatum } from '@/components/ui/CategoryPieChartWidget/CategoryPieChartWidget'
 import TransactionsDrawer from '@/components/Transactions/TransactionsDrawer'
 import { getTransactionFeed } from '@api/client'
 import type { TransactionFeedItem } from '@api/types'
@@ -21,7 +21,7 @@ interface ChartCategoryDatum extends Record<string, unknown> {
 	transactionCount?: number
 }
 
-type ChartDatumWithFormatted = ChartCategoryDatum & CategoryPieChartDatum
+type ChartDatumWithFormatted = ChartCategoryDatum & CategoryPieChartWidgetDatum
 
 interface StatisticsScreenProps {
 	onTransactionSelect?: (item: TransactionFeedItem) => void
@@ -238,7 +238,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 						</div>
 						<div className='flex flex-col items-center gap-3'>
 							<div className='bg-background-muted-2 py-3 w-full'>
-								<CategoryPieChart
+								<CategoryPieChartWidget
 									data={formattedData}
 									defaultLabel={defaultLabel}
 									fallbackValue={totalFormatted}

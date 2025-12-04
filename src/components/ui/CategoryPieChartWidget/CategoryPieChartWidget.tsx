@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { cn } from '@/lib/utils'
 
-export interface CategoryPieChartDatum extends Record<string, unknown> {
+export interface CategoryPieChartWidgetDatum extends Record<string, unknown> {
 	name: string
 	value: number
 	color: string
@@ -11,7 +11,7 @@ export interface CategoryPieChartDatum extends Record<string, unknown> {
 	categoryId?: number
 }
 
-interface CategoryPieChartProps<T extends CategoryPieChartDatum = CategoryPieChartDatum> {
+interface CategoryPieChartWidgetProps<T extends CategoryPieChartWidgetDatum = CategoryPieChartWidgetDatum> {
 	data: T[]
 	defaultLabel: string
 	fallbackValue: string
@@ -20,14 +20,14 @@ interface CategoryPieChartProps<T extends CategoryPieChartDatum = CategoryPieCha
 	onActiveSliceChange?: (slice: T | null, index: number | null) => void
 }
 
-const CategoryPieChart = <T extends CategoryPieChartDatum>({
+const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 	data,
 	defaultLabel,
 	fallbackValue,
 	className,
 	activeIndex: controlledActiveIndex,
 	onActiveSliceChange,
-}: CategoryPieChartProps<T>) => {
+}: CategoryPieChartWidgetProps<T>) => {
 	const [uncontrolledActiveIndex, setUncontrolledActiveIndex] = useState<number | null>(null)
 	const isControlled = typeof controlledActiveIndex !== 'undefined'
 	const activeIndex = isControlled ? controlledActiveIndex : uncontrolledActiveIndex
@@ -81,4 +81,4 @@ const CategoryPieChart = <T extends CategoryPieChartDatum>({
 	)
 }
 
-export default CategoryPieChart
+export default CategoryPieChartWidget
