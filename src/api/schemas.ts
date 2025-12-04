@@ -191,6 +191,7 @@ export const AnalyticsCategorySummarySchema = z.object({
 	categoryColor: HexColorSchema,
 	amount: z.coerce.number(),
 	percent: z.coerce.number(),
+	transactionCount: z.coerce.number().int().optional(),
 })
 
 export const AnalyticsPeriodSchema = z.object({
@@ -205,6 +206,7 @@ export const AnalyticsResponseSchema = z.object({
 	totalIncome: z.coerce.number(),
 	cashFlowAmount: z.coerce.number(),
 	cashFlowPercent: z.coerce.number(),
+	totalExpenseTransactions: z.coerce.number().int().optional(),
 	categories: AnalyticsCategorySummarySchema.array(),
 	topCategories: AnalyticsCategorySummarySchema.array(),
 })

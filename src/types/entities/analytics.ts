@@ -4,6 +4,7 @@ export interface AnalyticsCategorySummary {
 	categoryColor: string
 	amount: number
 	percent: number
+	transactionCount?: number
 }
 
 export interface AnalyticsPeriod {
@@ -18,6 +19,7 @@ export interface Analytics {
 	totalIncome: number
 	cashFlowAmount: number
 	cashFlowPercent: number
+	totalExpenseTransactions?: number
 	categories: AnalyticsCategorySummary[]
 	topCategories: AnalyticsCategorySummary[]
 }

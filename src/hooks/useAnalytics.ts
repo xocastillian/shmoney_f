@@ -20,6 +20,7 @@ const mapAnalytics = (response: AnalyticsResponse): Analytics => ({
 	totalIncome: response.totalIncome,
 	cashFlowAmount: response.cashFlowAmount,
 	cashFlowPercent: response.cashFlowPercent,
+	totalExpenseTransactions: response.totalExpenseTransactions,
 	categories:
 		response.categories?.map(category => ({
 			categoryId: category.categoryId,
@@ -27,6 +28,7 @@ const mapAnalytics = (response: AnalyticsResponse): Analytics => ({
 			categoryColor: category.categoryColor,
 			amount: category.amount,
 			percent: category.percent,
+			transactionCount: category.transactionCount ?? 0,
 		})) ?? [],
 	topCategories:
 		response.topCategories?.map(category => ({
@@ -35,6 +37,7 @@ const mapAnalytics = (response: AnalyticsResponse): Analytics => ({
 			categoryColor: category.categoryColor,
 			amount: category.amount,
 			percent: category.percent,
+			transactionCount: category.transactionCount ?? 0,
 		})) ?? [],
 })
 
