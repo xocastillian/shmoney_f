@@ -2,7 +2,7 @@ import type { TranslationDictionary } from './en'
 
 export const ru: TranslationDictionary = {
 	'bottomNav.home': 'Главная',
-	'bottomNav.statistics': 'Статистика',
+	'bottomNav.statistics': 'Аналитика',
 	'bottomNav.budgets': 'Бюджеты',
 	'bottomNav.settings': 'Настройки',
 	'settings.wallets': 'Кошельки',
@@ -16,6 +16,12 @@ export const ru: TranslationDictionary = {
 	'statistics.categories.empty': 'Нет данных для отображения',
 	'statistics.categories.button.showAll': 'Показать все транзакции',
 	'statistics.categories.button.showSelected': 'Показать {count} {transactionWord}',
+	'statistics.cashFlow.title': 'Денежный поток',
+	'statistics.cashFlow.net': 'Итог',
+	'statistics.cashFlow.percent': 'Изменение',
+	'statistics.cashFlow.expense': 'Расходы',
+	'statistics.cashFlow.income': 'Доходы',
+	'statistics.cashFlow.empty': 'Нет данных по денежному потоку',
 	'settings.archivedWallets': 'Архивные кошельки',
 	'settings.archivedWallets.empty': 'Нет архивных кошельков',
 	'settings.theme': 'Тема',

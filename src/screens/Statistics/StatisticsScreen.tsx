@@ -3,7 +3,8 @@ import Loader from '@/components/ui/Loader/Loader'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { useTranslation } from '@/i18n'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
-import CategoryPieChartWidget, { type CategoryPieChartWidgetDatum } from '@/components/ui/CategoryPieChartWidget/CategoryPieChartWidget'
+import CategoryPieChartWidget, { type CategoryPieChartWidgetDatum } from '@/widgets/CategoryPieChartWidget/CategoryPieChartWidget'
+import CashFlowWidget from '@/widgets/CashFlowWidget/CashFlowWidget'
 import TransactionsDrawer from '@/components/Transactions/TransactionsDrawer'
 import { getTransactionFeed } from '@api/client'
 import type { TransactionFeedItem } from '@api/types'
@@ -101,6 +102,23 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 		[chartData, currencyFormatter]
 	)
 
+	const totalExpenseValue = analytics?.totalExpense ?? 0
+	const totalIncomeValue = analytics?.totalIncome ?? 0
+	const cashFlowAmountValue = analytics?.cashFlowAmount ?? 0
+	const cashFlowPercentValue = analytics?.cashFlowPercent ?? 0
+
+	const formatCurrencyValue = useCallback((value: number) => currencyFormatter.format(Math.abs(value)), [currencyFormatter])
+
+	const cashFlowAmountDisplay = `${cashFlowAmountValue > 0 ? '+' : cashFlowAmountValue < 0 ? '-' : ''}${formatCurrencyValue(cashFlowAmountValue)}`
+	const cashFlowAmountClass = cashFlowAmountValue > 0 ? 'text-access' : cashFlowAmountValue < 0 ? 'text-danger' : 'text-text'
+	const cashFlowPercentDisplay = `${cashFlowPercentValue > 0 ? '+' : cashFlowPercentValue < 0 ? '-' : ''}${Math.abs(cashFlowPercentValue).toFixed(
+		2
+	)}%`
+	const cashFlowPercentClass = cashFlowPercentValue > 0 ? 'bg-access' : cashFlowPercentValue < 0 ? 'bg-danger' : 'text-text'
+	const totalExpenseDisplay = `-${formatCurrencyValue(totalExpenseValue)}`
+	const totalIncomeDisplay = `+${formatCurrencyValue(totalIncomeValue)}`
+	const hasCashFlowData = totalIncomeValue !== 0 || totalExpenseValue !== 0 || cashFlowAmountValue !== 0
+
 	const walletById = useMemo(() => {
 		const map: Record<number, Wallet> = {}
 		for (const wallet of wallets) {
@@ -190,6 +208,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 				categoryId: typeof categoryId === 'number' ? categoryId : undefined,
 				from,
 				to,
+				type: 'EXPENSE',
 			})
 			setDrawerItems(response.results)
 		} catch (err) {
@@ -223,7 +242,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	return (
 		<div className='min-h-full bg-background overflow-y-auto'>
 			{header}
-			<div className='p-3 pb-24'>
+			<div className='px-3 pb-28'>
 				{loading ? (
 					<div className='flex h-64 items-center justify-center'>
 						<Loader />
@@ -231,21 +250,35 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 				) : error ? (
 					<div className='text-center text-sm text-danger'>{error}</div>
 				) : (
-					<CategoryPieChartWidget
-						data={formattedData}
-						defaultLabel={defaultLabel}
-						fallbackValue={totalFormatted}
-						title={t('statistics.categories.title')}
-						emptyLabel={t('statistics.categories.empty')}
-						containerClassName='shadow-sm backdrop-blur'
-						className='w-full max-w-md'
-						activeIndex={activeSliceIndex}
-						onActiveSliceChange={handleSliceSelection}
-						showActions={formattedData.length > 0}
-						actionLabel={activeSlice ? showSelectedLabel : showAllLabel}
-						actionDisabled={drawerLoading}
-						onActionClick={handleDrawerButtonClick}
-					/>
+					<div className='space-y-3'>
+						<CategoryPieChartWidget
+							data={formattedData}
+							defaultLabel={defaultLabel}
+							fallbackValue={totalFormatted}
+							title={t('statistics.categories.title')}
+							emptyLabel={t('statistics.categories.empty')}
+							activeIndex={activeSliceIndex}
+							onActiveSliceChange={handleSliceSelection}
+							showActions={formattedData.length > 0}
+							actionLabel={activeSlice ? showSelectedLabel : showAllLabel}
+							actionDisabled={drawerLoading}
+							onActionClick={handleDrawerButtonClick}
+						/>
+
+						<CashFlowWidget
+							title={t('statistics.cashFlow.title')}
+							amountDisplay={cashFlowAmountDisplay}
+							amountClassName={cashFlowAmountClass}
+							percentDisplay={cashFlowPercentDisplay}
+							percentClassName={cashFlowPercentClass}
+							incomeLabel={t('statistics.cashFlow.income')}
+							incomeDisplay={totalIncomeDisplay}
+							expenseLabel={t('statistics.cashFlow.expense')}
+							expenseDisplay={totalExpenseDisplay}
+							emptyLabel={t('statistics.cashFlow.empty')}
+							hasData={hasCashFlowData}
+						/>
+					</div>
 				)}
 			</div>
 
