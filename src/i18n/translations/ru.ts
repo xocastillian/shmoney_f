@@ -89,6 +89,7 @@ export const ru: TranslationDictionary = {
 	'wallets.currency.eur': 'Евро',
 	'wallets.currency.cny': 'Юань',
 	'wallets.currency.aed': 'Дирхам',
+	'wallets.currency.rub': 'Рубль',
 	'wallets.balanceTitle': 'Баланс',
 	'wallets.balancePlaceholder': 'Здесь будет общий баланс',
 	'exchangeRates.title': 'Курсы валют',

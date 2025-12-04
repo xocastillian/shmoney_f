@@ -87,6 +87,7 @@ export const en = {
 	'wallets.currency.eur': 'Euro',
 	'wallets.currency.cny': 'Yuan',
 	'wallets.currency.aed': 'Dirham',
+	'wallets.currency.rub': 'Ruble',
 	'wallets.balanceTitle': 'Balance',
 	'wallets.balancePlaceholder': 'Total balance will appear here',
 	'exchangeRates.title': 'Exchange rates',

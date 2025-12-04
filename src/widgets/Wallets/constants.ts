@@ -6,6 +6,7 @@ export const currencyOptions: CurrencyOption[] = [
 	{ value: 'EUR', label: 'wallets.currency.eur' },
 	{ value: 'CNY', label: 'wallets.currency.cny' },
 	{ value: 'AED', label: 'wallets.currency.aed' },
+	{ value: 'RUB', label: 'wallets.currency.rub' },
 ]
 
 export const colorOptions: readonly string[] = [

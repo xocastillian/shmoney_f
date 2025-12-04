@@ -18,7 +18,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 	return (
 		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
-				<div className='flex justify-between items-center p-3'>
+				<div className='flex justify-between items-center p-3 sticky top-0'>
 					<h2 className='text-lg font-medium'>{t('wallets.form.currencyTitle')}</h2>
 
 					<button type='button' onClick={onClose} className='rounded-full p-2' aria-label={t('wallets.form.close')}>
@@ -26,7 +26,7 @@ export function CurrencyPickerDrawer({ open, onClose, options, selectedCode, onS
 					</button>
 				</div>
 
-				<div className='flex flex-col pb-10'>
+				<div className='flex flex-col pb-10 flex-1 overflow-y-auto'>
 					<div className='bg-background-muted border-t border-divider'>
 						{options.map(option => {
 							const isSelected = option.value === selectedCode

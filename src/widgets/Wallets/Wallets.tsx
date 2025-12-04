@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Carousel } from '@/components/ui/Carousel'
 import { AddWalletCard } from '@/components/WalletCard/AddWalletCard'
@@ -13,6 +13,7 @@ import { WalletStatus, WalletType } from '@/types/entities/wallet'
 import { sanitizeDecimalInput } from '@/utils/number'
 import { colorOptions, currencyOptions } from './constants'
 import { useTranslation } from '@/i18n'
+import { useSettings } from '@/hooks/useSettings'
 
 interface WalletsProps {
 	wallets: Wallet[]
@@ -24,9 +25,15 @@ const defaultWalletType = WalletType.CASH
 const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const { createWallet, updateWallet, actionLoading, fetchWalletBalances, updateWalletStatus } = useWallets()
 	const { t } = useTranslation()
+	const { supportedCurrencies, mainCurrency } = useSettings()
+	const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
+	const defaultCurrencyCode = useMemo(
+		() => mainCurrency ?? supportedCurrencies[0] ?? fallbackCurrencyCode,
+		[fallbackCurrencyCode, mainCurrency, supportedCurrencies]
+	)
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
-	const [currencyCode, setCurrencyCode] = useState(currencyOptions[0].value)
+	const [currencyCode, setCurrencyCode] = useState(defaultCurrencyCode)
 	const [balance, setBalance] = useState('')
 	const [formError, setFormError] = useState<string | null>(null)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
@@ -39,9 +46,19 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 
 	const isEditing = editingWalletId !== null
 
-	const resetFormState = () => {
+	const currencyPickerOptions = useMemo(() => {
+		if (!supportedCurrencies.length) {
+			return currencyOptions
+		}
+		return supportedCurrencies.map(code => {
+			const existing = currencyOptions.find(option => option.value === code)
+			return existing ?? { value: code, label: `wallets.currency.${code.toLowerCase()}` }
+		})
+	}, [supportedCurrencies])
+
+	const resetFormState = useCallback(() => {
 		setName('')
-		setCurrencyCode(currencyOptions[0].value)
+		setCurrencyCode(defaultCurrencyCode)
 		setBalance('')
 		setFormError(null)
 		setColorPickerOpen(false)
@@ -51,13 +68,19 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setCurrencyPickerOpen(false)
 		setEditingWalletId(null)
 		setEditingWalletStatus(WalletStatus.ACTIVE)
-	}
+	}, [defaultCurrencyCode])
 
 	useEffect(() => {
 		if (!open) {
 			resetFormState()
 		}
-	}, [open])
+	}, [open, resetFormState])
+
+	useEffect(() => {
+		if (!open && !isEditing) {
+			setCurrencyCode(defaultCurrencyCode)
+		}
+	}, [defaultCurrencyCode, isEditing, open])
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -138,10 +161,10 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		return actionLoading || trimmedName.length === 0 || trimmedCurrency.length === 0 || !balanceValid
 	}, [actionLoading, name, currencyCode, balance])
 
-	const handleAddWalletClick = () => {
+	const handleAddWalletClick = useCallback(() => {
 		resetFormState()
 		setOpen(true)
-	}
+	}, [resetFormState])
 
 	const handleWalletClick = (wallet: Wallet) => {
 		setEditingWalletId(wallet.id)
@@ -218,7 +241,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				}}
 				submitting={actionLoading}
 				currencyCode={currencyCode}
-				currencyOptions={currencyOptions}
+				currencyOptions={currencyPickerOptions}
 				onOpenCurrencyPicker={() => setCurrencyPickerOpen(true)}
 				onOpenTypePicker={() => setTypePickerOpen(true)}
 				selectedType={selectedType}
@@ -253,7 +276,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 			<CurrencyPickerDrawer
 				open={currencyPickerOpen}
 				onClose={() => setCurrencyPickerOpen(false)}
-				options={currencyOptions}
+				options={currencyPickerOptions}
 				selectedCode={currencyCode}
 				onSelect={code => {
 					setCurrencyCode(code)
