@@ -11,6 +11,7 @@ export const en = {
 	'settings.archivedWallets.empty': 'You have no archived wallets yet',
 	'settings.language': 'Language',
 	'settings.mainCurrency': 'Main currency',
+	'statistics.title': 'Analytics',
 	'statistics.categories.title': 'Spending by categories',
 	'statistics.categories.empty': 'No category data yet',
 	'statistics.categories.button.showAll': 'Show all transactions',

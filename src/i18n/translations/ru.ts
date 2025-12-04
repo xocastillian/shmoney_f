@@ -11,6 +11,7 @@ export const ru: TranslationDictionary = {
 	'settings.categories': 'Категории',
 	'settings.language': 'Язык',
 	'settings.mainCurrency': 'Основная валюта',
+	'statistics.title': 'Аналитика',
 	'statistics.categories.title': 'Траты по категориям',
 	'statistics.categories.empty': 'Нет данных для отображения',
 	'statistics.categories.button.showAll': 'Показать все транзакции',
