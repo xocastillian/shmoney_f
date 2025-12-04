@@ -17,7 +17,7 @@ export const en = {
 	'statistics.categories.button.showAll': 'Show all transactions',
 	'statistics.categories.button.showSelected': 'Show {count} {transactionWord}',
 	'statistics.cashFlow.title': 'Cash flow',
-	'statistics.cashFlow.net': 'Net',
+	'statistics.cashFlow.net': 'Total',
 	'statistics.cashFlow.percent': 'Change',
 	'statistics.cashFlow.expense': 'Expenses',
 	'statistics.cashFlow.income': 'Income',

@@ -17,7 +17,7 @@ export const ru: TranslationDictionary = {
 	'statistics.categories.button.showAll': 'Показать все транзакции',
 	'statistics.categories.button.showSelected': 'Показать {count} {transactionWord}',
 	'statistics.cashFlow.title': 'Денежный поток',
-	'statistics.cashFlow.net': 'Итог',
+	'statistics.cashFlow.net': 'Итого',
 	'statistics.cashFlow.percent': 'Изменение',
 	'statistics.cashFlow.expense': 'Расходы',
 	'statistics.cashFlow.income': 'Доходы',

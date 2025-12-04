@@ -70,8 +70,8 @@ const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 						</div>
 					)}
 					<div className='flex flex-col items-center gap-3'>
-						<div className='bg-background-muted-2 py-3 w-full'>
-							<div className={cn('relative h-64 w-full', className)}>
+						<div className='bg-background-muted-2 w-full'>
+							<div className={cn('relative h-[300px] w-full', className)}>
 								<div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
 									<span className='font-medium text-label text-sm'>{activeSlice?.name ?? defaultLabel}</span>
 									<span className='font-semibold text-base'>{activeSlice?.formattedValue ?? fallbackValue}</span>
@@ -82,8 +82,8 @@ const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 											data={data}
 											dataKey='value'
 											nameKey='name'
-											innerRadius={90}
-											outerRadius={125}
+											innerRadius={100}
+											outerRadius={130}
 											paddingAngle={1}
 											labelLine={false}
 											isAnimationActive={false}
