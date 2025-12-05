@@ -12,6 +12,7 @@ import { useWallets } from '@/hooks/useWallets'
 import { useCategories } from '@/hooks/useCategories'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import useTransactions from '@/hooks/useTransactions'
 
 interface ChartCategoryDatum extends Record<string, unknown> {
 	categoryId: number
@@ -47,6 +48,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	const { status } = useTelegramAuth({ auto: true })
 	const { wallets, fetchWallets, clearWallets } = useWallets()
 	const { categories, fetchCategories, clearCategories } = useCategories()
+	const { feed } = useTransactions()
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 
 	useEffect(() => {
@@ -231,7 +233,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	useEffect(() => {
 		if (!isDrawerOpen) return
 		void fetchDrawerTransactions(activeSlice?.categoryId ?? null)
-	}, [isDrawerOpen, activeSlice?.categoryId, fetchDrawerTransactions])
+	}, [isDrawerOpen, activeSlice?.categoryId, fetchDrawerTransactions, feed])
 
 	const header = (
 		<header className='sticky top-0 z-20 bg-background'>
