@@ -192,6 +192,7 @@ export const AnalyticsCategorySummarySchema = z.object({
 	amount: z.coerce.number(),
 	percent: z.coerce.number(),
 	transactionCount: z.coerce.number().int().optional(),
+	categoryIcon: z.string().nullable().optional(),
 })
 
 export const AnalyticsPeriodSchema = z.object({

@@ -12,6 +12,8 @@ import { useWallets } from '@/hooks/useWallets'
 import { useCategories } from '@/hooks/useCategories'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import useTransactions from '@/hooks/useTransactions'
+import PeriodSwitcher from '@/components/ui/PeriodSwitcher'
 
 interface ChartCategoryDatum extends Record<string, unknown> {
 	categoryId: number
@@ -20,6 +22,7 @@ interface ChartCategoryDatum extends Record<string, unknown> {
 	color: string
 	percent: number
 	transactionCount?: number
+	categoryIcon?: string
 }
 
 type ChartDatumWithFormatted = ChartCategoryDatum & CategoryPieChartWidgetDatum
@@ -33,10 +36,9 @@ const localeMap: Record<string, string> = {
 	en: 'en-US',
 }
 
-const getCurrentMonthRange = () => {
-	const now = new Date()
-	const from = new Date(now.getFullYear(), now.getMonth(), 1)
-	const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+const getMonthRange = (date: Date) => {
+	const from = new Date(date.getFullYear(), date.getMonth(), 1)
+	const to = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999)
 	return { from, to }
 }
 
@@ -46,19 +48,23 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	const { status } = useTelegramAuth({ auto: true })
 	const { wallets, fetchWallets, clearWallets } = useWallets()
 	const { categories, fetchCategories, clearCategories } = useCategories()
+	const { feed } = useTransactions()
 	const authenticated = useMemo(() => status === 'authenticated', [status])
+	const [selectedDate, setSelectedDate] = useState(() => new Date())
+	const periodRange = useMemo(() => getMonthRange(selectedDate), [selectedDate])
 
 	useEffect(() => {
 		if (!authenticated) {
 			clear()
 			clearWallets()
 			clearCategories()
-			return
 		}
+	}, [authenticated, clear, clearWallets, clearCategories])
 
-		if (analytics) return
-		void fetchAnalytics().catch(() => undefined)
-	}, [authenticated, analytics, fetchAnalytics, clear, clearWallets, clearCategories])
+	useEffect(() => {
+		if (!authenticated) return
+		void fetchAnalytics({ from: periodRange.from, to: periodRange.to }).catch(() => undefined)
+	}, [authenticated, fetchAnalytics, periodRange])
 
 	useEffect(() => {
 		if (!authenticated) {
@@ -83,6 +89,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 				color: category.categoryColor,
 				percent: category.percent,
 				transactionCount: category.transactionCount ?? 0,
+				categoryIcon: category.categoryIcon,
 			})) ?? [],
 		[analytics]
 	)
@@ -199,26 +206,28 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 		.replace('{transactionWord}', getTransactionWord(selectedTransactionsCount))
 	const drawerTitle = activeSlice?.name ?? t('transactions.drawer.all')
 
-	const fetchDrawerTransactions = useCallback(async (categoryId?: number | null) => {
-		setDrawerLoading(true)
-		setDrawerError(null)
-		try {
-			const { from, to } = getCurrentMonthRange()
-			const response = await getTransactionFeed({
-				categoryId: typeof categoryId === 'number' ? categoryId : undefined,
-				from,
-				to,
-				type: 'EXPENSE',
-			})
-			setDrawerItems(response.results)
-		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Не удалось загрузить транзакции'
-			setDrawerItems([])
-			setDrawerError(message)
-		} finally {
-			setDrawerLoading(false)
-		}
-	}, [])
+	const fetchDrawerTransactions = useCallback(
+		async (categoryId?: number | null) => {
+			setDrawerLoading(true)
+			setDrawerError(null)
+			try {
+				const response = await getTransactionFeed({
+					categoryId: typeof categoryId === 'number' ? categoryId : undefined,
+					from: periodRange.from,
+					to: periodRange.to,
+					type: 'EXPENSE',
+				})
+				setDrawerItems(response.results)
+			} catch (err) {
+				const message = err instanceof Error ? err.message : 'Не удалось загрузить транзакции'
+				setDrawerItems([])
+				setDrawerError(message)
+			} finally {
+				setDrawerLoading(false)
+			}
+		},
+		[periodRange]
+	)
 
 	const handleDrawerButtonClick = useCallback(() => {
 		if (!isDrawerOpen) {
@@ -229,7 +238,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	useEffect(() => {
 		if (!isDrawerOpen) return
 		void fetchDrawerTransactions(activeSlice?.categoryId ?? null)
-	}, [isDrawerOpen, activeSlice?.categoryId, fetchDrawerTransactions])
+	}, [isDrawerOpen, activeSlice?.categoryId, fetchDrawerTransactions, feed])
 
 	const header = (
 		<header className='sticky top-0 z-20 bg-background'>
@@ -243,43 +252,46 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 		<div className='min-h-full bg-background overflow-y-auto'>
 			{header}
 			<div className='px-3 pb-28'>
-				{loading ? (
-					<div className='flex h-64 items-center justify-center'>
-						<Loader />
-					</div>
-				) : error ? (
-					<div className='text-center text-sm text-danger'>{error}</div>
-				) : (
-					<div className='space-y-3'>
-						<CategoryPieChartWidget
-							data={formattedData}
-							defaultLabel={defaultLabel}
-							fallbackValue={totalFormatted}
-							title={t('statistics.categories.title')}
-							emptyLabel={t('statistics.categories.empty')}
-							activeIndex={activeSliceIndex}
-							onActiveSliceChange={handleSliceSelection}
-							showActions={formattedData.length > 0}
-							actionLabel={activeSlice ? showSelectedLabel : showAllLabel}
-							actionDisabled={drawerLoading}
-							onActionClick={handleDrawerButtonClick}
-						/>
+				<div className='space-y-3'>
+					<PeriodSwitcher currentDate={selectedDate} locale={resolvedLocale} onChange={setSelectedDate} className='rounded-xl' />
+					{loading ? (
+						<div className='flex h-64 items-center justify-center'>
+							<Loader />
+						</div>
+					) : error ? (
+						<div className='text-center text-sm text-danger'>{error}</div>
+					) : (
+						<div className='space-y-3'>
+							<CategoryPieChartWidget
+								data={formattedData}
+								defaultLabel={defaultLabel}
+								fallbackValue={totalFormatted}
+								title={t('statistics.categories.title')}
+								emptyLabel={t('statistics.categories.empty')}
+								activeIndex={activeSliceIndex}
+								onActiveSliceChange={handleSliceSelection}
+								showActions={formattedData.length > 0}
+								actionLabel={activeSlice ? showSelectedLabel : showAllLabel}
+								actionDisabled={drawerLoading}
+								onActionClick={handleDrawerButtonClick}
+							/>
 
-						<CashFlowWidget
-							title={t('statistics.cashFlow.title')}
-							amountDisplay={cashFlowAmountDisplay}
-							amountClassName={cashFlowAmountClass}
-							percentDisplay={cashFlowPercentDisplay}
-							percentClassName={cashFlowPercentClass}
-							incomeLabel={t('statistics.cashFlow.income')}
-							incomeDisplay={totalIncomeDisplay}
-							expenseLabel={t('statistics.cashFlow.expense')}
-							expenseDisplay={totalExpenseDisplay}
-							emptyLabel={t('statistics.cashFlow.empty')}
-							hasData={hasCashFlowData}
-						/>
-					</div>
-				)}
+							<CashFlowWidget
+								title={t('statistics.cashFlow.title')}
+								amountDisplay={cashFlowAmountDisplay}
+								amountClassName={cashFlowAmountClass}
+								percentDisplay={cashFlowPercentDisplay}
+								percentClassName={cashFlowPercentClass}
+								incomeLabel={t('statistics.cashFlow.income')}
+								incomeDisplay={totalIncomeDisplay}
+								expenseLabel={t('statistics.cashFlow.expense')}
+								expenseDisplay={totalExpenseDisplay}
+								emptyLabel={t('statistics.cashFlow.empty')}
+								hasData={hasCashFlowData}
+							/>
+						</div>
+					)}
+				</div>
 			</div>
 
 			<TransactionsDrawer

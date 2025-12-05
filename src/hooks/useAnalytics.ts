@@ -29,6 +29,7 @@ const mapAnalytics = (response: AnalyticsResponse): Analytics => ({
 			amount: category.amount,
 			percent: category.percent,
 			transactionCount: category.transactionCount ?? 0,
+			categoryIcon: category.categoryIcon ?? undefined,
 		})) ?? [],
 	topCategories:
 		response.topCategories?.map(category => ({
@@ -38,6 +39,7 @@ const mapAnalytics = (response: AnalyticsResponse): Analytics => ({
 			amount: category.amount,
 			percent: category.percent,
 			transactionCount: category.transactionCount ?? 0,
+			categoryIcon: category.categoryIcon ?? undefined,
 		})) ?? [],
 })
 

@@ -17,6 +17,7 @@ import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 const defaultWalletType = WalletType.CASH
 const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
@@ -71,6 +72,7 @@ const SettingsScreen = () => {
 		createWallet,
 		actionLoading,
 	} = useWallets()
+	const { fetchAnalytics: refreshAnalytics } = useAnalytics()
 	const { t } = useTranslation()
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
@@ -283,7 +285,8 @@ const SettingsScreen = () => {
 	const handleSubmitCategory = useCallback(() => {
 		setEditingCategory(null)
 		setAddCategoryDrawerOpen(false)
-	}, [])
+		void refreshAnalytics().catch(() => undefined)
+	}, [refreshAnalytics])
 
 	const handleSelectLanguage = useCallback(
 		async (nextLanguage: string) => {
