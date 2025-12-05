@@ -5,7 +5,7 @@ import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTim
 import { formatDateTimeLocal } from '@/utils/date'
 import { useTranslation } from '@/i18n'
 
-interface BudgetMonthSwitcherProps {
+export interface PeriodSwitcherProps {
 	currentDate: Date
 	locale: string
 	onChange: (nextDate: Date) => void
@@ -43,7 +43,7 @@ const isCurrentPeriod = (mode: 'MONTH' | 'WEEK' | 'YEAR', value: Date, now: Date
 	return now >= start && now <= end
 }
 
-const BudgetMonthSwitcher = ({ currentDate, locale, onChange, disableFuture = true, className, mode = 'MONTH' }: BudgetMonthSwitcherProps) => {
+const PeriodSwitcher = ({ currentDate, locale, onChange, disableFuture = true, className, mode = 'MONTH' }: PeriodSwitcherProps) => {
 	const now = new Date()
 	const normalizedDate = useMemo(() => {
 		if (mode === 'MONTH') return startOfMonth(currentDate)
@@ -156,4 +156,4 @@ const BudgetMonthSwitcher = ({ currentDate, locale, onChange, disableFuture = tr
 	)
 }
 
-export default BudgetMonthSwitcher
+export default PeriodSwitcher
