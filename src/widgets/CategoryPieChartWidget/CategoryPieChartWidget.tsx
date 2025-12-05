@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { cn } from '@/lib/utils'
+import { categoryIconMap } from '@/widgets/Categories/icons'
 
 export interface CategoryPieChartWidgetDatum extends Record<string, unknown> {
 	name: string
@@ -9,6 +10,7 @@ export interface CategoryPieChartWidgetDatum extends Record<string, unknown> {
 	formattedValue: string
 	transactionCount?: number
 	categoryId?: number
+	categoryIcon?: string
 }
 
 interface CategoryPieChartWidgetProps<T extends CategoryPieChartWidgetDatum = CategoryPieChartWidgetDatum> {
@@ -49,6 +51,10 @@ const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 	const activeIndex = isControlled ? controlledActiveIndex : uncontrolledActiveIndex
 
 	const activeSlice = typeof activeIndex === 'number' ? data[activeIndex] : null
+	const ActiveCategoryIcon = useMemo(() => {
+		if (!activeSlice?.categoryIcon) return null
+		return categoryIconMap[activeSlice.categoryIcon] ?? null
+	}, [activeSlice?.categoryIcon])
 
 	const handleSliceClick = (index: number) => {
 		const nextIndex = activeIndex === index ? null : index
@@ -73,6 +79,7 @@ const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 						<div className='bg-background-muted-2 w-full'>
 							<div className={cn('relative h-[300px] w-full', className)}>
 								<div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
+									{ActiveCategoryIcon && <ActiveCategoryIcon className='mb-1 h-7 w-7' style={{ color: activeSlice?.color }} aria-hidden='true' />}
 									<span className='font-medium text-label text-sm'>{activeSlice?.name ?? defaultLabel}</span>
 									<span className='font-semibold text-base'>{activeSlice?.formattedValue ?? fallbackValue}</span>
 								</div>

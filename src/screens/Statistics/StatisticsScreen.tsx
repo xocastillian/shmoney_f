@@ -20,6 +20,7 @@ interface ChartCategoryDatum extends Record<string, unknown> {
 	color: string
 	percent: number
 	transactionCount?: number
+	categoryIcon?: string
 }
 
 type ChartDatumWithFormatted = ChartCategoryDatum & CategoryPieChartWidgetDatum
@@ -83,6 +84,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 				color: category.categoryColor,
 				percent: category.percent,
 				transactionCount: category.transactionCount ?? 0,
+				categoryIcon: category.categoryIcon,
 			})) ?? [],
 		[analytics]
 	)

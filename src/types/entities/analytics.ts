@@ -5,6 +5,7 @@ export interface AnalyticsCategorySummary {
 	amount: number
 	percent: number
 	transactionCount?: number
+	categoryIcon?: string
 }
 
 export interface AnalyticsPeriod {
