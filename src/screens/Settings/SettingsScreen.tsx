@@ -13,6 +13,7 @@ import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/
 import WalletsDrawer from '@/widgets/Wallets/components/WalletsDrawer'
 import WalletDrawer from '@/widgets/Wallets/components/WalletDrawer'
 import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
+import { CustomColorPickerDrawer } from '@/widgets/Wallets/components/CustomColorPickerDrawer'
 import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
@@ -40,6 +41,7 @@ const SettingsScreen = () => {
 	const [walletFormDebetOrCredit, setWalletFormDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
 	const [walletFormStatus, setWalletFormStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
+	const [walletCustomColorPickerOpen, setWalletCustomColorPickerOpen] = useState(false)
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [walletCurrencyPickerOpen, setWalletCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
@@ -409,6 +411,7 @@ const SettingsScreen = () => {
 					setColorPickerOpen(false)
 					setWalletFormError(null)
 				}}
+				onOpenCustomPicker={() => setWalletCustomColorPickerOpen(true)}
 			/>
 
 			<CurrencyPickerDrawer
@@ -430,6 +433,18 @@ const SettingsScreen = () => {
 				onSelect={type => {
 					setWalletFormType(type)
 					setTypePickerOpen(false)
+					setWalletFormError(null)
+				}}
+			/>
+
+			<CustomColorPickerDrawer
+				open={walletCustomColorPickerOpen}
+				onClose={() => setWalletCustomColorPickerOpen(false)}
+				initialColor={walletFormColor}
+				onSelect={color => {
+					setWalletFormColor(color)
+					setWalletCustomColorPickerOpen(false)
+					setColorPickerOpen(false)
 					setWalletFormError(null)
 				}}
 			/>

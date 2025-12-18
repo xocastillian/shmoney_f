@@ -27,6 +27,7 @@ import { useTranslation, type Locale } from './i18n'
 import { BottomNav, type BottomNavTab } from './components/ui/BottomNav/BottomNav'
 import WalletDrawer from '@/widgets/Wallets/components/WalletDrawer'
 import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
+import { CustomColorPickerDrawer } from '@/widgets/Wallets/components/CustomColorPickerDrawer'
 import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
@@ -95,6 +96,7 @@ function App() {
 	const [walletFormDebetOrCredit, setWalletFormDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
 	const [walletFormSubmitting, setWalletFormSubmitting] = useState(false)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
+	const [walletCustomColorPickerOpen, setWalletCustomColorPickerOpen] = useState(false)
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const [transactionSubmitting, setTransactionSubmitting] = useState(false)
@@ -669,6 +671,7 @@ function App() {
 						setWalletFormError(null)
 					}}
 					selectedColor={walletFormColor}
+					onOpenCustomPicker={() => setWalletCustomColorPickerOpen(true)}
 				/>
 
 				<CurrencyPickerDrawer
@@ -690,6 +693,18 @@ function App() {
 					onSelect={type => {
 						setWalletFormType(type)
 						setTypePickerOpen(false)
+						setWalletFormError(null)
+					}}
+				/>
+
+				<CustomColorPickerDrawer
+					open={walletCustomColorPickerOpen}
+					onClose={() => setWalletCustomColorPickerOpen(false)}
+					initialColor={walletFormColor}
+					onSelect={color => {
+						setWalletFormColor(color)
+						setWalletCustomColorPickerOpen(false)
+						setColorPickerOpen(false)
 						setWalletFormError(null)
 					}}
 				/>

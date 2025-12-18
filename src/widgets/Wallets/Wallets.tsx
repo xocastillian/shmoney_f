@@ -7,6 +7,7 @@ import type { Wallet } from '@/types/entities/wallet'
 import { useWallets } from '@/hooks/useWallets'
 import { WalletDrawer } from './components/WalletDrawer'
 import { ColorPickerDrawer } from './components/ColorPickerDrawer'
+import { CustomColorPickerDrawer } from './components/CustomColorPickerDrawer'
 import { TypePickerDrawer } from './components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
 import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
@@ -37,6 +38,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const [balance, setBalance] = useState('')
 	const [formError, setFormError] = useState<string | null>(null)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
+	const [customColorPickerOpen, setCustomColorPickerOpen] = useState(false)
 	const [selectedColor, setSelectedColor] = useState<string>(colorOptions[0])
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [selectedType, setSelectedType] = useState<WalletType>(defaultWalletType)
@@ -266,6 +268,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 					setColorPickerOpen(false)
 					setFormError(null)
 				}}
+				onOpenCustomPicker={() => setCustomColorPickerOpen(true)}
 			/>
 
 			<CurrencyPickerDrawer
@@ -287,6 +290,18 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				onSelect={type => {
 					setSelectedType(type)
 					setTypePickerOpen(false)
+					setFormError(null)
+				}}
+			/>
+
+			<CustomColorPickerDrawer
+				open={customColorPickerOpen}
+				onClose={() => setCustomColorPickerOpen(false)}
+				initialColor={selectedColor}
+				onSelect={color => {
+					setSelectedColor(color)
+					setCustomColorPickerOpen(false)
+					setColorPickerOpen(false)
 					setFormError(null)
 				}}
 			/>

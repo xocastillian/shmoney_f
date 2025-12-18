@@ -4,6 +4,7 @@ import Loader from '@/components/ui/Loader/Loader'
 import type { Category } from '@/types/entities/category'
 import { CategoryStatus } from '@/types/entities/category'
 import ColorPickerDrawer from '@/widgets/Wallets/components/ColorPickerDrawer'
+import { CustomColorPickerDrawer } from '@/widgets/Wallets/components/CustomColorPickerDrawer'
 import { colorOptions } from '@/widgets/Wallets/constants'
 import IconPickerDrawer from './IconPickerDrawer'
 import CategoryForm from './CategoryForm'
@@ -32,6 +33,7 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [icon, setIcon] = useState(DEFAULT_ICON)
 	const [isColorPickerOpen, setColorPickerOpen] = useState(false)
+	const [isCustomColorPickerOpen, setCustomColorPickerOpen] = useState(false)
 	const [isIconPickerOpen, setIconPickerOpen] = useState(false)
 	const [internalSubmitting, setSubmitting] = useState(false)
 	const formId = useId()
@@ -152,6 +154,17 @@ const AddOrEditCategoryDrawer = ({ open, onClose, initialCategory, onSubmit, tit
 				colors={colorOptions}
 				onSelect={handleSelectColor}
 				selectedColor={color}
+				onOpenCustomPicker={() => setCustomColorPickerOpen(true)}
+			/>
+
+			<CustomColorPickerDrawer
+				open={isCustomColorPickerOpen}
+				onClose={() => setCustomColorPickerOpen(false)}
+				initialColor={color}
+				onSelect={nextColor => {
+					handleSelectColor(nextColor)
+					setCustomColorPickerOpen(false)
+				}}
 			/>
 
 			<IconPickerDrawer open={isIconPickerOpen} onClose={() => setIconPickerOpen(false)} selectedIcon={icon} onSelect={handleSelectIcon} />
