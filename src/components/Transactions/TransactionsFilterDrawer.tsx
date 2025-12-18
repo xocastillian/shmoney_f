@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import * as LucideIcons from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 import { ClockFading, FolderHeart, ListFilter, RotateCcw, Wallet as WalletIcon, X } from 'lucide-react'
 import type { TransactionsFilterState, TransactionFilterType, TransactionPeriodFilter } from './filters'
 import TransactionTypePickerDrawer from './TransactionTypePickerDrawer'
 import WalletsDrawer from '@/widgets/Wallets/components/WalletsDrawer'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
-import type { Wallet } from '@/types/entities/wallet'
-import type { Category } from '@/types/entities/category'
-import { typeIcons } from '@/widgets/Wallets/types'
+import { type Wallet, WalletStatus } from '@/types/entities/wallet'
+import { type Category, CategoryStatus } from '@/types/entities/category'
 import { formatDateDisplay } from '@/utils/date'
 import PeriodFilterDrawer from './PeriodFilterDrawer'
 import { periodOptions } from './filters'
@@ -52,20 +49,44 @@ const TransactionsFilterDrawer = ({
 	}, [open])
 
 	const walletPickerOptions = useMemo(
-		() => wallets.map(wallet => ({ id: wallet.id, name: wallet.name, color: wallet.color, type: wallet.type })),
+		() =>
+			wallets
+				.filter(wallet => (wallet.status ?? WalletStatus.ACTIVE) === WalletStatus.ACTIVE)
+				.map(wallet => ({
+					id: wallet.id,
+					name: wallet.name,
+					color: wallet.color,
+					type: wallet.type,
+					status: wallet.status,
+					debetOrCredit: wallet.debetOrCredit,
+				})),
 		[wallets]
 	)
-	const selectedWallet = filters.walletId ? walletPickerOptions.find(wallet => wallet.id === filters.walletId) ?? null : null
-	const walletLabel = selectedWallet?.name ?? t('transactions.filters.wallet.all')
-	const walletTextClass = selectedWallet ? 'text-text' : 'text-label'
-	const WalletIconComponent = selectedWallet?.type ? typeIcons[selectedWallet.type] ?? WalletIcon : WalletIcon
-	const walletIconClassName = selectedWallet ? 'mr-3 h-6 w-6' : 'mr-3 text-label'
-	const walletIconStyle = selectedWallet?.color ? { color: selectedWallet.color } : undefined
-	const selectedCategory = filters.categoryId ? categories.find(category => category.id === filters.categoryId) ?? null : null
-	const categoryLabel = selectedCategory?.name ?? t('transactions.filters.category.all')
-	const categoryTextClass = selectedCategory ? 'text-text' : 'text-label'
-	const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
-	const CategoryIcon = selectedCategory?.icon ? lucideIconMap[selectedCategory.icon] : undefined
+	const selectedWallets = useMemo(
+		() => walletPickerOptions.filter(wallet => filters.walletIds.includes(wallet.id)),
+		[walletPickerOptions, filters.walletIds]
+	)
+	const walletLabel = useMemo(() => {
+		if (selectedWallets.length === 0) return t('transactions.filters.wallet.all')
+		const names = selectedWallets.map(wallet => wallet.name)
+		const baseLabel = names.slice(0, 2).join(', ')
+		return names.length > 2 ? `${baseLabel} +${names.length - 2}` : baseLabel
+	}, [selectedWallets, t])
+	const walletTextClass = selectedWallets.length ? 'text-text' : 'text-label'
+	const WalletIconComponent = WalletIcon
+	const walletIconClassName = 'mr-3 text-label'
+	const activeCategories = useMemo(() => categories.filter(category => category.status === CategoryStatus.ACTIVE), [categories])
+	const selectedCategories = useMemo(
+		() => activeCategories.filter(category => filters.categoryIds.includes(category.id)),
+		[activeCategories, filters.categoryIds]
+	)
+	const categoryLabel = useMemo(() => {
+		if (selectedCategories.length === 0) return t('transactions.filters.category.all')
+		const names = selectedCategories.map(category => category.name)
+		const baseLabel = names.slice(0, 2).join(', ')
+		return names.length > 2 ? `${baseLabel} +${names.length - 2}` : baseLabel
+	}, [selectedCategories, t])
+	const categoryTextClass = selectedCategories.length ? 'text-text' : 'text-label'
 
 	const selectedPeriodOption = periodOptions.find(option => option.value === filters.period && option.value !== '')
 
@@ -155,17 +176,17 @@ const TransactionsFilterDrawer = ({
 								onClick={() => setWalletPickerOpen(true)}
 								className='flex h-16 w-full items-center px-3 pr-10 text-left focus:outline-none focus-visible:bg-background-muted'
 							>
-								<WalletIconComponent className={walletIconClassName} style={walletIconStyle} />
+								<WalletIconComponent className={walletIconClassName} />
 								<span className={walletTextClass}>{walletLabel}</span>
 							</button>
-							{selectedWallet && (
+							{filters.walletIds.length > 0 && (
 								<button
 									type='button'
 									className='absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-label hover:text-text'
 									onClick={event => {
 										event.stopPropagation()
 										event.preventDefault()
-										onFiltersChange({ walletId: null })
+										onFiltersChange({ walletIds: [] })
 									}}
 									aria-label={t('transactions.filters.wallet.reset')}
 								>
@@ -180,21 +201,17 @@ const TransactionsFilterDrawer = ({
 								onClick={() => setCategoryPickerOpen(true)}
 								className='flex h-16 w-full items-center px-3 pr-10 text-left focus:outline-none focus-visible:bg-background-muted'
 							>
-								{CategoryIcon ? (
-									<CategoryIcon className='mr-3 h-6 w-6' color={selectedCategory?.color || '#f89a04'} />
-								) : (
-									<FolderHeart className='mr-3 text-label' />
-								)}
+								<FolderHeart className='mr-3 text-label' />
 								<span className={categoryTextClass}>{categoryLabel}</span>
 							</button>
-							{selectedCategory && (
+							{filters.categoryIds.length > 0 && (
 								<button
 									type='button'
 									className='absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-label hover:text-text'
 									onClick={event => {
 										event.stopPropagation()
 										event.preventDefault()
-										onFiltersChange({ categoryId: null })
+										onFiltersChange({ categoryIds: [] })
 									}}
 									aria-label={t('transactions.filters.category.reset')}
 								>
@@ -258,17 +275,20 @@ const TransactionsFilterDrawer = ({
 				onClose={() => setWalletPickerOpen(false)}
 				title={t('transactions.filters.walletPicker.title')}
 				wallets={walletPickerOptions}
-				selectedWalletId={filters.walletId ?? null}
-				onSelect={walletId => {
-					onFiltersChange({ walletId: walletId === filters.walletId ? null : walletId })
-					setWalletPickerOpen(false)
+				selectedWalletId={null}
+				multiSelect
+				selectedWalletIds={filters.walletIds}
+				onToggleWallet={walletId => {
+					const exists = filters.walletIds.includes(walletId)
+					const next = exists ? filters.walletIds.filter(id => id !== walletId) : [...filters.walletIds, walletId]
+					onFiltersChange({ walletIds: next })
 				}}
+				onSelect={() => {}}
 				emptyStateLabel={t('transactions.filters.walletPicker.empty')}
 				showAllOption
 				allOptionLabel={t('transactions.filters.wallet.all')}
 				onSelectAll={() => {
-					onFiltersChange({ walletId: null })
-					setWalletPickerOpen(false)
+					onFiltersChange({ walletIds: [] })
 				}}
 				showCheckIcon
 			/>
@@ -276,16 +296,17 @@ const TransactionsFilterDrawer = ({
 			<CategoriesDrawer
 				open={isCategoryPickerOpen}
 				onClose={() => setCategoryPickerOpen(false)}
-				selectable
-				selectedCategoryId={filters.categoryId ?? null}
-				showAddButton={false}
-				onSelect={category => {
-					onFiltersChange({ categoryId: category.id === filters.categoryId ? null : category.id })
-					setCategoryPickerOpen(false)
+				showArchived={false}
+				multiSelect
+				selectedCategoryIds={filters.categoryIds}
+				onToggleCategory={category => {
+					const exists = filters.categoryIds.includes(category.id)
+					const next = exists ? filters.categoryIds.filter(id => id !== category.id) : [...filters.categoryIds, category.id]
+					onFiltersChange({ categoryIds: next })
 				}}
+				showAddButton={false}
 				onSelectAll={() => {
-					onFiltersChange({ categoryId: null })
-					setCategoryPickerOpen(false)
+					onFiltersChange({ categoryIds: [] })
 				}}
 				allOptionLabel={t('transactions.filters.category.all')}
 			/>
