@@ -15,6 +15,13 @@ export const WalletStatus = {
 
 export type WalletStatus = (typeof WalletStatus)[keyof typeof WalletStatus]
 
+export const WalletDebetOrCredit = {
+	DEBET: 'debet',
+	CREDIT: 'credit',
+} as const
+
+export type WalletDebetOrCredit = (typeof WalletDebetOrCredit)[keyof typeof WalletDebetOrCredit]
+
 export const walletTypeOrder: WalletType[] = [
 	WalletType.CASH,
 	WalletType.BANK_CARD,
@@ -39,6 +46,7 @@ export type Wallet = {
 	color: string
 	type: WalletType
 	status: WalletStatus
+	debetOrCredit: WalletDebetOrCredit
 }
 
 export type WalletBalanceSummary = {

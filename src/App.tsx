@@ -13,7 +13,7 @@ import useTransactions from '@/hooks/useTransactions'
 import { formatDateTimeLocal } from '@/utils/date'
 import { mapWalletsToPickerOptions } from '@/utils/wallet'
 import type { Wallet } from '@/types/entities/wallet'
-import { WalletStatus, WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 import { CategoryStatus } from '@/types/entities/category'
 import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
@@ -92,6 +92,7 @@ function App() {
 	const [walletFormColor, setWalletFormColor] = useState(defaultWalletColor)
 	const [walletFormType, setWalletFormType] = useState<WalletType>(defaultWalletType)
 	const [walletFormError, setWalletFormError] = useState<string | null>(null)
+	const [walletFormDebetOrCredit, setWalletFormDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
 	const [walletFormSubmitting, setWalletFormSubmitting] = useState(false)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
@@ -157,6 +158,7 @@ function App() {
 		setWalletFormBalance('')
 		setWalletFormColor(defaultWalletColor)
 		setWalletFormType(defaultWalletType)
+		setWalletFormDebetOrCredit(WalletDebetOrCredit.DEBET)
 		setWalletFormError(null)
 		setWalletFormOpen(true)
 	}, [defaultCurrencyCode])
@@ -352,6 +354,7 @@ function App() {
 					balance: parsedBalance,
 					color: walletFormColor,
 					type: walletFormType,
+					debetOrCredit: walletFormDebetOrCredit,
 				})
 				setWalletFormError(null)
 				handleCloseWalletForm()
@@ -373,6 +376,7 @@ function App() {
 			walletFormCurrencyCode,
 			walletFormName,
 			walletFormType,
+			walletFormDebetOrCredit,
 		]
 	)
 
@@ -635,6 +639,11 @@ function App() {
 					onOpenCurrencyPicker={() => setCurrencyPickerOpen(true)}
 					onOpenTypePicker={() => setTypePickerOpen(true)}
 					selectedType={walletFormType}
+					selectedDebetOrCredit={walletFormDebetOrCredit}
+					onDebetOrCreditChange={value => {
+						setWalletFormDebetOrCredit(value)
+						setWalletFormError(null)
+					}}
 					onOpenColorPicker={() => setColorPickerOpen(true)}
 					selectedColor={walletFormColor}
 					balance={walletFormBalance}

@@ -1,10 +1,11 @@
 import { z } from 'zod'
-import { WalletStatus, WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
 import { CategoryStatus } from '@/types/entities/category'
 import { BudgetPeriodType, BudgetStatus, BudgetType } from '@/types/entities/budget'
 
 export const WalletTypeSchema = z.enum(WalletType)
 export const WalletStatusSchema = z.enum(WalletStatus)
+export const WalletDebetOrCreditSchema = z.enum([WalletDebetOrCredit.DEBET, WalletDebetOrCredit.CREDIT])
 export const CategoryTransactionTypeSchema = z.enum(['EXPENSE', 'INCOME'])
 export const CategoryStatusSchema = z.enum(CategoryStatus)
 export const BudgetPeriodTypeSchema = z.enum(BudgetPeriodType)
@@ -34,6 +35,7 @@ export const WalletResponseSchema = z.object({
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	type: WalletTypeSchema,
 	status: WalletStatusSchema,
+	debetOrCredit: WalletDebetOrCreditSchema,
 	balance: z.coerce.number(),
 	createdAt: z.coerce.date().nullable().optional(),
 	updatedAt: z.coerce.date().nullable().optional(),
@@ -64,6 +66,7 @@ export const WalletCreateRequestSchema = z.object({
 	balance: z.coerce.number().min(0),
 	color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 	type: WalletTypeSchema,
+	debetOrCredit: WalletDebetOrCreditSchema,
 	ownerId: z.number().int().positive().optional(),
 })
 
@@ -75,6 +78,7 @@ export const WalletUpdateRequestSchema = z.object({
 		.regex(/^#[0-9A-Fa-f]{6}$/)
 		.optional(),
 	type: WalletTypeSchema.optional(),
+	debetOrCredit: WalletDebetOrCreditSchema.optional(),
 	balance: z.coerce.number().min(0).optional(),
 	ownerId: z.number().int().positive().optional(),
 })

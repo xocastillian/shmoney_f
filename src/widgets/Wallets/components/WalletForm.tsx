@@ -1,10 +1,11 @@
 import { Archive, Calculator, Check, CircleDollarSign, Info, Palette, RotateCcw } from 'lucide-react'
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react'
 import { currencyIconMap, typeIcons, type CurrencyOption } from '../types'
-import { WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit, WalletType } from '@/types/entities/wallet'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 import { useTranslation } from '@/i18n'
 import { cn } from '@/lib/utils'
+import SegmentedTabs from '@/components/ui/SegmentedTabs/SegmentedTabs'
 
 interface WalletFormProps {
 	name: string
@@ -17,6 +18,8 @@ interface WalletFormProps {
 	selectedColor: string
 	selectedType: WalletType
 	onOpenTypePicker: () => void
+	selectedDebetOrCredit: WalletDebetOrCredit
+	onDebetOrCreditChange: (value: WalletDebetOrCredit) => void
 	balance: string
 	onBalanceChange: (value: string) => void
 	error: string | null
@@ -39,6 +42,8 @@ export function WalletForm({
 	selectedColor,
 	selectedType,
 	onOpenTypePicker,
+	selectedDebetOrCredit,
+	onDebetOrCreditChange,
 	balance,
 	onBalanceChange,
 	error,
@@ -50,6 +55,11 @@ export function WalletForm({
 	isArchived = false,
 }: WalletFormProps) {
 	const { t } = useTranslation()
+
+	const debetOrCreditOptions = [
+		{ value: WalletDebetOrCredit.DEBET, label: t('wallets.form.debetOrCredit.debet') },
+		{ value: WalletDebetOrCredit.CREDIT, label: t('wallets.form.debetOrCredit.credit') },
+	]
 
 	const handleColorPickerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		if (event.key === 'Enter' || event.key === ' ') {
@@ -106,7 +116,14 @@ export function WalletForm({
 	return (
 		<form id={formId} className='flex flex-1 flex-col' onSubmit={onSubmit}>
 			<div>
-				<h1 className='text-sm px-3 mb-3'>{t('common.general')}</h1>
+				<h1 className='text-sm px-3 mb-3'>{t('common.accountingType')}</h1>
+
+				<div className='mb-4'>
+					<SegmentedTabs value={selectedDebetOrCredit} options={debetOrCreditOptions} onChange={onDebetOrCreditChange} />
+				</div>
+
+				<h2 className='text-sm px-3 mb-3'>{t('common.general')}</h2>
+
 				<div className='border-b border-t border-divider bg-background-muted'>
 					<div className='flex items-center px-3 h-16'>
 						<Info className='mr-3 text-label' />

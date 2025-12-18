@@ -8,6 +8,7 @@ import {
 	WalletCreateRequestSchema,
 	WalletUpdateRequestSchema,
 	WalletStatusUpdateRequestSchema,
+	WalletDebetOrCreditSchema,
 	WalletTransactionRequestSchema,
 	WalletTransactionResponseSchema,
 	WalletTransactionUpdateRequestSchema,
@@ -42,6 +43,7 @@ export type TelegramAuthRequest = z.infer<typeof TelegramAuthRequestSchema>
 
 export type UserResponse = z.infer<typeof UserResponseSchema>
 export type WalletResponse = z.infer<typeof WalletResponseSchema>
+export type WalletDebetOrCredit = z.infer<typeof WalletDebetOrCreditSchema>
 export type WalletCreateRequest = z.infer<typeof WalletCreateRequestSchema>
 export type WalletUpdateRequest = z.infer<typeof WalletUpdateRequestSchema>
 export type WalletStatusUpdateRequest = z.infer<typeof WalletStatusUpdateRequestSchema>

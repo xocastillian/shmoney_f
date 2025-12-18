@@ -19,6 +19,7 @@ function mapWallet(response: WalletResponse): Wallet {
 		color: response.color,
 		type: response.type,
 		status: response.status,
+		debetOrCredit: response.debetOrCredit,
 	}
 }
 
