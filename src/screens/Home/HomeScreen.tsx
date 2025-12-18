@@ -187,7 +187,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 			<Wallets wallets={wallets} loading={walletsLoading} />
 
 			<div className='mt-3'>
-				<WalletBalancesWidget balances={balances} loading={balancesLoading} error={walletsError} />
+				<WalletBalancesWidget balances={balances} wallets={wallets} loading={balancesLoading} error={walletsError} />
 			</div>
 
 			<div className='mt-3'>
