@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Carousel } from '@/components/ui/Carousel'
 import { AddWalletCard } from '@/components/WalletCard/AddWalletCard'
 import WalletCard from '@/components/WalletCard/WalletCard'
@@ -7,13 +6,15 @@ import type { Wallet } from '@/types/entities/wallet'
 import { useWallets } from '@/hooks/useWallets'
 import { WalletDrawer } from './components/WalletDrawer'
 import { ColorPickerDrawer } from './components/ColorPickerDrawer'
+import { CustomColorPickerDrawer } from './components/CustomColorPickerDrawer'
 import { TypePickerDrawer } from './components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from './components/CurrencyPickerDrawer'
-import { WalletStatus, WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
 import { sanitizeDecimalInput } from '@/utils/number'
 import { colorOptions, currencyOptions } from './constants'
 import { useTranslation } from '@/i18n'
 import { useSettings } from '@/hooks/useSettings'
+import SegmentedTabs, { type SegmentedTabOption } from '@/components/ui/SegmentedTabs/SegmentedTabs'
 
 interface WalletsProps {
 	wallets: Wallet[]
@@ -21,6 +22,7 @@ interface WalletsProps {
 }
 
 const defaultWalletType = WalletType.CASH
+type WalletTabValue = WalletDebetOrCredit | 'ALL'
 
 const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const { createWallet, updateWallet, actionLoading, fetchWalletBalances, updateWalletStatus } = useWallets()
@@ -37,12 +39,15 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const [balance, setBalance] = useState('')
 	const [formError, setFormError] = useState<string | null>(null)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
+	const [customColorPickerOpen, setCustomColorPickerOpen] = useState(false)
 	const [selectedColor, setSelectedColor] = useState<string>(colorOptions[0])
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [selectedType, setSelectedType] = useState<WalletType>(defaultWalletType)
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
 	const [editingWalletStatus, setEditingWalletStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
+	const [selectedDebetOrCredit, setSelectedDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
+	const [activeTab, setActiveTab] = useState<WalletTabValue>('ALL')
 
 	const isEditing = editingWalletId !== null
 
@@ -68,6 +73,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setCurrencyPickerOpen(false)
 		setEditingWalletId(null)
 		setEditingWalletStatus(WalletStatus.ACTIVE)
+		setSelectedDebetOrCredit(WalletDebetOrCredit.DEBET)
 	}, [defaultCurrencyCode])
 
 	useEffect(() => {
@@ -117,6 +123,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 					color: selectedColor,
 					type: selectedType,
 					balance: parsedBalance,
+					debetOrCredit: selectedDebetOrCredit,
 				})
 			} else {
 				await createWallet({
@@ -125,6 +132,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 					balance: parsedBalance,
 					color: selectedColor,
 					type: selectedType,
+					debetOrCredit: selectedDebetOrCredit,
 				})
 			}
 			await fetchWalletBalances()
@@ -174,6 +182,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 		setSelectedColor(wallet.color || colorOptions[0])
 		setSelectedType(wallet.type || defaultWalletType)
 		setEditingWalletStatus(wallet.status || WalletStatus.ACTIVE)
+		setSelectedDebetOrCredit(wallet.debetOrCredit ?? WalletDebetOrCredit.DEBET)
 		setFormError(null)
 		setColorPickerOpen(false)
 		setCurrencyPickerOpen(false)
@@ -182,52 +191,48 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	}
 
 	const activeWallets = useMemo(() => wallets.filter(wallet => wallet.status === WalletStatus.ACTIVE), [wallets])
+	const activeDebitWallets = useMemo(() => activeWallets.filter(wallet => wallet.debetOrCredit === WalletDebetOrCredit.DEBET), [activeWallets])
+	const activeCreditWallets = useMemo(() => activeWallets.filter(wallet => wallet.debetOrCredit === WalletDebetOrCredit.CREDIT), [activeWallets])
+	const hasWallets = activeWallets.length > 0
+	const hasDebitWallets = activeDebitWallets.length > 0
+	const hasCreditWallets = activeCreditWallets.length > 0
 
-	const pages = useMemo(() => {
-		const items: Array<Wallet | null> = [...activeWallets, null]
-		const result: Array<Array<Wallet | null>> = []
+	const availableTabs = useMemo(() => {
+		if (!hasWallets) return []
 
-		for (let index = 0; index < items.length; index += 2) {
-			result.push(items.slice(index, index + 2))
+		const tabs: Array<SegmentedTabOption<WalletTabValue>> = [{ value: 'ALL', label: t('wallets.section.all') }]
+		if (hasDebitWallets) tabs.push({ value: WalletDebetOrCredit.DEBET, label: t('wallets.section.debet') })
+		if (hasCreditWallets) tabs.push({ value: WalletDebetOrCredit.CREDIT, label: t('wallets.section.credit') })
+		return tabs
+	}, [hasCreditWallets, hasDebitWallets, hasWallets, t])
+
+	useEffect(() => {
+		if (availableTabs.length === 0) {
+			return
 		}
+		if (!availableTabs.some(tab => tab.value === activeTab)) {
+			setActiveTab(availableTabs[0].value)
+		}
+	}, [availableTabs, activeTab])
 
-		return result
-	}, [activeWallets])
-
+	const tabWallets = activeTab === 'ALL' ? activeWallets : activeTab === WalletDebetOrCredit.CREDIT ? activeCreditWallets : activeDebitWallets
+	const pages = useMemo(() => buildCarouselPages(tabWallets, true), [tabWallets])
 	const shouldRenderSkeleton = loading
+	const shouldRenderEmptyState = !hasWallets
 
 	return (
 		<>
 			{shouldRenderSkeleton ? (
 				<WalletsSkeleton />
+			) : shouldRenderEmptyState ? (
+				renderCarousel([[null]], 'empty', handleAddWalletClick, handleWalletClick)
 			) : (
-				<Carousel pageClassName='grid grid-cols-2 gap-[10px]' dots>
-					{pages.map((page, pageIndex) => (
-						<div key={`wallets-page-${pageIndex}`}>
-							{page.map((item, itemIndex) => {
-								if (!item && item !== null) {
-									return null
-								}
-
-								if (item === null) {
-									return <AddWalletCard key={`add-card-${pageIndex}-${itemIndex}`} onClick={handleAddWalletClick} />
-								}
-
-								return (
-									<WalletCard
-										key={item.id}
-										name={item.name}
-										balance={item.balance}
-										currencyCode={item.currencyCode}
-										color={item.color}
-										type={item.type}
-										onClick={() => handleWalletClick(item)}
-									/>
-								)
-							})}
-						</div>
-					))}
-				</Carousel>
+				<div>
+					{availableTabs.length > 1 && (
+						<SegmentedTabs className='rounded-xl mb-3' value={activeTab} options={availableTabs} onChange={value => setActiveTab(value)} />
+					)}
+					{renderCarousel(pages, activeTab, handleAddWalletClick, handleWalletClick)}
+				</div>
 			)}
 
 			<WalletDrawer
@@ -247,6 +252,11 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				selectedType={selectedType}
 				onOpenColorPicker={() => setColorPickerOpen(true)}
 				selectedColor={selectedColor}
+				selectedDebetOrCredit={selectedDebetOrCredit}
+				onDebetOrCreditChange={value => {
+					setSelectedDebetOrCredit(value)
+					setFormError(null)
+				}}
 				balance={balance}
 				onBalanceChange={value => {
 					setBalance(value)
@@ -271,6 +281,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 					setColorPickerOpen(false)
 					setFormError(null)
 				}}
+				onOpenCustomPicker={() => setCustomColorPickerOpen(true)}
 			/>
 
 			<CurrencyPickerDrawer
@@ -292,6 +303,18 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 				onSelect={type => {
 					setSelectedType(type)
 					setTypePickerOpen(false)
+					setFormError(null)
+				}}
+			/>
+
+			<CustomColorPickerDrawer
+				open={customColorPickerOpen}
+				onClose={() => setCustomColorPickerOpen(false)}
+				initialColor={selectedColor}
+				onSelect={color => {
+					setSelectedColor(color)
+					setCustomColorPickerOpen(false)
+					setColorPickerOpen(false)
 					setFormError(null)
 				}}
 			/>
@@ -319,3 +342,51 @@ function WalletsSkeleton() {
 }
 
 export default Wallets
+
+function buildCarouselPages(wallets: Wallet[], appendAddCard: boolean): Array<Array<Wallet | null>> {
+	const items: Array<Wallet | null> = appendAddCard ? [...wallets, null] : [...wallets]
+	const result: Array<Array<Wallet | null>> = []
+
+	for (let index = 0; index < items.length; index += 2) {
+		result.push(items.slice(index, index + 2))
+	}
+
+	return result
+}
+
+function renderCarousel(
+	pages: Array<Array<Wallet | null>>,
+	keyPrefix: string,
+	onAddWalletClick: () => void,
+	onWalletClick: (wallet: Wallet) => void
+) {
+	return (
+		<Carousel pageClassName='grid grid-cols-2 gap-[10px]' dots>
+			{pages.map((page, pageIndex) => (
+				<div key={`${keyPrefix}-page-${pageIndex}`}>
+					{page.map((item, itemIndex) => {
+						if (!item && item !== null) {
+							return null
+						}
+
+						if (item === null) {
+							return <AddWalletCard key={`${keyPrefix}-add-${pageIndex}-${itemIndex}`} onClick={onAddWalletClick} />
+						}
+
+						return (
+							<WalletCard
+								key={item.id}
+								name={item.name}
+								balance={item.balance}
+								currencyCode={item.currencyCode}
+								color={item.color}
+								type={item.type}
+								onClick={() => onWalletClick(item)}
+							/>
+						)
+					})}
+				</div>
+			))}
+		</Carousel>
+	)
+}

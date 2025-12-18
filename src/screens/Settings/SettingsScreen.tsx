@@ -9,10 +9,11 @@ import LanguageSettingsDrawer from './components/LanguageSettingsDrawer'
 import { useSettings } from '@/hooks/useSettings'
 import { useTranslation } from '@/i18n'
 import { useWallets } from '@/hooks/useWallets'
-import { WalletStatus, WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
 import WalletsDrawer from '@/widgets/Wallets/components/WalletsDrawer'
 import WalletDrawer from '@/widgets/Wallets/components/WalletDrawer'
 import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
+import { CustomColorPickerDrawer } from '@/widgets/Wallets/components/CustomColorPickerDrawer'
 import { TypePickerDrawer } from '@/widgets/Wallets/components/TypePickerDrawer'
 import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPickerDrawer'
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
@@ -37,8 +38,10 @@ const SettingsScreen = () => {
 	const [walletFormColor, setWalletFormColor] = useState(colorOptions[0])
 	const [walletFormType, setWalletFormType] = useState<WalletType>(defaultWalletType)
 	const [walletFormError, setWalletFormError] = useState<string | null>(null)
+	const [walletFormDebetOrCredit, setWalletFormDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
 	const [walletFormStatus, setWalletFormStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 	const [colorPickerOpen, setColorPickerOpen] = useState(false)
+	const [walletCustomColorPickerOpen, setWalletCustomColorPickerOpen] = useState(false)
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [walletCurrencyPickerOpen, setWalletCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
@@ -132,6 +135,7 @@ const SettingsScreen = () => {
 			setWalletFormColor(wallet.color || colorOptions[0])
 			setWalletFormType(wallet.type || defaultWalletType)
 			setWalletFormStatus(wallet.status || WalletStatus.ACTIVE)
+			setWalletFormDebetOrCredit(wallet.debetOrCredit ?? WalletDebetOrCredit.DEBET)
 			setWalletFormError(null)
 			setWalletFormOpen(true)
 		},
@@ -146,6 +150,7 @@ const SettingsScreen = () => {
 		setWalletFormColor(colorOptions[0])
 		setWalletFormType(defaultWalletType)
 		setWalletFormStatus(WalletStatus.ACTIVE)
+		setWalletFormDebetOrCredit(WalletDebetOrCredit.DEBET)
 		setWalletFormError(null)
 		setWalletFormOpen(true)
 		setArchivedWalletsDrawerOpen(false)
@@ -155,6 +160,7 @@ const SettingsScreen = () => {
 		setWalletFormOpen(false)
 		setEditingWalletId(null)
 		setWalletFormStatus(WalletStatus.ACTIVE)
+		setWalletFormDebetOrCredit(WalletDebetOrCredit.DEBET)
 	}, [])
 
 	useEffect(() => {
@@ -219,6 +225,7 @@ const SettingsScreen = () => {
 						balance: parsedBalance,
 						color: walletFormColor,
 						type: walletFormType,
+						debetOrCredit: walletFormDebetOrCredit,
 					})
 				} else {
 					await createWallet({
@@ -227,6 +234,7 @@ const SettingsScreen = () => {
 						balance: parsedBalance,
 						color: walletFormColor,
 						type: walletFormType,
+						debetOrCredit: walletFormDebetOrCredit,
 					})
 				}
 				setWalletFormError(null)
@@ -249,6 +257,7 @@ const SettingsScreen = () => {
 			walletFormCurrencyCode,
 			walletFormName,
 			walletFormType,
+			walletFormDebetOrCredit,
 		]
 	)
 
@@ -370,6 +379,11 @@ const SettingsScreen = () => {
 				onOpenCurrencyPicker={() => setWalletCurrencyPickerOpen(true)}
 				onOpenTypePicker={() => setTypePickerOpen(true)}
 				selectedType={walletFormType}
+				selectedDebetOrCredit={walletFormDebetOrCredit}
+				onDebetOrCreditChange={value => {
+					setWalletFormDebetOrCredit(value)
+					setWalletFormError(null)
+				}}
 				onOpenColorPicker={() => setColorPickerOpen(true)}
 				selectedColor={walletFormColor}
 				balance={walletFormBalance}
@@ -397,6 +411,7 @@ const SettingsScreen = () => {
 					setColorPickerOpen(false)
 					setWalletFormError(null)
 				}}
+				onOpenCustomPicker={() => setWalletCustomColorPickerOpen(true)}
 			/>
 
 			<CurrencyPickerDrawer
@@ -418,6 +433,18 @@ const SettingsScreen = () => {
 				onSelect={type => {
 					setWalletFormType(type)
 					setTypePickerOpen(false)
+					setWalletFormError(null)
+				}}
+			/>
+
+			<CustomColorPickerDrawer
+				open={walletCustomColorPickerOpen}
+				onClose={() => setWalletCustomColorPickerOpen(false)}
+				initialColor={walletFormColor}
+				onSelect={color => {
+					setWalletFormColor(color)
+					setWalletCustomColorPickerOpen(false)
+					setColorPickerOpen(false)
 					setWalletFormError(null)
 				}}
 			/>

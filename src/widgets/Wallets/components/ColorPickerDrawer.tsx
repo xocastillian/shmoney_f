@@ -9,13 +9,14 @@ interface ColorPickerDrawerProps {
 	colors: readonly string[]
 	onSelect: (color: string) => void
 	selectedColor: string
+	onOpenCustomPicker?: () => void
 }
 
-export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedColor }: ColorPickerDrawerProps) {
+export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedColor, onOpenCustomPicker }: ColorPickerDrawerProps) {
 	const { t } = useTranslation()
 
 	return (
-		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary'>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-between items-center p-3 border-b border-divider'>
 					<h1 className='text-lg font-medium'>{t('wallets.form.colorPickerTitle')}</h1>
@@ -44,6 +45,16 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 							/>
 						))}
 					</div>
+
+					{onOpenCustomPicker && (
+						<button
+							type='button'
+							onClick={onOpenCustomPicker}
+							className='mt-8 flex items-center justify-center gap-2 rounded-lg border border-dashed border-accent px-4 py-3 text-sm text-accent'
+						>
+							{t('wallets.form.customColorButton')}
+						</button>
+					)}
 				</div>
 			</div>
 		</Drawer>

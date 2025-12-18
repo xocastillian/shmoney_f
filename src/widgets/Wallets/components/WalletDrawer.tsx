@@ -4,7 +4,7 @@ import type { FormEvent } from 'react'
 import Loader from '@/components/ui/Loader/Loader'
 import { WalletForm } from './WalletForm'
 import type { CurrencyOption } from '../types'
-import { WalletStatus, type WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit, WalletStatus, type WalletType } from '@/types/entities/wallet'
 import Drawer from '@/components/Drawer/Drawer'
 
 interface WalletDrawerProps {
@@ -20,6 +20,8 @@ interface WalletDrawerProps {
 	selectedType: WalletType
 	onOpenColorPicker: () => void
 	selectedColor: string
+	selectedDebetOrCredit: WalletDebetOrCredit
+	onDebetOrCreditChange: (value: WalletDebetOrCredit) => void
 	balance: string
 	onBalanceChange: (value: string) => void
 	error: string | null
@@ -45,6 +47,8 @@ export function WalletDrawer({
 	selectedType,
 	onOpenColorPicker,
 	selectedColor,
+	selectedDebetOrCredit,
+	onDebetOrCreditChange,
 	balance,
 	onBalanceChange,
 	error,
@@ -85,6 +89,8 @@ export function WalletDrawer({
 						onOpenCurrencyPicker={onOpenCurrencyPicker}
 						onOpenTypePicker={onOpenTypePicker}
 						selectedType={selectedType}
+						selectedDebetOrCredit={selectedDebetOrCredit}
+						onDebetOrCreditChange={onDebetOrCreditChange}
 						onOpenColorPicker={onOpenColorPicker}
 						selectedColor={selectedColor}
 						balance={balance}
