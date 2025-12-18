@@ -303,8 +303,8 @@ export async function getTransactionFeed(params?: {
 	page?: number
 	size?: number
 	type?: string
-	walletId?: number
-	categoryId?: number
+	walletIds?: number[]
+	categoryIds?: number[]
 	from?: Date | string
 	to?: Date | string
 	period?: string
@@ -313,8 +313,16 @@ export async function getTransactionFeed(params?: {
 	if (typeof params?.page === 'number') query.set('page', String(params.page))
 	if (typeof params?.size === 'number') query.set('size', String(params.size))
 	if (params?.type) query.set('type', params.type)
-	if (typeof params?.walletId === 'number') query.set('walletId', String(params.walletId))
-	if (typeof params?.categoryId === 'number') query.set('categoryId', String(params.categoryId))
+	if (params?.walletIds?.length) {
+		for (const walletId of params.walletIds) {
+			query.append('walletId', String(walletId))
+		}
+	}
+	if (params?.categoryIds?.length) {
+		for (const categoryId of params.categoryIds) {
+			query.append('categoryId', String(categoryId))
+		}
+	}
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
 	if (params?.period) query.set('period', params.period)

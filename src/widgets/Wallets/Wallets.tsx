@@ -16,15 +16,18 @@ import { useTranslation } from '@/i18n'
 import { useSettings } from '@/hooks/useSettings'
 import SegmentedTabs, { type SegmentedTabOption } from '@/components/ui/SegmentedTabs/SegmentedTabs'
 
+export type WalletTabValue = WalletDebetOrCredit | 'ALL'
+
 interface WalletsProps {
 	wallets: Wallet[]
 	loading?: boolean
+	activeTab?: WalletTabValue
+	onTabChange?: (value: WalletTabValue) => void
 }
 
 const defaultWalletType = WalletType.CASH
-type WalletTabValue = WalletDebetOrCredit | 'ALL'
 
-const Wallets = ({ wallets, loading = false }: WalletsProps) => {
+const Wallets = ({ wallets, loading = false, activeTab, onTabChange }: WalletsProps) => {
 	const { createWallet, updateWallet, actionLoading, fetchWalletBalances, updateWalletStatus } = useWallets()
 	const { t } = useTranslation()
 	const { supportedCurrencies, mainCurrency } = useSettings()
@@ -47,7 +50,8 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
 	const [editingWalletStatus, setEditingWalletStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 	const [selectedDebetOrCredit, setSelectedDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
-	const [activeTab, setActiveTab] = useState<WalletTabValue>('ALL')
+	const [internalTab, setInternalTab] = useState<WalletTabValue>('ALL')
+	const currentTab = activeTab ?? internalTab
 
 	const isEditing = editingWalletId !== null
 
@@ -198,7 +202,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const hasCreditWallets = activeCreditWallets.length > 0
 
 	const availableTabs = useMemo(() => {
-		if (!hasWallets) return []
+		if (!hasWallets || !(hasDebitWallets && hasCreditWallets)) return []
 
 		const tabs: Array<SegmentedTabOption<WalletTabValue>> = [{ value: 'ALL', label: t('wallets.section.all') }]
 		if (hasDebitWallets) tabs.push({ value: WalletDebetOrCredit.DEBET, label: t('wallets.section.debet') })
@@ -207,15 +211,27 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	}, [hasCreditWallets, hasDebitWallets, hasWallets, t])
 
 	useEffect(() => {
-		if (availableTabs.length === 0) {
-			return
+		if (availableTabs.length === 0) return
+		if (!availableTabs.some(tab => tab.value === currentTab)) {
+			const fallback = availableTabs[0].value
+			if (onTabChange) {
+				onTabChange(fallback)
+			} else {
+				setInternalTab(fallback)
+			}
 		}
-		if (!availableTabs.some(tab => tab.value === activeTab)) {
-			setActiveTab(availableTabs[0].value)
-		}
-	}, [availableTabs, activeTab])
+	}, [availableTabs, currentTab, onTabChange])
 
-	const tabWallets = activeTab === 'ALL' ? activeWallets : activeTab === WalletDebetOrCredit.CREDIT ? activeCreditWallets : activeDebitWallets
+	useEffect(() => {
+		if (availableTabs.length > 0 || currentTab === 'ALL') return
+		if (onTabChange) {
+			onTabChange('ALL')
+		} else {
+			setInternalTab('ALL')
+		}
+	}, [availableTabs.length, currentTab, onTabChange])
+
+	const tabWallets = currentTab === 'ALL' ? activeWallets : currentTab === WalletDebetOrCredit.CREDIT ? activeCreditWallets : activeDebitWallets
 	const pages = useMemo(() => buildCarouselPages(tabWallets, true), [tabWallets])
 	const shouldRenderSkeleton = loading
 	const shouldRenderEmptyState = !hasWallets
@@ -229,9 +245,20 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 			) : (
 				<div>
 					{availableTabs.length > 1 && (
-						<SegmentedTabs className='rounded-xl mb-3' value={activeTab} options={availableTabs} onChange={value => setActiveTab(value)} />
+						<SegmentedTabs
+							className='rounded-xl mb-3'
+							value={currentTab}
+							options={availableTabs}
+							onChange={value => {
+								if (onTabChange) {
+									onTabChange(value)
+								} else {
+									setInternalTab(value)
+								}
+							}}
+						/>
 					)}
-					{renderCarousel(pages, activeTab, handleAddWalletClick, handleWalletClick)}
+					{renderCarousel(pages, currentTab, handleAddWalletClick, handleWalletClick)}
 				</div>
 			)}
 

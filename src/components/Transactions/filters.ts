@@ -16,6 +16,6 @@ export interface TransactionsFilterState {
 	from: string
 	to: string
 	period: TransactionPeriodFilter
-	walletId: number | null
-	categoryId: number | null
+	walletIds: number[]
+	categoryIds: number[]
 }

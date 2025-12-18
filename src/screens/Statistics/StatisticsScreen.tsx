@@ -212,7 +212,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 			setDrawerError(null)
 			try {
 				const response = await getTransactionFeed({
-					categoryId: typeof categoryId === 'number' ? categoryId : undefined,
+					categoryIds: typeof categoryId === 'number' ? [categoryId] : undefined,
 					from: periodRange.from,
 					to: periodRange.to,
 					type: 'EXPENSE',

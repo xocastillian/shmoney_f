@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
-import Wallets from '@/widgets/Wallets/Wallets'
+import Wallets, { type WalletTabValue } from '@/widgets/Wallets/Wallets'
 import WalletBalancesWidget from '@/widgets/Wallets/WalletBalancesWidget'
 import ExchangeRates from '@/widgets/ExchangeRates/ExchangeRates'
 import TransactionsWidget from '@/components/Transactions/TransactionsWidget'
@@ -48,15 +48,19 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		from: '',
 		to: '',
 		period: '',
-		walletId: null,
-		categoryId: null,
+		walletIds: [],
+		categoryIds: [],
 	})
 	const [drawerItems, setDrawerItems] = useState<TransactionFeedItem[]>([])
 	const [drawerNextPage, setDrawerNextPage] = useState<number | null>(null)
 	const [drawerLoading, setDrawerLoading] = useState(false)
 	const [drawerError, setDrawerError] = useState<string | null>(null)
+	const [walletsTab, setWalletsTab] = useState<WalletTabValue>('ALL')
 	const hasActiveFeedFilters = useMemo(
-		() => Boolean(feedFilters.type || feedFilters.from || feedFilters.to || feedFilters.period || feedFilters.walletId || feedFilters.categoryId),
+		() =>
+			Boolean(
+				feedFilters.type || feedFilters.from || feedFilters.to || feedFilters.period || feedFilters.walletIds.length || feedFilters.categoryIds.length
+			),
 		[feedFilters]
 	)
 
@@ -74,11 +78,11 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		if (feedFilters.period) {
 			params.period = feedFilters.period
 		}
-		if (typeof feedFilters.walletId === 'number') {
-			params.walletId = feedFilters.walletId
+		if (feedFilters.walletIds.length) {
+			params.walletIds = feedFilters.walletIds
 		}
-		if (typeof feedFilters.categoryId === 'number') {
-			params.categoryId = feedFilters.categoryId
+		if (feedFilters.categoryIds.length) {
+			params.categoryIds = feedFilters.categoryIds
 		}
 		return params
 	}, [feedFilters])
@@ -88,7 +92,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	}, [])
 
 	const handleResetFeedFilters = useCallback(() => {
-		setFeedFilters({ type: '', from: '', to: '', period: '', walletId: null, categoryId: null })
+		setFeedFilters({ type: '', from: '', to: '', period: '', walletIds: [], categoryIds: [] })
 		setDrawerNextPage(null)
 		setDrawerItems([])
 	}, [])
@@ -184,10 +188,10 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	return (
 		<div className='min-h-full p-3 pb-24'>
 			{walletsError && <div className='text-sm text-danger'>{walletsError}</div>}
-			<Wallets wallets={wallets} loading={walletsLoading} />
+			<Wallets wallets={wallets} loading={walletsLoading} activeTab={walletsTab} onTabChange={setWalletsTab} />
 
 			<div className='mt-3'>
-				<WalletBalancesWidget balances={balances} wallets={wallets} loading={balancesLoading} error={walletsError} />
+				<WalletBalancesWidget balances={balances} wallets={wallets} activeTab={walletsTab} loading={balancesLoading} error={walletsError} />
 			</div>
 
 			<div className='mt-3'>

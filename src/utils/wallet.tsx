@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Wallet as WalletIcon } from 'lucide-react'
 import type { Wallet, WalletType } from '@/types/entities/wallet'
+import { WalletDebetOrCredit } from '@/types/entities/wallet'
 import { typeIcons } from '@/widgets/Wallets/types'
 
 export interface WalletPickerOption {
@@ -9,6 +10,7 @@ export interface WalletPickerOption {
 	color?: string | null
 	type?: WalletType | null
 	status?: Wallet['status']
+	debetOrCredit?: WalletDebetOrCredit | null
 }
 
 const defaultIconClassName = 'mr-3 h-6 w-6'
@@ -29,6 +31,7 @@ export const toWalletPickerOption = (wallet: Wallet): WalletPickerOption => ({
 	color: wallet.color,
 	type: wallet.type,
 	status: wallet.status,
+	debetOrCredit: wallet.debetOrCredit,
 })
 
 export const mapWalletsToPickerOptions = (wallets: readonly Wallet[]): WalletPickerOption[] => wallets.map(toWalletPickerOption)
