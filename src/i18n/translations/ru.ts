@@ -107,6 +107,7 @@ export const ru: TranslationDictionary = {
 	'wallets.drawer.archived': 'Архивные кошельки',
 	'wallets.section.debet': 'Дебетовые',
 	'wallets.section.credit': 'Кредитные',
+	'wallets.section.all': 'Все',
 	'wallets.currency.usd': 'Доллар США',
 	'wallets.currency.kzt': 'Тенге',
 	'wallets.currency.eur': 'Евро',

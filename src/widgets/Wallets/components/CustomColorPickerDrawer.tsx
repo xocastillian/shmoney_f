@@ -76,7 +76,7 @@ export function CustomColorPickerDrawer({ open, onClose, initialColor, onSelect 
 					</div>
 
 					<div className='mt-auto'>
-						<Button text={t('wallets.form.customColorApply')} onClick={handleApply} />
+						<Button text={t('wallets.form.customColorApply')} onClick={handleApply} className='py-3' />
 					</div>
 				</div>
 			</div>

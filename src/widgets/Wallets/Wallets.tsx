@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Carousel } from '@/components/ui/Carousel'
 import { AddWalletCard } from '@/components/WalletCard/AddWalletCard'
 import WalletCard from '@/components/WalletCard/WalletCard'
@@ -15,6 +14,7 @@ import { sanitizeDecimalInput } from '@/utils/number'
 import { colorOptions, currencyOptions } from './constants'
 import { useTranslation } from '@/i18n'
 import { useSettings } from '@/hooks/useSettings'
+import SegmentedTabs, { type SegmentedTabOption } from '@/components/ui/SegmentedTabs/SegmentedTabs'
 
 interface WalletsProps {
 	wallets: Wallet[]
@@ -22,6 +22,7 @@ interface WalletsProps {
 }
 
 const defaultWalletType = WalletType.CASH
+type WalletTabValue = WalletDebetOrCredit | 'ALL'
 
 const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const { createWallet, updateWallet, actionLoading, fetchWalletBalances, updateWalletStatus } = useWallets()
@@ -46,6 +47,7 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
 	const [editingWalletStatus, setEditingWalletStatus] = useState<WalletStatus>(WalletStatus.ACTIVE)
 	const [selectedDebetOrCredit, setSelectedDebetOrCredit] = useState<WalletDebetOrCredit>(WalletDebetOrCredit.DEBET)
+	const [activeTab, setActiveTab] = useState<WalletTabValue>('ALL')
 
 	const isEditing = editingWalletId !== null
 
@@ -191,13 +193,32 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 	const activeWallets = useMemo(() => wallets.filter(wallet => wallet.status === WalletStatus.ACTIVE), [wallets])
 	const activeDebitWallets = useMemo(() => activeWallets.filter(wallet => wallet.debetOrCredit === WalletDebetOrCredit.DEBET), [activeWallets])
 	const activeCreditWallets = useMemo(() => activeWallets.filter(wallet => wallet.debetOrCredit === WalletDebetOrCredit.CREDIT), [activeWallets])
+	const hasWallets = activeWallets.length > 0
 	const hasDebitWallets = activeDebitWallets.length > 0
 	const hasCreditWallets = activeCreditWallets.length > 0
-	const firstSection = hasDebitWallets ? 'debit' : hasCreditWallets ? 'credit' : null
-	const debitPages = useMemo(() => buildCarouselPages(activeDebitWallets, firstSection === 'debit'), [activeDebitWallets, firstSection])
-	const creditPages = useMemo(() => buildCarouselPages(activeCreditWallets, firstSection === 'credit'), [activeCreditWallets, firstSection])
+
+	const availableTabs = useMemo(() => {
+		if (!hasWallets) return []
+
+		const tabs: Array<SegmentedTabOption<WalletTabValue>> = [{ value: 'ALL', label: t('wallets.section.all') }]
+		if (hasDebitWallets) tabs.push({ value: WalletDebetOrCredit.DEBET, label: t('wallets.section.debet') })
+		if (hasCreditWallets) tabs.push({ value: WalletDebetOrCredit.CREDIT, label: t('wallets.section.credit') })
+		return tabs
+	}, [hasCreditWallets, hasDebitWallets, hasWallets, t])
+
+	useEffect(() => {
+		if (availableTabs.length === 0) {
+			return
+		}
+		if (!availableTabs.some(tab => tab.value === activeTab)) {
+			setActiveTab(availableTabs[0].value)
+		}
+	}, [availableTabs, activeTab])
+
+	const tabWallets = activeTab === 'ALL' ? activeWallets : activeTab === WalletDebetOrCredit.CREDIT ? activeCreditWallets : activeDebitWallets
+	const pages = useMemo(() => buildCarouselPages(tabWallets, true), [tabWallets])
 	const shouldRenderSkeleton = loading
-	const shouldRenderEmptyState = !hasDebitWallets && !hasCreditWallets
+	const shouldRenderEmptyState = !hasWallets
 
 	return (
 		<>
@@ -206,19 +227,11 @@ const Wallets = ({ wallets, loading = false }: WalletsProps) => {
 			) : shouldRenderEmptyState ? (
 				renderCarousel([[null]], 'empty', handleAddWalletClick, handleWalletClick)
 			) : (
-				<div className='flex flex-col gap-3'>
-					{hasDebitWallets && (
-						<section>
-							<h2 className='mb-2 text-base font-medium tracking-wide text-text'>{t('wallets.section.debet')}</h2>
-							{renderCarousel(debitPages, 'debit', handleAddWalletClick, handleWalletClick)}
-						</section>
+				<div>
+					{availableTabs.length > 1 && (
+						<SegmentedTabs className='rounded-xl mb-3' value={activeTab} options={availableTabs} onChange={value => setActiveTab(value)} />
 					)}
-					{hasCreditWallets && (
-						<section>
-							<h2 className='mb-2 text-base font-medium tracking-wide text-text'>{t('wallets.section.credit')}</h2>
-							{renderCarousel(creditPages, 'credit', handleAddWalletClick, handleWalletClick)}
-						</section>
-					)}
+					{renderCarousel(pages, activeTab, handleAddWalletClick, handleWalletClick)}
 				</div>
 			)}
 

@@ -14,7 +14,7 @@ const IconPickerDrawer = ({ open, onClose, selectedIcon, onSelect }: IconPickerD
 	const { t } = useTranslation()
 
 	return (
-		<Drawer open={open} onClose={onClose} className='h-[70vh] rounded-t-lg bg-background-secondary'>
+		<Drawer open={open} onClose={onClose} className='rounded-t-lg bg-background-secondary' swipeable={false}>
 			<div className='flex h-full flex-col'>
 				<div className='flex justify-between items-center p-3 border-b border-divider'>
 					<h1 className='text-lg font-medium'>{t('common.iconPicker')}</h1>

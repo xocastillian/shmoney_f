@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { cn } from '@/lib/utils'
 import { categoryIconMap } from '@/widgets/Categories/icons'
+import Button from '@/components/ui/Button/Button'
 
 export interface CategoryPieChartWidgetDatum extends Record<string, unknown> {
 	name: string
@@ -40,8 +41,6 @@ const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 	emptyLabel,
 	showActions = false,
 	actionLabel,
-	actionButtonClassName,
-	actionDisabled = false,
 	onActionClick,
 	activeIndex: controlledActiveIndex,
 	onActiveSliceChange,
@@ -113,17 +112,7 @@ const CategoryPieChartWidget = <T extends CategoryPieChartWidgetDatum>({
 
 						{showActions && actionLabel && data.length > 0 && (
 							<div className='w-full px-3'>
-								<button
-									type='button'
-									onClick={onActionClick}
-									disabled={actionDisabled}
-									className={cn(
-										'w-full rounded-md bg-accent px-4 py-2 text-sm font-medium text-text-dark transition-colors duration-300 ease-in-out disabled:bg-background-muted disabled:text-accent disabled:opacity-50',
-										actionButtonClassName
-									)}
-								>
-									{actionLabel}
-								</button>
+								<Button text={actionLabel} onClick={onActionClick} />
 							</div>
 						)}
 					</div>

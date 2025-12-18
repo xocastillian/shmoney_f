@@ -105,6 +105,7 @@ export const en = {
 	'wallets.drawer.archived': 'Archived wallets',
 	'wallets.section.debet': 'Debit',
 	'wallets.section.credit': 'Credit',
+	'wallets.section.all': 'All',
 	'wallets.currency.usd': 'US Dollar',
 	'wallets.currency.kzt': 'Tenge',
 	'wallets.currency.eur': 'Euro',

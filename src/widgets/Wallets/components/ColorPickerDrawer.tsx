@@ -50,7 +50,7 @@ export function ColorPickerDrawer({ open, onClose, colors, onSelect, selectedCol
 						<button
 							type='button'
 							onClick={onOpenCustomPicker}
-							className='mt-8 flex items-center justify-center gap-2 rounded-xl border border-dashed border-accent px-4 py-3 text-sm text-accent'
+							className='mt-8 flex items-center justify-center gap-2 rounded-lg border border-dashed border-accent px-4 py-3 text-sm text-accent'
 						>
 							{t('wallets.form.customColorButton')}
 						</button>
