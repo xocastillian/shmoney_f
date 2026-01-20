@@ -160,7 +160,6 @@ function App() {
 		() => [
 			{ key: 'home', label: t('bottomNav.home'), icon: HomeIcon },
 			{ key: 'statistics', label: t('bottomNav.statistics'), icon: BarChart2 },
-			{ key: 'create', variant: 'action' as const },
 			{ key: 'budgets', label: t('bottomNav.budgets'), icon: WalletIcon },
 			{ key: 'settings', label: t('bottomNav.settings'), icon: Settings },
 		],
@@ -204,6 +203,12 @@ function App() {
 		setTransactionError(null)
 		setTransactionSubmitting(false)
 	}, [])
+
+	const handleCreateTransaction = useCallback(() => {
+		resetForm()
+		setEditingTransaction(null)
+		setTransactionDrawerOpen(true)
+	}, [resetForm])
 
 	useEffect(() => {
 		if (!transactionDrawerOpen || !isAuthenticated) return
@@ -694,7 +699,7 @@ function App() {
 			<div className='relative z-10'>
 				<main>
 					<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
-						<HomeScreen onTransactionSelect={handleTransactionSelect} />
+						<HomeScreen onTransactionSelect={handleTransactionSelect} onCreateTransaction={handleCreateTransaction} />
 					</section>
 
 					<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
@@ -714,11 +719,6 @@ function App() {
 					tabs={tabs}
 					activeKey={activeTab}
 					onTabChange={value => setActiveTab(value as TabKey)}
-					onCreate={() => {
-						resetForm()
-						setEditingTransaction(null)
-						setTransactionDrawerOpen(true)
-					}}
 				/>
 
 				<TransactionDrawer

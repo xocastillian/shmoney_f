@@ -21,6 +21,7 @@ module.exports = {
 				access: 'var(--access)',
 				disable: 'var(--disable)',
 				'accent-b': 'var(--accent-b)',
+				'accent/80': 'var(--accent80)',
 			},
 		},
 	},

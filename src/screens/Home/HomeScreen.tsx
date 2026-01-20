@@ -14,17 +14,20 @@ import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useCategories } from '@/hooks/useCategories'
 import useTransactions from '@/hooks/useTransactions'
 import { useTranslation } from '@/i18n'
+import { cn } from '@/lib/utils'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
 import type { DebtCounterparty } from '@/types/entities/debt'
 import { getTransactionFeed } from '@api/client'
 import useDebts from '@/hooks/useDebts'
+import { Plus } from 'lucide-react'
 
 interface HomeScreenProps {
 	onTransactionSelect?: (item: TransactionFeedItem) => void
+	onCreateTransaction?: () => void
 }
 
-const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
+const HomeScreen = ({ onTransactionSelect, onCreateTransaction }: HomeScreenProps) => {
 	const { status } = useTelegramAuth({ auto: true })
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 	const {
@@ -61,6 +64,9 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	const [drawerLoading, setDrawerLoading] = useState(false)
 	const [drawerError, setDrawerError] = useState<string | null>(null)
 	const [walletsTab, setWalletsTab] = useState<WalletTabValue>('ALL')
+	const [showCreateButton, setShowCreateButton] = useState(true)
+	const lastScrollYRef = useRef(0)
+	const scrollRafRef = useRef<number | null>(null)
 	const hasActiveFeedFilters = useMemo(
 		() =>
 			Boolean(
@@ -115,13 +121,42 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		setDrawerItems([])
 	}, [])
 
+	useEffect(() => {
+		const handleScroll = () => {
+			const currentY = window.scrollY
+			const prevY = lastScrollYRef.current
+			if (currentY > prevY + 4) {
+				setShowCreateButton(false)
+			} else if (currentY < prevY - 4) {
+				setShowCreateButton(true)
+			}
+			lastScrollYRef.current = currentY
+		}
+
+		const onScroll = () => {
+			if (scrollRafRef.current !== null) return
+			scrollRafRef.current = window.requestAnimationFrame(() => {
+				handleScroll()
+				scrollRafRef.current = null
+			})
+		}
+
+		window.addEventListener('scroll', onScroll, { passive: true })
+		return () => {
+			window.removeEventListener('scroll', onScroll)
+			if (scrollRafRef.current !== null) {
+				window.cancelAnimationFrame(scrollRafRef.current)
+			}
+		}
+	}, [])
+
 	const walletById = useMemo(() => {
 		const map: Record<number, Wallet> = {}
 
 		for (const wallet of wallets) {
 			map[wallet.id] = wallet
 		}
-    
+
 		return map
 	}, [wallets])
 
@@ -278,6 +313,20 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				categories={categories}
 				title={t('transactions.drawer.filters')}
 			/>
+
+			{onCreateTransaction && (
+				<button
+					type='button'
+					onClick={onCreateTransaction}
+					aria-label='Добавить транзакцию'
+					className={cn(
+						'fixed bottom-28 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-accent/80 text-background shadow-lg transition-all duration-300',
+						showCreateButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none',
+					)}
+				>
+					<Plus />
+				</button>
+			)}
 		</div>
 	)
 }
