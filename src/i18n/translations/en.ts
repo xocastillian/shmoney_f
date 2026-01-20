@@ -64,7 +64,7 @@ export const en = {
 	'transactions.form.to': 'To',
 	'transactions.form.categoryFallback': 'Category',
 	'transactions.form.counterpartyFallback': 'Who',
-	'transactions.form.borrowToggle': 'I am borrowing',
+	'transactions.form.borrowToggle': 'I am borrowing / i got back',
 	'transactions.form.description': 'Description (optional)',
 	'transactions.form.date': 'Date and time',
 	'transactions.form.delete': 'Delete',
