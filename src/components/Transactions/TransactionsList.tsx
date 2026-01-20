@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import type { TransactionFeedItem } from '@api/types'
 import type { Category } from '@/types/entities/category'
 import type { Wallet } from '@/types/entities/wallet'
+import type { DebtCounterparty } from '@/types/entities/debt'
 import TransactionListItem from './TransactionListItem'
 import { useTranslation } from '@/i18n'
 
@@ -9,11 +10,12 @@ export interface TransactionsListProps {
 	items: TransactionFeedItem[]
 	walletById?: Record<number, Wallet>
 	categoryById?: Record<number, Category>
+	counterpartyById?: Record<number, DebtCounterparty>
 	limit?: number
 	onItemClick?: (item: TransactionFeedItem) => void
 }
 
-export const TransactionsList = ({ items, walletById = {}, categoryById = {}, limit, onItemClick }: TransactionsListProps) => {
+export const TransactionsList = ({ items, walletById = {}, categoryById = {}, counterpartyById = {}, limit, onItemClick }: TransactionsListProps) => {
 	const { t, locale } = useTranslation()
 	const normalizedLimit = typeof limit === 'number' && limit > 0 ? limit : null
 	const visibleItems = normalizedLimit ? items.slice(0, normalizedLimit) : items
@@ -50,6 +52,7 @@ export const TransactionsList = ({ items, walletById = {}, categoryById = {}, li
 									item={item}
 									walletById={walletById}
 									categoryById={categoryById}
+									counterpartyById={counterpartyById}
 									onClick={onItemClick}
 								/>
 							))}

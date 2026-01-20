@@ -1,5 +1,5 @@
 import type { Setting } from '@/types/entities/setting'
-import { CircleDollarSign, FolderHeart, Languages, Wallet } from 'lucide-react'
+import { CircleDollarSign, FolderHeart, Languages, Wallet, UserRound } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { useMemo } from 'react'
 
@@ -8,6 +8,7 @@ interface SettingsOptions {
 	onLanguagePress: () => void
 	onCurrencyPress: () => void
 	onArchivedWalletsPress: () => void
+	onDebtorsPress: () => void
 	languageValue?: string
 	currencyValue?: string
 }
@@ -17,6 +18,7 @@ export const useSettingsList = ({
 	onLanguagePress,
 	onCurrencyPress,
 	onArchivedWalletsPress,
+	onDebtorsPress,
 	languageValue,
 	currencyValue,
 }: SettingsOptions): Setting[] => {
@@ -36,6 +38,11 @@ export const useSettingsList = ({
 				icon: FolderHeart,
 			},
 			{
+				title: t('settings.debtors'),
+				onClick: onDebtorsPress,
+				icon: UserRound,
+			},
+			{
 				title: t('settings.wallets'),
 				onClick: onArchivedWalletsPress,
 				icon: Wallet,
@@ -47,6 +54,6 @@ export const useSettingsList = ({
 				value: languageValue,
 			},
 		],
-		[onArchivedWalletsPress, onCategoriesPress, onCurrencyPress, onLanguagePress, currencyValue, languageValue, t]
+		[onArchivedWalletsPress, onCategoriesPress, onCurrencyPress, onDebtorsPress, onLanguagePress, currencyValue, languageValue, t]
 	)
 }

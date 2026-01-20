@@ -16,7 +16,9 @@ import useTransactions from '@/hooks/useTransactions'
 import { useTranslation } from '@/i18n'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import type { DebtCounterparty } from '@/types/entities/debt'
 import { getTransactionFeed } from '@api/client'
+import useDebts from '@/hooks/useDebts'
 
 interface HomeScreenProps {
 	onTransactionSelect?: (item: TransactionFeedItem) => void
@@ -38,6 +40,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	const { rates, loading: ratesLoading, error: ratesError, fetchExchangeRates, clearRates } = useExchangeRates()
 	const { categories, fetchCategories, clearCategories: resetCategories } = useCategories()
 	const { feed, feedLoading, feedError, fetchTransactionFeed, clearTransactions } = useTransactions()
+	const { counterparties, fetchCounterparties, clearDebts } = useDebts()
 	const { t } = useTranslation()
 	const [isTransactionsDrawerOpen, setTransactionsDrawerOpen] = useState(false)
 	const [isFiltersDrawerOpen, setFiltersDrawerOpen] = useState(false)
@@ -50,6 +53,8 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		period: '',
 		walletIds: [],
 		categoryIds: [],
+		debtCounterpartyIds: [],
+		debtDirection: '',
 	})
 	const [drawerItems, setDrawerItems] = useState<TransactionFeedItem[]>([])
 	const [drawerNextPage, setDrawerNextPage] = useState<number | null>(null)
@@ -59,9 +64,16 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	const hasActiveFeedFilters = useMemo(
 		() =>
 			Boolean(
-				feedFilters.type || feedFilters.from || feedFilters.to || feedFilters.period || feedFilters.walletIds.length || feedFilters.categoryIds.length
+				feedFilters.type ||
+				feedFilters.from ||
+				feedFilters.to ||
+				feedFilters.period ||
+				feedFilters.walletIds.length ||
+				feedFilters.categoryIds.length ||
+				feedFilters.debtCounterpartyIds.length ||
+				feedFilters.debtDirection,
 			),
-		[feedFilters]
+		[feedFilters],
 	)
 
 	const feedQueryParams = useMemo(() => {
@@ -84,6 +96,12 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		if (feedFilters.categoryIds.length) {
 			params.categoryIds = feedFilters.categoryIds
 		}
+		if (feedFilters.debtCounterpartyIds.length) {
+			params.debtCounterpartyIds = feedFilters.debtCounterpartyIds
+		}
+		if (feedFilters.debtDirection) {
+			params.debtDirection = feedFilters.debtDirection
+		}
 		return params
 	}, [feedFilters])
 
@@ -92,26 +110,40 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 	}, [])
 
 	const handleResetFeedFilters = useCallback(() => {
-		setFeedFilters({ type: '', from: '', to: '', period: '', walletIds: [], categoryIds: [] })
+		setFeedFilters({ type: '', from: '', to: '', period: '', walletIds: [], categoryIds: [], debtCounterpartyIds: [], debtDirection: '' })
 		setDrawerNextPage(null)
 		setDrawerItems([])
 	}, [])
 
 	const walletById = useMemo(() => {
 		const map: Record<number, Wallet> = {}
+
 		for (const wallet of wallets) {
 			map[wallet.id] = wallet
 		}
+    
 		return map
 	}, [wallets])
 
 	const categoryById = useMemo(() => {
 		const map: Record<number, Category> = {}
+
 		for (const category of categories) {
 			map[category.id] = category
 		}
+
 		return map
 	}, [categories])
+
+	const counterpartyById = useMemo(() => {
+		const map: Record<number, DebtCounterparty> = {}
+
+		for (const counterparty of counterparties) {
+			map[counterparty.id] = counterparty
+		}
+
+		return map
+	}, [counterparties])
 
 	useEffect(() => {
 		if (!authenticated) {
@@ -119,6 +151,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 			clearRates()
 			resetCategories()
 			clearTransactions()
+			clearDebts()
 			return
 		}
 
@@ -126,16 +159,19 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 		void fetchWalletBalances().catch(() => undefined)
 		void fetchExchangeRates().catch(() => undefined)
 		void fetchCategories().catch(() => undefined)
+		void fetchCounterparties().catch(() => undefined)
 	}, [
 		authenticated,
 		fetchWallets,
 		fetchWalletBalances,
 		fetchExchangeRates,
 		fetchCategories,
+		fetchCounterparties,
 		clearWallets,
 		clearRates,
 		resetCategories,
 		clearTransactions,
+		clearDebts,
 	])
 
 	useEffect(() => {
@@ -172,7 +208,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				}
 			}
 		},
-		[feedQueryParams]
+		[feedQueryParams],
 	)
 
 	useEffect(() => {
@@ -201,6 +237,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 					error={feedError}
 					walletById={walletById}
 					categoryById={categoryById}
+					counterpartyById={counterpartyById}
 					onItemClick={onTransactionSelect}
 					onOpenDrawer={() => setTransactionsDrawerOpen(true)}
 				/>
@@ -219,6 +256,7 @@ const HomeScreen = ({ onTransactionSelect }: HomeScreenProps) => {
 				items={drawerItems}
 				walletById={walletById}
 				categoryById={categoryById}
+				counterpartyById={counterpartyById}
 				hasMore={drawerNextPage != null}
 				loadingMore={isLoadingMoreFeed}
 				initialLoading={drawerLoading}

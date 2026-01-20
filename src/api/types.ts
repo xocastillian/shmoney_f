@@ -35,6 +35,14 @@ import {
 	BudgetResponseSchema,
 	BudgetCreateRequestSchema,
 	BudgetUpdateRequestSchema,
+	DebtCounterpartyResponseSchema,
+	DebtCounterpartyCreateRequestSchema,
+	DebtCounterpartyUpdateRequestSchema,
+	DebtTransactionResponseSchema,
+	DebtTransactionCreateRequestSchema,
+	DebtTransactionUpdateRequestSchema,
+	DebtTransactionPageResponseSchema,
+	DebtSummaryResponseSchema,
 } from './schemas'
 
 export type AuthResponse = z.infer<typeof AuthResponseSchema>
@@ -75,3 +83,11 @@ export type SettingsUpdateRequest = z.infer<typeof SettingsUpdateRequestSchema>
 export type BudgetResponse = z.infer<typeof BudgetResponseSchema>
 export type BudgetCreateRequest = z.infer<typeof BudgetCreateRequestSchema>
 export type BudgetUpdateRequest = z.infer<typeof BudgetUpdateRequestSchema>
+export type DebtCounterpartyResponse = z.infer<typeof DebtCounterpartyResponseSchema>
+export type DebtCounterpartyCreateRequest = z.infer<typeof DebtCounterpartyCreateRequestSchema>
+export type DebtCounterpartyUpdateRequest = z.infer<typeof DebtCounterpartyUpdateRequestSchema>
+export type DebtTransactionResponse = z.infer<typeof DebtTransactionResponseSchema>
+export type DebtTransactionCreateRequest = z.infer<typeof DebtTransactionCreateRequestSchema>
+export type DebtTransactionUpdateRequest = z.infer<typeof DebtTransactionUpdateRequestSchema>
+export type DebtTransactionPageResponse = z.infer<typeof DebtTransactionPageResponseSchema>
+export type DebtSummaryResponse = z.infer<typeof DebtSummaryResponseSchema>

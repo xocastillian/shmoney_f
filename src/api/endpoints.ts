@@ -49,4 +49,14 @@ export const endpoints = {
 	analytics: {
 		base: '/api/analytics',
 	},
+	debts: {
+		counterparties: '/api/debts/counterparties',
+		counterpartyById: (id: number | string) => `/api/debts/counterparties/${id}`,
+		counterpartyArchive: (id: number | string) => `/api/debts/counterparties/${id}/archive`,
+		counterpartyRestore: (id: number | string) => `/api/debts/counterparties/${id}/restore`,
+		transactions: '/api/debts/transactions',
+		transactionById: (id: number | string) => `/api/debts/transactions/${id}`,
+		summary: '/api/debts/analytics/summary',
+		history: '/api/debts/analytics/history',
+	},
 } as const

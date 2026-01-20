@@ -1,7 +1,7 @@
 import { useTranslation } from '@/i18n'
 import SegmentedTabs from '@/components/ui/SegmentedTabs/SegmentedTabs'
 
-const TRANSACTION_TABS = ['EXPENSE', 'INCOME', 'TRANSFER'] as const
+const TRANSACTION_TABS = ['EXPENSE', 'INCOME', 'TRANSFER', 'DEBT'] as const
 
 export type TransactionTypeTabValue = (typeof TRANSACTION_TABS)[number]
 
@@ -17,6 +17,7 @@ export const TransactionTypeTabs = ({ value = 'EXPENSE', onChange, className, op
 		EXPENSE: 'transactions.tabs.expense',
 		INCOME: 'transactions.tabs.income',
 		TRANSFER: 'transactions.tabs.transfer',
+		DEBT: 'transactions.tabs.debt',
 	}
 
 	const { t } = useTranslation()

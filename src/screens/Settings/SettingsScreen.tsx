@@ -3,6 +3,8 @@ import type { Category } from '@/types/entities/category'
 import SettingsItem from '@/components/SettingsItem/SettingsItem'
 import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
+import DebtCounterpartiesDrawer from '@/widgets/Debts/components/DebtCounterpartiesDrawer'
+import AddOrEditDebtCounterpartyDrawer from '@/widgets/Debts/components/AddOrEditDebtCounterpartyDrawer'
 import { useSettingsList } from './settings'
 import { useCategories } from '@/hooks/useCategories'
 import LanguageSettingsDrawer from './components/LanguageSettingsDrawer'
@@ -10,6 +12,7 @@ import { useSettings } from '@/hooks/useSettings'
 import { useTranslation } from '@/i18n'
 import { useWallets } from '@/hooks/useWallets'
 import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
+import type { DebtCounterparty } from '@/types/entities/debt'
 import WalletsDrawer from '@/widgets/Wallets/components/WalletsDrawer'
 import WalletDrawer from '@/widgets/Wallets/components/WalletDrawer'
 import { ColorPickerDrawer } from '@/widgets/Wallets/components/ColorPickerDrawer'
@@ -19,6 +22,7 @@ import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPicke
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
 import { useAnalytics } from '@/hooks/useAnalytics'
+import useDebts from '@/hooks/useDebts'
 
 const defaultWalletType = WalletType.CASH
 const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
@@ -26,10 +30,13 @@ const fallbackCurrencyCode = currencyOptions[0]?.value ?? 'USD'
 const SettingsScreen = () => {
 	const [isCategoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false)
 	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
+	const [isDebtCounterpartiesDrawerOpen, setDebtCounterpartiesDrawerOpen] = useState(false)
+	const [isAddDebtCounterpartyDrawerOpen, setAddDebtCounterpartyDrawerOpen] = useState(false)
 	const [isLanguageDrawerOpen, setLanguageDrawerOpen] = useState(false)
 	const [isCurrencyDrawerOpen, setCurrencyDrawerOpen] = useState(false)
 	const [isArchivedWalletsDrawerOpen, setArchivedWalletsDrawerOpen] = useState(false)
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+	const [editingCounterparty, setEditingCounterparty] = useState<DebtCounterparty | null>(null)
 	const [isWalletFormOpen, setWalletFormOpen] = useState(false)
 	const [editingWalletId, setEditingWalletId] = useState<number | null>(null)
 	const [walletFormName, setWalletFormName] = useState('')
@@ -45,6 +52,7 @@ const SettingsScreen = () => {
 	const [typePickerOpen, setTypePickerOpen] = useState(false)
 	const [walletCurrencyPickerOpen, setWalletCurrencyPickerOpen] = useState(false)
 	const { actionLoading: categoriesSubmitting } = useCategories()
+	const { actionLoading: debtsSubmitting } = useDebts()
 	const {
 		supportedLanguages,
 		supportedCurrencies,
@@ -80,6 +88,8 @@ const SettingsScreen = () => {
 
 	const openCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(true), [])
 	const closeCategoriesDrawer = useCallback(() => setCategoriesDrawerOpen(false), [])
+	const openDebtCounterpartiesDrawer = useCallback(() => setDebtCounterpartiesDrawerOpen(true), [])
+	const closeDebtCounterpartiesDrawer = useCallback(() => setDebtCounterpartiesDrawerOpen(false), [])
 	const openLanguageDrawer = useCallback(() => setLanguageDrawerOpen(true), [])
 	const closeLanguageDrawer = useCallback(() => setLanguageDrawerOpen(false), [])
 	const openCurrencyDrawer = useCallback(() => setCurrencyDrawerOpen(true), [])
@@ -96,6 +106,7 @@ const SettingsScreen = () => {
 
 	const settings = useSettingsList({
 		onCategoriesPress: openCategoriesDrawer,
+		onDebtorsPress: openDebtCounterpartiesDrawer,
 		onLanguagePress: openLanguageDrawer,
 		onCurrencyPress: openCurrencyDrawer,
 		onArchivedWalletsPress: openArchivedWalletsDrawer,
@@ -139,7 +150,7 @@ const SettingsScreen = () => {
 			setWalletFormError(null)
 			setWalletFormOpen(true)
 		},
-		[wallets]
+		[wallets],
 	)
 
 	const handleAddWallet = useCallback(() => {
@@ -186,7 +197,7 @@ const SettingsScreen = () => {
 				// errors handled in hook
 			}
 		},
-		[changeMainCurrency]
+		[changeMainCurrency],
 	)
 
 	const handleWalletFormSubmit = useCallback(
@@ -258,7 +269,7 @@ const SettingsScreen = () => {
 			walletFormName,
 			walletFormType,
 			walletFormDebetOrCredit,
-		]
+		],
 	)
 
 	const handleWalletArchiveToggle = useCallback(async () => {
@@ -297,6 +308,26 @@ const SettingsScreen = () => {
 		void refreshAnalytics().catch(() => undefined)
 	}, [refreshAnalytics])
 
+	const handleSelectCounterparty = useCallback((counterparty: DebtCounterparty) => {
+		setEditingCounterparty(counterparty)
+		setAddDebtCounterpartyDrawerOpen(true)
+	}, [])
+
+	const handleAddCounterparty = useCallback(() => {
+		setEditingCounterparty(null)
+		setAddDebtCounterpartyDrawerOpen(true)
+	}, [])
+
+	const closeAddCounterpartyDrawer = useCallback(() => {
+		setEditingCounterparty(null)
+		setAddDebtCounterpartyDrawerOpen(false)
+	}, [])
+
+	const handleSubmitCounterparty = useCallback(() => {
+		setEditingCounterparty(null)
+		setAddDebtCounterpartyDrawerOpen(false)
+	}, [])
+
 	const handleSelectLanguage = useCallback(
 		async (nextLanguage: string) => {
 			try {
@@ -306,7 +337,7 @@ const SettingsScreen = () => {
 				// errors handled in useSettings
 			}
 		},
-		[changeLanguage]
+		[changeLanguage],
 	)
 
 	return (
@@ -330,6 +361,22 @@ const SettingsScreen = () => {
 				onSubmit={handleSubmitCategory}
 				submitting={categoriesSubmitting}
 				title={editingCategory ? t('categories.drawer.editTitle') : t('categories.drawer.newTitle')}
+			/>
+
+			<DebtCounterpartiesDrawer
+				open={isDebtCounterpartiesDrawerOpen}
+				onClose={closeDebtCounterpartiesDrawer}
+				onSelect={handleSelectCounterparty}
+				onAdd={handleAddCounterparty}
+			/>
+
+			<AddOrEditDebtCounterpartyDrawer
+				open={isAddDebtCounterpartyDrawerOpen}
+				onClose={closeAddCounterpartyDrawer}
+				initialCounterparty={editingCounterparty ?? undefined}
+				onSubmit={handleSubmitCounterparty}
+				submitting={debtsSubmitting}
+				title={editingCounterparty ? t('debts.drawer.editTitle') : t('debts.drawer.newTitle')}
 			/>
 
 			<LanguageSettingsDrawer
