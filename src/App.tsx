@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useId, useMemo, useState, type FormEvent } from 'react'
-import { Home as HomeIcon, BarChart2, Wallet as WalletIcon, Settings } from 'lucide-react'
+import { Home as HomeIcon, BarChart2, Wallet as WalletIcon, Settings, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import HomeScreen from '@/screens/Home/HomeScreen'
 import StatisticsScreen from '@/screens/Statistics/StatisticsScreen'
 import BudgetsScreen from '@/screens/Budgets/BudgetsScreen'
 import SettingsScreen from '@/screens/Settings/SettingsScreen'
+import CounterpartiesScreen from '@/screens/Counterparties/CounterpartiesScreen'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
 import { useBudgets } from '@/hooks/useBudgets'
@@ -37,7 +38,7 @@ import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPicke
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
 
-type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
+type TabKey = 'home' | 'statistics' | 'budgets' | 'debtors' | 'settings'
 type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
 
 const isCategoryTransactionType = (value: TransactionTypeTabValue): value is CategoryTransactionTypeValue => value === 'EXPENSE' || value === 'INCOME'
@@ -76,6 +77,7 @@ function App() {
 		updateTransaction: updateDebtTransaction,
 		deleteTransaction: deleteDebtTransaction,
 		fetchTransaction: fetchDebtTransaction,
+		fetchCounterparties,
 		counterparties,
 	} = useDebts()
 	const currencyPickerOptions = useMemo(() => {
@@ -161,6 +163,7 @@ function App() {
 			{ key: 'home', label: t('bottomNav.home'), icon: HomeIcon },
 			{ key: 'statistics', label: t('bottomNav.statistics'), icon: BarChart2 },
 			{ key: 'budgets', label: t('bottomNav.budgets'), icon: WalletIcon },
+			{ key: 'debtors', label: t('bottomNav.debtors'), icon: UserRound },
 			{ key: 'settings', label: t('bottomNav.settings'), icon: Settings },
 		],
 		[t],
@@ -512,6 +515,7 @@ function App() {
 			} else {
 				await deleteCategoryTransaction(editingTransaction.id)
 			}
+			void fetchCounterparties().catch(() => undefined)
 			void fetchWallets().catch(() => undefined)
 			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
@@ -529,6 +533,7 @@ function App() {
 		deleteWalletTransaction,
 		deleteDebtTransaction,
 		deleteCategoryTransaction,
+		fetchCounterparties,
 		fetchWalletBalances,
 		fetchWallets,
 		fetchTransactionFeed,
@@ -650,6 +655,7 @@ function App() {
 					})
 				}
 
+				void fetchCounterparties().catch(() => undefined)
 				void fetchWallets().catch(() => undefined)
 				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
@@ -683,6 +689,7 @@ function App() {
 			updateDebtTransaction,
 			updateCategoryTransaction,
 			fetchTransactionFeed,
+			fetchCounterparties,
 			fetchWallets,
 			handleDrawerClose,
 			fetchWalletBalances,
@@ -712,6 +719,10 @@ function App() {
 
 					<section className={cn('min-h-screen', activeTab === 'settings' ? 'block' : 'hidden')}>
 						<SettingsScreen />
+					</section>
+
+					<section className={cn('min-h-screen', activeTab === 'debtors' ? 'block' : 'hidden')}>
+						<CounterpartiesScreen />
 					</section>
 				</main>
 
