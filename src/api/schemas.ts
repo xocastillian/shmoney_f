@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/wallet'
 import { CategoryStatus } from '@/types/entities/category'
 import { BudgetPeriodType, BudgetStatus, BudgetType } from '@/types/entities/budget'
+import { DebtCounterpartyStatus, DebtTransactionDirection } from '@/types/entities/debt'
 
 export const WalletTypeSchema = z.enum(WalletType)
 export const WalletStatusSchema = z.enum(WalletStatus)
@@ -11,6 +12,8 @@ export const CategoryStatusSchema = z.enum(CategoryStatus)
 export const BudgetPeriodTypeSchema = z.enum(BudgetPeriodType)
 export const BudgetTypeSchema = z.enum(BudgetType)
 export const BudgetStatusSchema = z.enum(BudgetStatus)
+export const DebtCounterpartyStatusSchema = z.enum(DebtCounterpartyStatus)
+export const DebtTransactionDirectionSchema = z.enum(DebtTransactionDirection)
 
 export const AuthResponseSchema = z.object({
 	accessToken: z.string().min(1),
@@ -164,7 +167,7 @@ export const CategoryTransactionPageResponseSchema = z.object({
 	results: CategoryTransactionResponseSchema.array(),
 })
 
-export const TransactionFeedTypeSchema = z.enum(['TRANSFER', 'EXPENSE', 'INCOME'])
+export const TransactionFeedTypeSchema = z.enum(['TRANSFER', 'EXPENSE', 'INCOME', 'DEBT'])
 
 export const TransactionFeedItemSchema = z.object({
 	id: z.number().int(),
@@ -172,7 +175,12 @@ export const TransactionFeedItemSchema = z.object({
 	categoryType: CategoryTransactionTypeSchema.nullable(),
 	walletId: z.number().int().nullable(),
 	counterpartyWalletId: z.number().int().nullable(),
+	counterpartyId: z.number().int().nullable().optional(),
+	counterpartyName: z.string().nullable().optional(),
+	counterpartyColor: z.string().nullable().optional(),
 	categoryId: z.number().int().nullable(),
+	debtCounterpartyId: z.number().int().nullable().optional(),
+	debtDirection: DebtTransactionDirectionSchema.nullable().optional(),
 	amount: z.coerce.number(),
 	currencyCode: z.string(),
 	description: z.string().nullable().optional(),
@@ -323,4 +331,82 @@ export const BudgetUpdateRequestSchema = z.object({
 	categoryIds: z.array(z.number().int().positive()).nonempty().optional(),
 	currencyCode: z.string().min(3).max(10).optional(),
 	amountLimit: z.coerce.number().positive().optional(),
+})
+
+export const DebtCounterpartyResponseSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	color: z.string().nullable().optional(),
+	currencyCode: z.string(),
+	owedToMe: z.coerce.number(),
+	iOwe: z.coerce.number(),
+	status: DebtCounterpartyStatusSchema,
+	createdAt: z.coerce.date().nullable().optional(),
+	updatedAt: z.coerce.date().nullable().optional(),
+})
+
+export const DebtCounterpartyCreateRequestSchema = z.object({
+	name: z.string().min(1).max(120),
+	color: z.string().max(16).optional(),
+})
+
+export const DebtCounterpartyUpdateRequestSchema = z.object({
+	name: z.string().max(120).optional(),
+	color: z.string().max(16).optional(),
+})
+
+export const DebtTransactionResponseSchema = z.object({
+	id: z.number().int(),
+	counterpartyId: z.number().int(),
+	counterpartyName: z.string(),
+	walletId: z.number().int(),
+	direction: DebtTransactionDirectionSchema,
+	amount: z.coerce.number(),
+	currencyCode: z.string(),
+	description: z.string().nullable().optional(),
+	occurredAt: z.coerce.date(),
+	createdAt: z.coerce.date().nullable().optional(),
+})
+
+export const DebtTransactionCreateRequestSchema = z.object({
+	counterpartyId: z.number().int().positive(),
+	walletId: z.number().int().positive(),
+	direction: DebtTransactionDirectionSchema,
+	amount: z.coerce.number().positive(),
+	currencyId: z.number().int().positive(),
+	occurredAt: z.coerce.date(),
+	description: z.string().max(255).optional(),
+})
+
+export const DebtTransactionUpdateRequestSchema = z.object({
+	counterpartyId: z.number().int().positive().optional(),
+	walletId: z.number().int().positive().optional(),
+	direction: DebtTransactionDirectionSchema.optional(),
+	amount: z.coerce.number().positive().optional(),
+	currencyId: z.number().int().positive().optional(),
+	occurredAt: z.coerce.date().optional(),
+	description: z.string().max(255).optional(),
+})
+
+export const DebtTransactionPageResponseSchema = z.object({
+	count: z.number().int(),
+	next: z.number().int().nullable().optional(),
+	previous: z.number().int().nullable().optional(),
+	results: DebtTransactionResponseSchema.array(),
+})
+
+export const DebtCounterpartySummarySchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	owedToMe: z.coerce.number(),
+	iOwe: z.coerce.number(),
+	owedToMeShare: z.coerce.number(),
+	iOweShare: z.coerce.number(),
+})
+
+export const DebtSummaryResponseSchema = z.object({
+	currencyCode: z.string(),
+	totalOwedToMe: z.coerce.number(),
+	totalIOwe: z.coerce.number(),
+	counterparties: DebtCounterpartySummarySchema.array(),
 })

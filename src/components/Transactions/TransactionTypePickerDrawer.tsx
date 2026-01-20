@@ -8,6 +8,7 @@ const typeOptions: { value: TransactionFilterType; labelKey: string }[] = [
 	{ value: 'EXPENSE', labelKey: 'transactions.filters.type.expense' },
 	{ value: 'INCOME', labelKey: 'transactions.filters.type.income' },
 	{ value: 'TRANSFER', labelKey: 'transactions.filters.type.transfer' },
+	{ value: 'DEBT', labelKey: 'transactions.filters.type.debt' },
 ]
 
 interface TransactionTypePickerDrawerProps {

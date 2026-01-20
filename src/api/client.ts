@@ -30,6 +30,14 @@ import {
 	BudgetCreateRequestSchema,
 	BudgetUpdateRequestSchema,
 	AnalyticsResponseSchema,
+	DebtCounterpartyResponseSchema,
+	DebtCounterpartyCreateRequestSchema,
+	DebtCounterpartyUpdateRequestSchema,
+	DebtTransactionResponseSchema,
+	DebtTransactionCreateRequestSchema,
+	DebtTransactionUpdateRequestSchema,
+	DebtTransactionPageResponseSchema,
+	DebtSummaryResponseSchema,
 } from './schemas'
 import type {
 	AuthResponse,
@@ -60,6 +68,14 @@ import type {
 	BudgetCreateRequest,
 	BudgetUpdateRequest,
 	AnalyticsResponse,
+	DebtCounterpartyResponse,
+	DebtCounterpartyCreateRequest,
+	DebtCounterpartyUpdateRequest,
+	DebtTransactionResponse,
+	DebtTransactionCreateRequest,
+	DebtTransactionUpdateRequest,
+	DebtTransactionPageResponse,
+	DebtSummaryResponse,
 } from './types'
 import type { BudgetPeriodType } from '@/types/entities/budget'
 
@@ -299,12 +315,118 @@ export async function deleteBudget(id: number): Promise<void> {
 	await del<void>(endpoints.budgets.byId(id))
 }
 
+export async function listDebtCounterparties(params?: { status?: string }): Promise<DebtCounterpartyResponse[]> {
+	const query = new URLSearchParams()
+	if (params?.status) query.set('status', params.status)
+	const queryString = query.toString()
+	const url = queryString ? `${endpoints.debts.counterparties}?${queryString}` : endpoints.debts.counterparties
+	const data = await get<unknown>(url)
+	return DebtCounterpartyResponseSchema.array().parse(data)
+}
+
+export async function getDebtCounterparty(id: number): Promise<DebtCounterpartyResponse> {
+	const data = await get<unknown>(endpoints.debts.counterpartyById(id))
+	return DebtCounterpartyResponseSchema.parse(data)
+}
+
+export async function createDebtCounterparty(payload: DebtCounterpartyCreateRequest): Promise<DebtCounterpartyResponse> {
+	const body = DebtCounterpartyCreateRequestSchema.parse(payload)
+	const data = await post<unknown>(endpoints.debts.counterparties, body)
+	return DebtCounterpartyResponseSchema.parse(data)
+}
+
+export async function updateDebtCounterparty(id: number, payload: DebtCounterpartyUpdateRequest): Promise<DebtCounterpartyResponse> {
+	const body = DebtCounterpartyUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.debts.counterpartyById(id), body)
+	return DebtCounterpartyResponseSchema.parse(data)
+}
+
+export async function archiveDebtCounterparty(id: number): Promise<DebtCounterpartyResponse> {
+	const data = await post<unknown>(endpoints.debts.counterpartyArchive(id), {})
+	return DebtCounterpartyResponseSchema.parse(data)
+}
+
+export async function restoreDebtCounterparty(id: number): Promise<DebtCounterpartyResponse> {
+	const data = await post<unknown>(endpoints.debts.counterpartyRestore(id), {})
+	return DebtCounterpartyResponseSchema.parse(data)
+}
+
+export async function listDebtTransactions(params?: {
+	page?: number
+	size?: number
+	counterpartyId?: number
+	direction?: string
+	from?: Date | string
+	to?: Date | string
+}): Promise<DebtTransactionPageResponse> {
+	const query = new URLSearchParams()
+	if (typeof params?.page === 'number') query.set('page', String(params.page))
+	if (typeof params?.size === 'number') query.set('size', String(params.size))
+	if (typeof params?.counterpartyId === 'number') query.set('counterpartyId', String(params.counterpartyId))
+	if (params?.direction) query.set('direction', params.direction)
+	if (params?.from) query.set('from', new Date(params.from).toISOString())
+	if (params?.to) query.set('to', new Date(params.to).toISOString())
+	const queryString = query.toString()
+	const url = queryString ? `${endpoints.debts.transactions}?${queryString}` : endpoints.debts.transactions
+	const data = await get<unknown>(url)
+	return DebtTransactionPageResponseSchema.parse(data)
+}
+
+export async function getDebtTransaction(id: number): Promise<DebtTransactionResponse> {
+	const data = await get<unknown>(endpoints.debts.transactionById(id))
+	return DebtTransactionResponseSchema.parse(data)
+}
+
+export async function createDebtTransaction(payload: DebtTransactionCreateRequest): Promise<DebtTransactionResponse> {
+	const body = DebtTransactionCreateRequestSchema.parse(payload)
+	const data = await post<unknown>(endpoints.debts.transactions, body)
+	return DebtTransactionResponseSchema.parse(data)
+}
+
+export async function deleteDebtTransaction(id: number): Promise<void> {
+	await del<void>(endpoints.debts.transactionById(id))
+}
+
+export async function updateDebtTransaction(id: number, payload: DebtTransactionUpdateRequest): Promise<DebtTransactionResponse> {
+	const body = DebtTransactionUpdateRequestSchema.parse(payload)
+	const data = await patch<unknown>(endpoints.debts.transactionById(id), body)
+	return DebtTransactionResponseSchema.parse(data)
+}
+
+export async function getDebtSummary(): Promise<DebtSummaryResponse> {
+	const data = await get<unknown>(endpoints.debts.summary)
+	return DebtSummaryResponseSchema.parse(data)
+}
+
+export async function listDebtHistory(params?: {
+	page?: number
+	size?: number
+	counterpartyId?: number
+	direction?: string
+	from?: Date | string
+	to?: Date | string
+}): Promise<DebtTransactionPageResponse> {
+	const query = new URLSearchParams()
+	if (typeof params?.page === 'number') query.set('page', String(params.page))
+	if (typeof params?.size === 'number') query.set('size', String(params.size))
+	if (typeof params?.counterpartyId === 'number') query.set('counterpartyId', String(params.counterpartyId))
+	if (params?.direction) query.set('direction', params.direction)
+	if (params?.from) query.set('from', new Date(params.from).toISOString())
+	if (params?.to) query.set('to', new Date(params.to).toISOString())
+	const queryString = query.toString()
+	const url = queryString ? `${endpoints.debts.history}?${queryString}` : endpoints.debts.history
+	const data = await get<unknown>(url)
+	return DebtTransactionPageResponseSchema.parse(data)
+}
+
 export async function getTransactionFeed(params?: {
 	page?: number
 	size?: number
 	type?: string
 	walletIds?: number[]
 	categoryIds?: number[]
+	debtCounterpartyIds?: number[]
+	debtDirection?: string
 	from?: Date | string
 	to?: Date | string
 	period?: string
@@ -323,6 +445,12 @@ export async function getTransactionFeed(params?: {
 			query.append('categoryId', String(categoryId))
 		}
 	}
+	if (params?.debtCounterpartyIds?.length) {
+		for (const counterpartyId of params.debtCounterpartyIds) {
+			query.append('debtCounterpartyId', String(counterpartyId))
+		}
+	}
+	if (params?.debtDirection) query.set('debtDirection', params.debtDirection)
 	if (params?.from) query.set('from', new Date(params.from).toISOString())
 	if (params?.to) query.set('to', new Date(params.to).toISOString())
 	if (params?.period) query.set('period', params.period)

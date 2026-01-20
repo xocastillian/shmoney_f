@@ -29,6 +29,7 @@ const TransactionsDrawer = ({
 	items,
 	walletById,
 	categoryById,
+	counterpartyById,
 	hasMore = false,
 	loadingMore = false,
 	onLoadMore,
@@ -87,7 +88,13 @@ const TransactionsDrawer = ({
 					<div className='flex flex-1 items-center justify-center px-3 pb-10 text-lg '>{t('transactions.placeholder')}</div>
 				) : (
 					<div className='flex-1 overflow-y-auto pb-10' onScroll={handleScroll}>
-						<TransactionsList items={items} walletById={walletById} categoryById={categoryById} onItemClick={onItemClick} />
+						<TransactionsList
+							items={items}
+							walletById={walletById}
+							categoryById={categoryById}
+							counterpartyById={counterpartyById}
+							onItemClick={onItemClick}
+						/>
 					</div>
 				)}
 				{error && <div className='px-3 pb-4 text-sm text-danger'>{error}</div>}

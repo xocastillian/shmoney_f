@@ -1,4 +1,4 @@
-import { CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart, CalendarClock, Check } from 'lucide-react'
+import { CircleDollarSign, FileText, Wallet as WalletIcon, Trash, FolderHeart, CalendarClock, Check, UserRound } from 'lucide-react'
 import type { ChangeEvent, FormEvent, ReactNode } from 'react'
 import { formatDecimalForDisplay, sanitizeDecimalInput } from '@/utils/number'
 import TransactionTypeTabs, { type TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
@@ -6,6 +6,7 @@ import { useTranslation } from '@/i18n'
 import MobileDateTimePickerField from '@/components/DateTimePicker/MobileDateTimePickerField'
 import { cn } from '@/lib/utils'
 import { formatDateTimeLocal } from '@/utils/date'
+import Switch from '@/components/ui/Switch'
 
 interface TransactionFormProps {
 	formId: string
@@ -33,6 +34,13 @@ interface TransactionFormProps {
 	categoryIcon?: ReactNode
 	onOpenCategoryPicker?: () => void
 	categoryPickerDisabled?: boolean
+	counterpartyLabel?: string
+	counterpartySelected?: boolean
+	counterpartyIcon?: ReactNode
+	onOpenCounterpartyPicker?: () => void
+	counterpartyPickerDisabled?: boolean
+	isBorrowing?: boolean
+	onBorrowingChange?: (value: boolean) => void
 	description: string
 	onDescriptionChange: (value: string) => void
 	dateTime: string
@@ -68,6 +76,13 @@ export const TransactionForm = ({
 	categoryIcon,
 	onOpenCategoryPicker,
 	categoryPickerDisabled = false,
+	counterpartyLabel = '',
+	counterpartySelected = false,
+	counterpartyIcon,
+	onOpenCounterpartyPicker,
+	counterpartyPickerDisabled = false,
+	isBorrowing = false,
+	onBorrowingChange,
 	description,
 	onDescriptionChange,
 	dateTime,
@@ -78,13 +93,25 @@ export const TransactionForm = ({
 }: TransactionFormProps) => {
 	const { t, locale } = useTranslation()
 	const formattedAmount = formatDecimalForDisplay(amount)
-	const amountSign = transactionType === 'EXPENSE' ? '-' : transactionType === 'INCOME' ? '+' : ''
-	const amountColorClass = transactionType === 'EXPENSE' ? 'text-danger' : transactionType === 'INCOME' ? 'text-accent' : 'text-text'
+	const isDebtBorrowing = transactionType === 'DEBT' && isBorrowing
+	const amountSign = transactionType === 'EXPENSE' ? '-' : transactionType === 'INCOME' ? '+' : transactionType === 'DEBT' ? (isDebtBorrowing ? '+' : '-') : ''
+	const amountColorClass =
+		transactionType === 'EXPENSE'
+			? 'text-danger'
+			: transactionType === 'INCOME'
+				? 'text-accent'
+				: transactionType === 'DEBT'
+					? isDebtBorrowing
+						? 'text-accent'
+						: 'text-danger'
+					: 'text-text'
 	const displayAmount = formattedAmount ? `${amountSign}${formattedAmount}` : ''
 	const isEditMode = mode === 'edit'
 	const isEditingTransfer = isEditMode && transactionType === 'TRANSFER'
-	const shouldRenderTransactionTypeTabs = !isEditingTransfer
-	const transactionTypeOptions = isEditMode && !isEditingTransfer ? (['EXPENSE', 'INCOME'] as TransactionTypeTabValue[]) : undefined
+	const isEditingDebt = isEditMode && transactionType === 'DEBT'
+	const shouldRenderTransactionTypeTabs = !isEditingTransfer && !isEditingDebt
+	const transactionTypeOptions =
+		isEditMode && !isEditingTransfer && !isEditingDebt ? (['EXPENSE', 'INCOME'] as TransactionTypeTabValue[]) : undefined
 	const resolvedSubmitLabel = submitLabel ?? (isEditMode ? t('transactions.drawer.save') : t('transactions.drawer.create'))
 
 	const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -161,6 +188,28 @@ export const TransactionForm = ({
 								<span className={toWalletSelected ? 'text-text' : 'text-label'}>{toWalletSelected ? toWalletLabel : t('transactions.form.to')}</span>
 							</div>
 						</button>
+					) : transactionType === 'DEBT' ? (
+						<>
+							<div className='border-b border-divider'>
+								<div className='flex h-16 items-center justify-between px-3'>
+									<span className='text-text'>{t('transactions.form.borrowToggle')}</span>
+									<Switch checked={isBorrowing} onChange={value => onBorrowingChange?.(value)} />
+								</div>
+							</div>
+							<button
+								type='button'
+								onClick={onOpenCounterpartyPicker}
+								className='w-full border-b border-divider text-left focus:outline-none focus-visible:bg-background-muted disabled:cursor-not-allowed disabled:opacity-60'
+								disabled={counterpartyPickerDisabled}
+							>
+								<div className='flex h-16 items-center px-3'>
+									{counterpartyIcon ?? <UserRound className='mr-3 text-label' />}
+									<span className={counterpartySelected ? 'text-text' : 'text-label'}>
+										{counterpartySelected ? counterpartyLabel : t('transactions.form.counterpartyFallback')}
+									</span>
+								</div>
+							</button>
+						</>
 					) : (
 						<button
 							type='button'

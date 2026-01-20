@@ -16,6 +16,7 @@ export const TransactionsWidget = ({
 	error = null,
 	walletById = {},
 	categoryById = {},
+	counterpartyById = {},
 	onOpenDrawer,
 	onItemClick,
 	limit = 5,
@@ -49,7 +50,14 @@ export const TransactionsWidget = ({
 				<h2 className='text-base border-b border-divider pb-3 w-full'>{t('transactions.widget.title')}</h2>
 			</div>
 
-			<TransactionsList items={items} walletById={walletById} categoryById={categoryById} limit={limit} onItemClick={onItemClick} />
+			<TransactionsList
+				items={items}
+				walletById={walletById}
+				categoryById={categoryById}
+				counterpartyById={counterpartyById}
+				limit={limit}
+				onItemClick={onItemClick}
+			/>
 
 			<div className='mt-3 px-3 w-full'>
 				<Button text={t('transactions.widget.showAll')} onClick={onOpenDrawer} />

@@ -1,8 +1,9 @@
-import { BanknoteArrowDown } from 'lucide-react'
+import { BanknoteArrowDown, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { TransactionFeedItem } from '@api/types'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import type { DebtCounterparty } from '@/types/entities/debt'
 import { categoryIconMap } from '@/widgets/Categories/icons'
 import { useTranslation } from '@/i18n'
 
@@ -10,25 +11,72 @@ interface TransactionListItemProps {
 	item: TransactionFeedItem
 	walletById?: Record<number, Wallet>
 	categoryById?: Record<number, Category>
+	counterpartyById?: Record<number, DebtCounterparty>
 	onClick?: (item: TransactionFeedItem) => void
 }
 
-export const TransactionListItem = ({ item, walletById = {}, categoryById = {}, onClick }: TransactionListItemProps) => {
+export const TransactionListItem = ({ item, walletById = {}, categoryById = {}, counterpartyById = {}, onClick }: TransactionListItemProps) => {
 	const { t, locale } = useTranslation()
 	const category = item.categoryId ? categoryById[item.categoryId] : undefined
 	const wallet = item.walletId ? walletById[item.walletId] : undefined
 	const counterpartyWallet = item.counterpartyWalletId ? walletById[item.counterpartyWalletId] : undefined
-	const typeLabel = item.entryType === 'TRANSFER' ? t('transactions.item.transfer') : category?.name ?? t('transactions.item.transaction')
+	const debtCounterpartyId =
+		item.entryType === 'DEBT'
+			? item.debtCounterpartyId ?? item.counterpartyId ?? item.counterpartyWalletId ?? item.categoryId ?? null
+			: null
+	const debtCounterparty = debtCounterpartyId ? counterpartyById[debtCounterpartyId] : undefined
+	const debtCounterpartyName = item.entryType === 'DEBT' ? item.counterpartyName ?? debtCounterparty?.name ?? null : null
+	const debtCounterpartyColor = item.entryType === 'DEBT' ? item.counterpartyColor ?? debtCounterparty?.color ?? null : null
+	const typeLabel =
+		item.entryType === 'TRANSFER'
+			? t('transactions.item.transfer')
+			: item.entryType === 'DEBT'
+				? debtCounterpartyName ?? t('transactions.tabs.debt')
+				: (category?.name ?? t('transactions.item.transaction'))
 	const timeLabel = item.occurredAt ? new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(item.occurredAt)) : ''
 	const walletLabel = wallet?.name ?? item.walletId ?? '—'
 	const counterpartyLabel = counterpartyWallet?.name ?? item.counterpartyWalletId ?? null
 	const walletDisplay = item.entryType === 'TRANSFER' && counterpartyLabel ? `${walletLabel} → ${counterpartyLabel}` : walletLabel
 	const categoryIconName = category?.icon
 	const CategoryIcon: LucideIcon =
-		item.entryType === 'TRANSFER' ? BanknoteArrowDown : (categoryIconName && categoryIconMap[categoryIconName]) || BanknoteArrowDown
-	const categoryColor = category?.color || '#9CA3AF'
-	const amountClass = item.categoryType === 'EXPENSE' ? 'text-danger' : item.categoryType === 'INCOME' ? 'text-access' : 'text-text'
-	const amountPrefix = item.categoryType === 'EXPENSE' ? '-' : item.categoryType === 'INCOME' ? '+' : ''
+		item.entryType === 'TRANSFER'
+			? BanknoteArrowDown
+			: item.entryType === 'DEBT'
+				? UserRound
+				: (categoryIconName && categoryIconMap[categoryIconName]) || BanknoteArrowDown
+	const categoryColor = item.entryType === 'DEBT' ? debtCounterpartyColor || '#9CA3AF' : category?.color || '#9CA3AF'
+	const resolvedDebtType =
+		item.entryType === 'DEBT'
+			? item.debtDirection === 'BORROWED'
+				? 'INCOME'
+				: item.debtDirection === 'LENT'
+					? 'EXPENSE'
+					: item.categoryType ?? (item.amount < 0 ? 'EXPENSE' : item.amount > 0 ? 'INCOME' : null)
+			: item.categoryType
+	const amountClass =
+		item.entryType === 'DEBT'
+			? resolvedDebtType === 'INCOME'
+				? 'text-access'
+				: resolvedDebtType === 'EXPENSE'
+					? 'text-danger'
+					: 'text-text'
+			: item.categoryType === 'EXPENSE'
+				? 'text-danger'
+				: item.categoryType === 'INCOME'
+					? 'text-access'
+					: 'text-text'
+	const amountPrefix =
+		item.entryType === 'DEBT'
+			? resolvedDebtType === 'INCOME'
+				? '+'
+				: resolvedDebtType === 'EXPENSE'
+					? '-'
+					: ''
+			: item.categoryType === 'EXPENSE'
+				? '-'
+				: item.categoryType === 'INCOME'
+					? '+'
+					: ''
 
 	return (
 		<li className='text-sm'>

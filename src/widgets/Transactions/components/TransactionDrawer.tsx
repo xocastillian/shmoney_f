@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { X } from 'lucide-react'
+import { UserRound, X } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Loader from '@/components/ui/Loader/Loader'
@@ -14,6 +14,9 @@ import CategoriesDrawer from '@/widgets/Categories/components/CategoriesDrawer'
 import AddOrEditCategoryDrawer from '@/widgets/Categories/components/AddOrEditCategoryDrawer'
 import { useTranslation } from '@/i18n'
 import Drawer from '@/components/Drawer/Drawer'
+import type { DebtCounterparty } from '@/types/entities/debt'
+import DebtCounterpartiesDrawer from '@/widgets/Debts/components/DebtCounterpartiesDrawer'
+import AddOrEditDebtCounterpartyDrawer from '@/widgets/Debts/components/AddOrEditDebtCounterpartyDrawer'
 
 const lucideIconMap = LucideIcons as unknown as Record<string, LucideIcon | undefined>
 
@@ -33,6 +36,10 @@ interface TransactionDrawerProps {
 	onTransactionTypeChange: (type: TransactionTypeTabValue) => void
 	selectedCategory: Category | null
 	onSelectCategory: (category: Category | null) => void
+	selectedCounterparty: DebtCounterparty | null
+	onSelectCounterparty: (counterparty: DebtCounterparty | null) => void
+	isBorrowing: boolean
+	onBorrowingChange: (value: boolean) => void
 	description: string
 	onDescriptionChange: (value: string) => void
 	dateTime: string
@@ -62,6 +69,10 @@ export const TransactionDrawer = ({
 	onTransactionTypeChange,
 	selectedCategory,
 	onSelectCategory,
+	selectedCounterparty,
+	onSelectCounterparty,
+	isBorrowing,
+	onBorrowingChange,
 	description,
 	onDescriptionChange,
 	dateTime,
@@ -79,6 +90,9 @@ export const TransactionDrawer = ({
 	const [categoryPickerOpen, setCategoryPickerOpen] = useState(false)
 	const [isAddCategoryDrawerOpen, setAddCategoryDrawerOpen] = useState(false)
 	const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+	const [counterpartyPickerOpen, setCounterpartyPickerOpen] = useState(false)
+	const [isAddCounterpartyDrawerOpen, setAddCounterpartyDrawerOpen] = useState(false)
+	const [editingCounterparty, setEditingCounterparty] = useState<DebtCounterparty | null>(null)
 	const { t } = useTranslation()
 
 	useEffect(() => {
@@ -88,6 +102,9 @@ export const TransactionDrawer = ({
 			setCategoryPickerOpen(false)
 			setAddCategoryDrawerOpen(false)
 			setEditingCategory(null)
+			setCounterpartyPickerOpen(false)
+			setAddCounterpartyDrawerOpen(false)
+			setEditingCounterparty(null)
 		}
 	}, [open])
 
@@ -104,6 +121,21 @@ export const TransactionDrawer = ({
 	const handleSubmitCategory = () => {
 		setEditingCategory(null)
 		setAddCategoryDrawerOpen(false)
+	}
+
+	const handleOpenAddCounterpartyDrawer = () => {
+		setEditingCounterparty(null)
+		setAddCounterpartyDrawerOpen(true)
+	}
+
+	const closeAddCounterpartyDrawer = () => {
+		setEditingCounterparty(null)
+		setAddCounterpartyDrawerOpen(false)
+	}
+
+	const handleSubmitCounterparty = () => {
+		setEditingCounterparty(null)
+		setAddCounterpartyDrawerOpen(false)
 	}
 
 	const fromWalletCurrencyIcon = useMemo(() => (fromWallet?.currencyCode ? currencyIconMap[fromWallet.currencyCode] ?? null : null), [fromWallet])
@@ -133,6 +165,11 @@ export const TransactionDrawer = ({
 		)
 	}, [selectedCategory])
 	const categoryLabel = selectedCategory?.name ?? t('transactions.drawer.category')
+	const counterpartyLabel = selectedCounterparty?.name ?? t('transactions.form.counterpartyFallback')
+	const counterpartyIconNode = useMemo(() => {
+		if (!selectedCounterparty) return null
+		return <UserRound className='mr-3 h-6 w-6' color={selectedCounterparty.color || '#f89a04'} />
+	}, [selectedCounterparty])
 	const formTitle = mode === 'edit' ? t('transactions.drawer.editTitle') : t('transactions.drawer.newTitle')
 	const maxTransactionDate = new Date()
 
@@ -180,7 +217,14 @@ export const TransactionDrawer = ({
 							categorySelected={Boolean(selectedCategory)}
 							categoryIcon={categoryIconNode}
 							onOpenCategoryPicker={() => setCategoryPickerOpen(true)}
-							categoryPickerDisabled={transactionType === 'TRANSFER'}
+							categoryPickerDisabled={transactionType === 'TRANSFER' || transactionType === 'DEBT'}
+							counterpartyLabel={counterpartyLabel}
+							counterpartySelected={Boolean(selectedCounterparty)}
+							counterpartyIcon={counterpartyIconNode}
+							onOpenCounterpartyPicker={() => setCounterpartyPickerOpen(true)}
+							counterpartyPickerDisabled={false}
+							isBorrowing={isBorrowing}
+							onBorrowingChange={onBorrowingChange}
 							description={description}
 							onDescriptionChange={onDescriptionChange}
 							dateTime={dateTime}
@@ -246,6 +290,31 @@ export const TransactionDrawer = ({
 					setCategoryPickerOpen(false)
 					handleOpenAddCategoryDrawer()
 				}}
+			/>
+
+			<DebtCounterpartiesDrawer
+				open={counterpartyPickerOpen}
+				onClose={() => setCounterpartyPickerOpen(false)}
+				selectable
+				selectedCounterpartyId={selectedCounterparty?.id ?? null}
+				showArchived={false}
+				onSelect={counterparty => {
+					onSelectCounterparty(counterparty)
+					setCounterpartyPickerOpen(false)
+				}}
+				onAdd={() => {
+					setCounterpartyPickerOpen(false)
+					handleOpenAddCounterpartyDrawer()
+				}}
+			/>
+
+			<AddOrEditDebtCounterpartyDrawer
+				open={isAddCounterpartyDrawerOpen}
+				onClose={closeAddCounterpartyDrawer}
+				initialCounterparty={editingCounterparty ?? undefined}
+				onSubmit={handleSubmitCounterparty}
+				title={editingCounterparty ? t('debts.drawer.editTitle') : t('debts.drawer.newTitle')}
+				submitting={submitting}
 			/>
 
 			<AddOrEditCategoryDrawer

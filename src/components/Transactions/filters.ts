@@ -1,6 +1,8 @@
-export type TransactionFilterType = '' | 'EXPENSE' | 'INCOME' | 'TRANSFER'
+export type TransactionFilterType = '' | 'EXPENSE' | 'INCOME' | 'TRANSFER' | 'DEBT'
 
 export type TransactionPeriodFilter = '' | 'TODAY' | 'LAST_7_DAYS' | 'LAST_MONTH' | 'LAST_6_MONTHS' | 'LAST_YEAR'
+
+export type TransactionDebtDirection = '' | 'BORROWED' | 'LENT'
 
 export const periodOptions: Array<{ value: TransactionPeriodFilter; labelKey: string }> = [
 	{ value: '', labelKey: 'transactions.filters.period.pick' },
@@ -18,4 +20,6 @@ export interface TransactionsFilterState {
 	period: TransactionPeriodFilter
 	walletIds: number[]
 	categoryIds: number[]
+	debtCounterpartyIds: number[]
+	debtDirection: TransactionDebtDirection
 }

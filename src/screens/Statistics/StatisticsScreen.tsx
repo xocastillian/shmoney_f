@@ -12,8 +12,10 @@ import { useWallets } from '@/hooks/useWallets'
 import { useCategories } from '@/hooks/useCategories'
 import type { Wallet } from '@/types/entities/wallet'
 import type { Category } from '@/types/entities/category'
+import type { DebtCounterparty } from '@/types/entities/debt'
 import useTransactions from '@/hooks/useTransactions'
 import PeriodSwitcher from '@/components/ui/PeriodSwitcher'
+import useDebts from '@/hooks/useDebts'
 
 interface ChartCategoryDatum extends Record<string, unknown> {
 	categoryId: number
@@ -49,6 +51,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 	const { wallets, fetchWallets, clearWallets } = useWallets()
 	const { categories, fetchCategories, clearCategories } = useCategories()
 	const { feed } = useTransactions()
+	const { counterparties, fetchCounterparties, clearDebts } = useDebts()
 	const authenticated = useMemo(() => status === 'authenticated', [status])
 	const [selectedDate, setSelectedDate] = useState(() => new Date())
 	const periodRange = useMemo(() => getMonthRange(selectedDate), [selectedDate])
@@ -58,8 +61,9 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 			clear()
 			clearWallets()
 			clearCategories()
+			clearDebts()
 		}
-	}, [authenticated, clear, clearWallets, clearCategories])
+	}, [authenticated, clear, clearWallets, clearCategories, clearDebts])
 
 	useEffect(() => {
 		if (!authenticated) return
@@ -78,7 +82,10 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 		if (!categories.length) {
 			void fetchCategories().catch(() => undefined)
 		}
-	}, [authenticated, wallets.length, categories.length, fetchWallets, fetchCategories])
+		if (!counterparties.length) {
+			void fetchCounterparties().catch(() => undefined)
+		}
+	}, [authenticated, wallets.length, categories.length, counterparties.length, fetchWallets, fetchCategories, fetchCounterparties])
 
 	const chartData = useMemo<ChartCategoryDatum[]>(
 		() =>
@@ -141,6 +148,14 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 		}
 		return map
 	}, [categories])
+
+	const counterpartyById = useMemo(() => {
+		const map: Record<number, DebtCounterparty> = {}
+		for (const counterparty of counterparties) {
+			map[counterparty.id] = counterparty
+		}
+		return map
+	}, [counterparties])
 
 	const totalAmount = useMemo(() => chartData.reduce((sum, item) => sum + item.value, 0), [chartData])
 	const totalFormatted = currencyFormatter.format(totalAmount)
@@ -301,6 +316,7 @@ const StatisticsScreen = ({ onTransactionSelect }: StatisticsScreenProps) => {
 				items={drawerItems}
 				walletById={walletById}
 				categoryById={categoryById}
+				counterpartyById={counterpartyById}
 				initialLoading={drawerLoading}
 				error={drawerError}
 				onItemClick={onTransactionSelect}

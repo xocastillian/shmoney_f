@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useId, useMemo, useState, type FormEvent } from 'react'
-import { Home as HomeIcon, BarChart2, Wallet as WalletIcon, Settings } from 'lucide-react'
+import { Home as HomeIcon, BarChart2, Wallet as WalletIcon, Settings, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import HomeScreen from '@/screens/Home/HomeScreen'
 import StatisticsScreen from '@/screens/Statistics/StatisticsScreen'
 import BudgetsScreen from '@/screens/Budgets/BudgetsScreen'
 import SettingsScreen from '@/screens/Settings/SettingsScreen'
+import CounterpartiesScreen from '@/screens/Counterparties/CounterpartiesScreen'
 import TransactionDrawer from '@/widgets/Transactions/components/TransactionDrawer'
 import { useWallets } from '@/hooks/useWallets'
 import { useBudgets } from '@/hooks/useBudgets'
@@ -17,11 +18,15 @@ import { WalletDebetOrCredit, WalletStatus, WalletType } from '@/types/entities/
 import type { Category } from '@/types/entities/category'
 import { CategoryStatus } from '@/types/entities/category'
 import type { TransactionTypeTabValue } from '@/components/Transactions/TransactionTypeTabs'
-import type { TransactionFeedItem } from '@api/types'
+import type { CurrencyResponse, TransactionFeedItem } from '@api/types'
 import { disableVerticalSwipes, enableVerticalSwipes, isInTelegram } from '@/lib/telegram'
 import { useCategories } from '@/hooks/useCategories'
 import { useAuthStore } from '@/store/authStore'
 import { useSettings } from '@/hooks/useSettings'
+import useDebts from '@/hooks/useDebts'
+import type { DebtCounterparty } from '@/types/entities/debt'
+import { DebtCounterpartyStatus, DebtTransactionDirection } from '@/types/entities/debt'
+import { listCurrencies } from '@api/client'
 import Loader from './components/ui/Loader/Loader'
 import { useTranslation, type Locale } from './i18n'
 import { BottomNav, type BottomNavTab } from './components/ui/BottomNav/BottomNav'
@@ -33,7 +38,7 @@ import { CurrencyPickerDrawer } from '@/widgets/Wallets/components/CurrencyPicke
 import { colorOptions, currencyOptions } from '@/widgets/Wallets/constants'
 import { sanitizeDecimalInput } from '@/utils/number'
 
-type TabKey = 'home' | 'statistics' | 'budgets' | 'settings'
+type TabKey = 'home' | 'statistics' | 'budgets' | 'debtors' | 'settings'
 type CategoryTransactionTypeValue = Extract<TransactionTypeTabValue, 'EXPENSE' | 'INCOME'>
 
 const isCategoryTransactionType = (value: TransactionTypeTabValue): value is CategoryTransactionTypeValue => value === 'EXPENSE' || value === 'INCOME'
@@ -67,6 +72,14 @@ function App() {
 	const authStatus = useAuthStore(state => state.status)
 	const isAuthenticated = authStatus === 'authenticated'
 	const { fetchSettings, language, clear: clearSettings, supportedCurrencies, mainCurrency } = useSettings()
+	const {
+		createTransaction: createDebtTransaction,
+		updateTransaction: updateDebtTransaction,
+		deleteTransaction: deleteDebtTransaction,
+		fetchTransaction: fetchDebtTransaction,
+		fetchCounterparties,
+		counterparties,
+	} = useDebts()
 	const currencyPickerOptions = useMemo(() => {
 		if (!supportedCurrencies.length) {
 			return currencyOptions
@@ -86,6 +99,8 @@ function App() {
 	const [formError, setFormError] = useState<string | null>(null)
 	const [transactionType, setTransactionType] = useState<TransactionTypeTabValue>('EXPENSE')
 	const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+	const [selectedCounterparty, setSelectedCounterparty] = useState<DebtCounterparty | null>(null)
+	const [isBorrowing, setIsBorrowing] = useState(false)
 	const [isWalletFormOpen, setWalletFormOpen] = useState(false)
 	const [walletFormName, setWalletFormName] = useState('')
 	const [walletFormCurrencyCode, setWalletFormCurrencyCode] = useState(defaultCurrencyCode)
@@ -101,12 +116,14 @@ function App() {
 	const [currencyPickerOpen, setCurrencyPickerOpen] = useState(false)
 	const [transactionSubmitting, setTransactionSubmitting] = useState(false)
 	const [transactionError, setTransactionError] = useState<string | null>(null)
-	const [editingTransaction, setEditingTransaction] = useState<{ kind: 'TRANSFER' | 'CATEGORY'; id: number } | null>(null)
+	const [editingTransaction, setEditingTransaction] = useState<{ kind: 'TRANSFER' | 'CATEGORY' | 'DEBT'; id: number } | null>(null)
+	const [currencies, setCurrencies] = useState<CurrencyResponse[]>([])
 
 	useEffect(() => {
 		if (!isInTelegram()) return
 
 		disableVerticalSwipes()
+
 		return () => {
 			enableVerticalSwipes()
 		}
@@ -122,9 +139,15 @@ function App() {
 	}, [clearSettings, fetchSettings, isAuthenticated])
 
 	useEffect(() => {
-		if (language) {
-			setLocale(language as Locale)
-		}
+		if (!isAuthenticated || currencies.length > 0) return
+
+		listCurrencies()
+			.then(setCurrencies)
+			.catch(() => undefined)
+	}, [currencies.length, isAuthenticated])
+
+	useEffect(() => {
+		if (language) setLocale(language as Locale)
 	}, [language, setLocale])
 
 	useEffect(() => {
@@ -139,11 +162,11 @@ function App() {
 		() => [
 			{ key: 'home', label: t('bottomNav.home'), icon: HomeIcon },
 			{ key: 'statistics', label: t('bottomNav.statistics'), icon: BarChart2 },
-			{ key: 'create', variant: 'action' as const },
 			{ key: 'budgets', label: t('bottomNav.budgets'), icon: WalletIcon },
+			{ key: 'debtors', label: t('bottomNav.debtors'), icon: UserRound },
 			{ key: 'settings', label: t('bottomNav.settings'), icon: Settings },
 		],
-		[t]
+		[t],
 	)
 
 	const clearTransactionError = useCallback(() => setTransactionError(null), [])
@@ -176,11 +199,19 @@ function App() {
 		setFromWalletId(null)
 		setToWalletId(null)
 		setSelectedCategory(null)
+		setSelectedCounterparty(null)
+		setIsBorrowing(false)
 		setTransactionType('EXPENSE')
 		setFormError(null)
 		setTransactionError(null)
 		setTransactionSubmitting(false)
 	}, [])
+
+	const handleCreateTransaction = useCallback(() => {
+		resetForm()
+		setEditingTransaction(null)
+		setTransactionDrawerOpen(true)
+	}, [resetForm])
 
 	useEffect(() => {
 		if (!transactionDrawerOpen || !isAuthenticated) return
@@ -243,7 +274,7 @@ function App() {
 		!amountValid ||
 		!dateValid ||
 		fromWalletId === null ||
-		(transactionType === 'TRANSFER' ? toWalletId === null : selectedCategory === null)
+		(transactionType === 'TRANSFER' ? toWalletId === null : transactionType === 'DEBT' ? selectedCounterparty === null : selectedCategory === null)
 	const combinedError = formError ?? transactionError
 
 	const handleDrawerClose = useCallback(() => {
@@ -258,7 +289,7 @@ function App() {
 			setFormError(null)
 			clearTransactionError()
 		},
-		[clearTransactionError]
+		[clearTransactionError],
 	)
 
 	const handleDescriptionChange = useCallback(
@@ -267,7 +298,7 @@ function App() {
 			setFormError(null)
 			clearTransactionError()
 		},
-		[clearTransactionError]
+		[clearTransactionError],
 	)
 
 	const handleDateTimeChange = useCallback(
@@ -276,7 +307,7 @@ function App() {
 			setFormError(null)
 			clearTransactionError()
 		},
-		[clearTransactionError]
+		[clearTransactionError],
 	)
 
 	const handleSelectFromWallet = useCallback(
@@ -285,7 +316,7 @@ function App() {
 			setFormError(null)
 			clearTransactionError()
 		},
-		[clearTransactionError]
+		[clearTransactionError],
 	)
 
 	const handleSelectToWallet = useCallback(
@@ -294,7 +325,7 @@ function App() {
 			setFormError(null)
 			clearTransactionError()
 		},
-		[clearTransactionError]
+		[clearTransactionError],
 	)
 
 	const handleTransactionTypeChange = useCallback(
@@ -304,11 +335,19 @@ function App() {
 			clearTransactionError()
 			if (type === 'TRANSFER') {
 				setSelectedCategory(null)
+				setSelectedCounterparty(null)
 			} else {
 				setToWalletId(null)
 			}
+			if (type === 'DEBT') {
+				setSelectedCategory(null)
+				setToWalletId(null)
+				setIsBorrowing(false)
+			} else {
+				setSelectedCounterparty(null)
+			}
 		},
-		[clearTransactionError]
+		[clearTransactionError],
 	)
 
 	const handleSelectCategory = useCallback(
@@ -317,7 +356,16 @@ function App() {
 			setFormError(null)
 			clearTransactionError()
 		},
-		[clearTransactionError]
+		[clearTransactionError],
+	)
+
+	const handleSelectCounterparty = useCallback(
+		(counterparty: DebtCounterparty | null) => {
+			setSelectedCounterparty(counterparty)
+			setFormError(null)
+			clearTransactionError()
+		},
+		[clearTransactionError],
 	)
 
 	const handleWalletFormSubmit = useCallback(
@@ -379,7 +427,7 @@ function App() {
 			walletFormName,
 			walletFormType,
 			walletFormDebetOrCredit,
-		]
+		],
 	)
 
 	const handleTransactionSelect = useCallback(
@@ -396,7 +444,33 @@ function App() {
 					setDescription(detail.description ?? '')
 					setDateTime(formatDateTimeLocal(detail.executedAt ? new Date(detail.executedAt) : new Date()))
 					setSelectedCategory(null)
+					setSelectedCounterparty(null)
+					setIsBorrowing(false)
 					setEditingTransaction({ kind: 'TRANSFER', id: detail.id })
+				} else if (item.entryType === 'DEBT') {
+					const detail = await fetchDebtTransaction(item.id)
+					setTransactionType('DEBT')
+					setFromWalletId(detail.walletId)
+					setToWalletId(null)
+					setSelectedCategory(null)
+					const matchedCounterparty = counterparties.find(counterparty => counterparty.id === detail.counterpartyId)
+					const fallbackCounterparty: DebtCounterparty = matchedCounterparty ?? {
+						id: detail.counterpartyId,
+						name: detail.counterpartyName,
+						color: '#9CA3AF',
+						currencyCode: detail.currencyCode,
+						owedToMe: 0,
+						iOwe: 0,
+						status: DebtCounterpartyStatus.ACTIVE,
+						createdAt: null,
+						updatedAt: null,
+					}
+					setSelectedCounterparty(fallbackCounterparty)
+					setIsBorrowing(detail.direction === DebtTransactionDirection.BORROWED)
+					setAmount(detail.amount.toString())
+					setDescription(detail.description ?? '')
+					setDateTime(formatDateTimeLocal(new Date(detail.occurredAt)))
+					setEditingTransaction({ kind: 'DEBT', id: detail.id })
 				} else {
 					const detail = await getCategoryTransaction(item.id)
 					setTransactionType(detail.type)
@@ -413,6 +487,8 @@ function App() {
 						updatedAt: null,
 					}
 					setSelectedCategory(fallbackCategory)
+					setSelectedCounterparty(null)
+					setIsBorrowing(false)
 					setAmount(detail.amount.toString())
 					setDescription(detail.description ?? '')
 					setDateTime(formatDateTimeLocal(new Date(detail.occurredAt)))
@@ -424,7 +500,7 @@ function App() {
 				setTransactionError(message)
 			}
 		},
-		[getWalletTransaction, getCategoryTransaction, categories, clearTransactionError]
+		[getWalletTransaction, getCategoryTransaction, fetchDebtTransaction, categories, counterparties, clearTransactionError],
 	)
 
 	const handleDeleteTransaction = useCallback(async () => {
@@ -434,9 +510,12 @@ function App() {
 		try {
 			if (editingTransaction.kind === 'TRANSFER') {
 				await deleteWalletTransaction(editingTransaction.id)
+			} else if (editingTransaction.kind === 'DEBT') {
+				await deleteDebtTransaction(editingTransaction.id)
 			} else {
 				await deleteCategoryTransaction(editingTransaction.id)
 			}
+			void fetchCounterparties().catch(() => undefined)
 			void fetchWallets().catch(() => undefined)
 			void fetchWalletBalances().catch(() => undefined)
 			void fetchTransactionFeed().catch(() => undefined)
@@ -452,7 +531,9 @@ function App() {
 	}, [
 		editingTransaction,
 		deleteWalletTransaction,
+		deleteDebtTransaction,
 		deleteCategoryTransaction,
+		fetchCounterparties,
 		fetchWalletBalances,
 		fetchWallets,
 		fetchTransactionFeed,
@@ -464,7 +545,16 @@ function App() {
 	const handleSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
 			event.preventDefault()
-			if (submitDisabled || fromWalletId === null || (transactionType === 'TRANSFER' ? toWalletId === null : selectedCategory === null)) {
+
+			if (
+				submitDisabled ||
+				fromWalletId === null ||
+				(transactionType === 'TRANSFER'
+					? toWalletId === null
+					: transactionType === 'DEBT'
+						? selectedCounterparty === null
+						: selectedCategory === null)
+			) {
 				return
 			}
 
@@ -493,6 +583,22 @@ function App() {
 							description: description.trim() || undefined,
 							executedAt,
 						})
+					} else if (editingTransaction.kind === 'DEBT') {
+						const selectedWallet = wallets.find(wallet => wallet.id === fromWalletId) ?? null
+						const currencyId = currencies.find(item => item.code === selectedWallet?.currencyCode)?.id ?? null
+						if (!currencyId) {
+							setFormError(t('debts.errors.currencyMissing'))
+							return
+						}
+						await updateDebtTransaction(editingTransaction.id, {
+							counterpartyId: selectedCounterparty!.id,
+							walletId: fromWalletId,
+							direction: isBorrowing ? DebtTransactionDirection.BORROWED : DebtTransactionDirection.LENT,
+							amount: parsedAmount,
+							currencyId,
+							occurredAt: executedAt,
+							description: description.trim() || undefined,
+						})
 					} else {
 						if (!isCategoryTransactionType(transactionType)) {
 							setFormError('Некорректный тип транзакции')
@@ -515,11 +621,30 @@ function App() {
 						description: description.trim() || undefined,
 						executedAt,
 					})
+				} else if (transactionType === 'DEBT') {
+					const selectedWallet = wallets.find(wallet => wallet.id === fromWalletId) ?? null
+					const currencyId = currencies.find(item => item.code === selectedWallet?.currencyCode)?.id ?? null
+
+					if (!currencyId) {
+						setFormError(t('debts.errors.currencyMissing'))
+						return
+					}
+
+					await createDebtTransaction({
+						counterpartyId: selectedCounterparty!.id,
+						walletId: fromWalletId,
+						direction: isBorrowing ? DebtTransactionDirection.BORROWED : DebtTransactionDirection.LENT,
+						amount: parsedAmount,
+						currencyId,
+						occurredAt: executedAt,
+						description: description.trim() || undefined,
+					})
 				} else {
 					if (!isCategoryTransactionType(transactionType)) {
 						setFormError('Некорректный тип транзакции')
 						return
 					}
+
 					await createCategoryTransaction({
 						walletId: fromWalletId,
 						categoryId: selectedCategory!.id,
@@ -530,11 +655,13 @@ function App() {
 					})
 				}
 
+				void fetchCounterparties().catch(() => undefined)
 				void fetchWallets().catch(() => undefined)
 				void fetchWalletBalances().catch(() => undefined)
 				void fetchTransactionFeed().catch(() => undefined)
 				void fetchBudgets().catch(() => undefined)
 				void refreshAnalytics().catch(() => undefined)
+
 				handleDrawerClose()
 			} catch (err) {
 				const message = err instanceof Error ? err.message : 'Не удалось сохранить транзакцию'
@@ -549,21 +676,29 @@ function App() {
 			fromWalletId,
 			toWalletId,
 			selectedCategory,
+			selectedCounterparty,
+			isBorrowing,
 			amount,
 			dateTime,
 			description,
 			editingTransaction,
 			createWalletTransaction,
 			createCategoryTransaction,
+			createDebtTransaction,
 			updateWalletTransaction,
+			updateDebtTransaction,
 			updateCategoryTransaction,
 			fetchTransactionFeed,
+			fetchCounterparties,
 			fetchWallets,
 			handleDrawerClose,
 			fetchWalletBalances,
 			fetchBudgets,
 			refreshAnalytics,
-		]
+			currencies,
+			wallets,
+			t,
+		],
 	)
 
 	return (
@@ -571,7 +706,7 @@ function App() {
 			<div className='relative z-10'>
 				<main>
 					<section className={cn('min-h-screen', activeTab === 'home' ? 'block' : 'hidden')}>
-						<HomeScreen onTransactionSelect={handleTransactionSelect} />
+						<HomeScreen onTransactionSelect={handleTransactionSelect} onCreateTransaction={handleCreateTransaction} />
 					</section>
 
 					<section className={cn('min-h-screen', activeTab === 'statistics' ? 'block' : 'hidden')}>
@@ -585,17 +720,16 @@ function App() {
 					<section className={cn('min-h-screen', activeTab === 'settings' ? 'block' : 'hidden')}>
 						<SettingsScreen />
 					</section>
+
+					<section className={cn('min-h-screen', activeTab === 'debtors' ? 'block' : 'hidden')}>
+						<CounterpartiesScreen />
+					</section>
 				</main>
 
 				<BottomNav
 					tabs={tabs}
 					activeKey={activeTab}
 					onTabChange={value => setActiveTab(value as TabKey)}
-					onCreate={() => {
-						resetForm()
-						setEditingTransaction(null)
-						setTransactionDrawerOpen(true)
-					}}
 				/>
 
 				<TransactionDrawer
@@ -614,6 +748,10 @@ function App() {
 					onTransactionTypeChange={handleTransactionTypeChange}
 					selectedCategory={selectedCategory}
 					onSelectCategory={handleSelectCategory}
+					selectedCounterparty={selectedCounterparty}
+					onSelectCounterparty={handleSelectCounterparty}
+					isBorrowing={isBorrowing}
+					onBorrowingChange={setIsBorrowing}
 					description={description}
 					onDescriptionChange={handleDescriptionChange}
 					dateTime={dateTime}
