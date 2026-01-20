@@ -138,7 +138,7 @@ export const TransactionDrawer = ({
 		setAddCounterpartyDrawerOpen(false)
 	}
 
-	const fromWalletCurrencyIcon = useMemo(() => (fromWallet?.currencyCode ? currencyIconMap[fromWallet.currencyCode] ?? null : null), [fromWallet])
+	const fromWalletCurrencyIcon = useMemo(() => (fromWallet?.currencyCode ? (currencyIconMap[fromWallet.currencyCode] ?? null) : null), [fromWallet])
 	const fromWalletIcon = useMemo(() => getWalletIcon(fromWallet), [fromWallet])
 	const toWalletIcon = useMemo(() => getWalletIcon(toWallet), [toWallet])
 	const fromWalletLabel =
@@ -191,7 +191,7 @@ export const TransactionDrawer = ({
 						</div>
 					)}
 
-					<div className='overflow-auto flex-1 px-0 py-3 pb-10'>
+					<div className='overflow-y-auto flex-1 px-0 py-3 pb-10 overflow-x-hidden'>
 						<TransactionForm
 							formId={formId}
 							onSubmit={onSubmit}
