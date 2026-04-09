@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BudgetCard } from '@/components/BudgetCard/BudgetCard'
-import BudgetStatusTabs from '@/screens/Budgets/components/BudgetStatusTabs'
 import BudgetDrawer from '@/widgets/Budgets/BudgetDrawer'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useTelegramAuth } from '@/hooks/useTelegramAuth'
@@ -29,7 +28,6 @@ const BudgetsScreen = () => {
 	const resolvedLocale = localeMap[locale] ?? localeMap.ru
 	const [drawerOpen, setDrawerOpen] = useState(false)
 	const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
-	const [statusFilter, setStatusFilter] = useState<BudgetStatus>(BudgetStatus.ACTIVE)
 
 	const formatCurrency = useCallback(
 		(value: number, currencyCode: string) => {
@@ -65,11 +63,11 @@ const BudgetsScreen = () => {
 	const loadBudgets = useCallback(async () => {
 		if (!authenticated) return
 		try {
-			await fetchBudgets({ status: statusFilter })
+			await fetchBudgets({ status: BudgetStatus.ACTIVE })
 		} catch {
 			// ошибка уже прокидывается хуком
 		}
-	}, [authenticated, fetchBudgets, statusFilter])
+	}, [authenticated, fetchBudgets])
 
 	useEffect(() => {
 		if (!authenticated) {
@@ -82,9 +80,9 @@ const BudgetsScreen = () => {
 	const sections = useMemo(() => {
 		return PERIOD_SECTIONS.map(section => ({
 			...section,
-			items: budgets.filter(budget => budget.periodType === section.type && budget.status === statusFilter),
+			items: budgets.filter(budget => budget.periodType === section.type && budget.status === BudgetStatus.ACTIVE),
 		})).filter(section => section.items.length > 0)
-	}, [budgets, statusFilter])
+	}, [budgets])
 
 	const isEmpty = !loading && sections.length === 0
 
@@ -106,9 +104,6 @@ const BudgetsScreen = () => {
 					<button className='p-2' onClick={handleOpenCreate}>
 						<Plus className='h-6 w-6' />
 					</button>
-				</div>
-				<div className='px-3'>
-					<BudgetStatusTabs value={statusFilter} onChange={setStatusFilter} className='rounded-xl' />
 				</div>
 			</header>
 
