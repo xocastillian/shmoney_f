@@ -66,7 +66,7 @@ export const ru: TranslationDictionary = {
 	'transactions.form.to': 'Куда',
 	'transactions.form.categoryFallback': 'Категория',
 	'transactions.form.counterpartyFallback': 'Кому',
-	'transactions.form.borrowToggle': 'Я беру в долг',
+	'transactions.form.borrowToggle': 'Я беру в долг / Мне возвращают',
 	'transactions.form.description': 'Описание (опционально)',
 	'transactions.form.date': 'Дата и время',
 	'transactions.form.delete': 'Удалить',
